@@ -1,0 +1,284 @@
+{
+  "adraSOL": {
+    "symbol": "adraSOL",
+    "underlying_mint": "sctmY8fJucsJatwHz6P48RuWBBkdBMNmSMuBYrWFdrw",
+    "vault": "3tYeKEBZxcGcuZiEoDMQvn81q4MXnCzqSnUUUcWpPgeb",
+    "decimals": 9
+  },
+  "bSOL": {
+    "symbol": "bSOL",
+    "underlying_mint": "bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1",
+    "vault": "AQeaZUp248NPCBwRuVPzCsN3DX6DsgVHyiE25z6eEeAs",
+    "decimals": 9
+  },
+  "tBTC": {
+    "symbol": "tBTC",
+    "underlying_mint": "6DNSN2BJsaPFdFFc1zP37kkeNe4Usc1Sqkzr9C9vPWcU",
+    "vault": "J2Ex2efY1e9TizMrjFQqtqGTwNBx888GTctHEkWemThV",
+    "decimals": 8
+  },
+  "EURC": {
+    "symbol": "EURC",
+    "underlying_mint": "HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr",
+    "vault": "DrZeFpbzMXmNnMqsQFngQeJiVgUpX8vaCHoJKj9FGMYv",
+    "decimals": 6
+  },
+  "bbSOL": {
+    "symbol": "bbSOL",
+    "underlying_mint": "Bybit2vBJGhPF52GBdNaQfUJ6ZpThSgHBobjWZpLPb4B",
+    "vault": "5cda5cLwVatEY1z3tJ3LmVe9tzsqCeHv39HtyUtTpNAM",
+    "decimals": 9
+  },
+  "JTO": {
+    "symbol": "JTO",
+    "underlying_mint": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+    "vault": "FBhE6TAt6vtpcZaCKNkttAJqzTLGpfYDchfziw9dgFiL",
+    "decimals": 9
+  },
+  "hSOL": {
+    "symbol": "hSOL",
+    "underlying_mint": "he1iusmfkpAdwvxLNGV8Y1iSbj4rUy6yMhEA3fotn9A",
+    "vault": "3mLgvnLFbyq4U1pLYvLQu8t3ZJ1Rjzq1dby6fWi7bfqi",
+    "decimals": 9
+  },
+  "USDT": {
+    "symbol": "USDT",
+    "underlying_mint": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "vault": "2Eff8Udy2G2gzNcf2619AnTx3xM4renEv4QrHKjS1o9N",
+    "decimals": 6
+  },
+  "JupSOL": {
+    "symbol": "JupSOL",
+    "underlying_mint": "jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v",
+    "vault": "FbbgvvnwfN25cyX52Zqut2ZTbtvCWZbhKS177gfdUd6K",
+    "decimals": 9
+  },
+  "xBTC": {
+    "symbol": "xBTC",
+    "underlying_mint": "CtzPWv73Sn1dMGVU3ZtLv9yWSyUAanBni19YWDaznnkn",
+    "vault": "FT8Kf9pcawxAW7AuoKoe48LXsz6E2tS34oR9SJLMq5HL",
+    "decimals": 8
+  },
+  "USDH": {
+    "symbol": "USDH",
+    "underlying_mint": "USDH1SM1ojwWUga67PGrgFWUHibbjqMvuMaDkRJTgkX",
+    "vault": "DZyy6x2SrRSSpaWwM6fDgiqwkdqTqf61frmnvaBHuLT6",
+    "decimals": 6
+  },
+  "laineSOL": {
+    "symbol": "laineSOL",
+    "underlying_mint": "LAinEtNLgpmCP9Rvsf5Hn8W6EhNiKLZQti1xfWMLy6X",
+    "vault": "GBty2bfL5sS74eaERsbXuoyefjJERyANsqjutmRSh2vS",
+    "decimals": 9
+  },
+  "USDG": {
+    "symbol": "USDG",
+    "underlying_mint": "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+    "vault": "DGBo8HmL7pBWBZLGePjHQ73JKRE37HVZ7ZbjA2FYUZHZ",
+    "decimals": 6
+  },
+  "kSOLMSOLRaydium": {
+    "symbol": "kSOLMSOLRaydium",
+    "underlying_mint": "3Fb5DMRWoBLWD36Lp4BtG41LaFjVeEJNCH9YLNPYdVqj",
+    "vault": "6kF1hRfx9nMnSnkuBtCXA2xYCcyC23omhDXJx8V6dLRG",
+    "decimals": 6
+  },
+  "kUXDUSDCOrca": {
+    "symbol": "kUXDUSDCOrca",
+    "underlying_mint": "4G9USgnbg6fDTQ5AUfpCjM89zqbzWj32xfqvsaAu66DM",
+    "vault": "5srbg3QKPf2mSX5Sb8FtK6Azzu33fNkpDXiGcWtqy8Vx",
+    "decimals": 6
+  },
+  "cgntSOL": {
+    "symbol": "cgntSOL",
+    "underlying_mint": "CgnTSoL3DgY9SFHxcLj6CgCgKKoTBr6tp4CPAEWy25DE",
+    "vault": "6jcTTL6Usm2i87XMSerXTo3dVpx3jAuuhuVxPLLHePs5",
+    "decimals": 9
+  },
+  "JITOSOL": {
+    "symbol": "JITOSOL",
+    "underlying_mint": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
+    "vault": "6sga1yRArgQRqa8Darhm54EBromEpV3z8iDAvMTVYXB3",
+    "decimals": 9
+  },
+  "cdcSOL": {
+    "symbol": "cdcSOL",
+    "underlying_mint": "CDCSoLckzozyktpAp9FWT3w92KFJVEUxAU7cNu2Jn3aX",
+    "vault": "98yKLQA7QsU9ND1ejmSVbqnvfZ9TZqswtTedbfFFG1Ur",
+    "decimals": 9
+  },
+  "UXD": {
+    "symbol": "UXD",
+    "underlying_mint": "7kbnvuGBxxj8AG9qp8Scn56muWGaRaFqxg1FsRp3PaFT",
+    "vault": "BD42Tzzh2DBiL4aqbNPP46MRTom451Aa2vPuHgVCrrqD",
+    "decimals": 6
+  },
+  "WBTC": {
+    "symbol": "WBTC",
+    "underlying_mint": "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
+    "vault": "3y8JYyF8HPPK5YeUzxPPEvAahdPX4Z5wdZTiVc1atuQi",
+    "decimals": 8
+  },
+  "cbBTC": {
+    "symbol": "cbBTC",
+    "underlying_mint": "cbbtcf3aa214zXHbiAZQwf4122FBYbraNdFqgw4iMij",
+    "vault": "BcPpdmg4vxXSenvkp12XbVp6XnzwKChnzfNa6cQXLW96",
+    "decimals": 8
+  },
+  "dfdvSOL": {
+    "symbol": "dfdvSOL",
+    "underlying_mint": "sctmB7GPi5L2Q5G9tUSzXvhZ4YiDMEGcRov9KfArQpx",
+    "vault": "ABXjerwMyHoTJ28yPv8RAMPU6XimqNCzx65kintzEbEU",
+    "decimals": 9
+  },
+  "strongSOL": {
+    "symbol": "strongSOL",
+    "underlying_mint": "strng7mqqc1MBJJV6vMzYbEqnwVGvKKGKedeCvtktWA",
+    "vault": "91eZvHs1J6JUeis7U48Ykrsudvb867VfnZBdyYKiaTyu",
+    "decimals": 9
+  },
+  "bonkSOL": {
+    "symbol": "bonkSOL",
+    "underlying_mint": "BonK1YhkXEGLZzwtcvRTip3gAL9nCeQD7ppZBLXhtTs",
+    "vault": "DdFQdzd27qYMhGeSjLXgkzfGSzr4j2hATyWkETyPvUsk",
+    "decimals": 9
+  },
+  "lanternSOL": {
+    "symbol": "lanternSOL",
+    "underlying_mint": "LnTRntk2kTfWEY6cVB8K9649pgJbt6dJLS1Ns1GZCWg",
+    "vault": "EgJnCq2QZ89JBNfxgaKob3EAKna2UgBjHHpUZx2RQig",
+    "decimals": 9
+  },
+  "picoSOL": {
+    "symbol": "picoSOL",
+    "underlying_mint": "picobAEvs6w7QEknPce34wAE4gknZA9v5tTonnmHYdX",
+    "vault": "Gm8VfrmSViEaVjgzQonvV53EK834hcHXRE8DpfxjJe2b",
+    "decimals": 9
+  },
+  "hubSOL": {
+    "symbol": "hubSOL",
+    "underlying_mint": "HUBsveNpjo5pWqNkH57QzxjQASdTVXcSK7bVKTSZtcSX",
+    "vault": "HsT1ceN4BAkKHBARnciNHuwzbaHbWJkkrZibQwHKKuZw",
+    "decimals": 9
+  },
+  "USDC": {
+    "symbol": "USDC",
+    "underlying_mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "vault": "Bgq7trRgVMeq33yt235zM2onQ4bRDBsY5EWiTetF4qw6",
+    "decimals": 6
+  },
+  "bnSOL": {
+    "symbol": "bnSOL",
+    "underlying_mint": "BNso1VUJnh4zcfpZa6986Ea66P6TCp59hvtNJ8b1X85",
+    "vault": "DvB11zGUS4RxMGNNpLD9s93N4nuNsu6Yjhg1mhoLHjgw",
+    "decimals": 9
+  },
+  "jSOL": {
+    "symbol": "jSOL",
+    "underlying_mint": "7Q2afV64in6N6SeZsAAB81TJzwDoD6zpqmHkzi9Dcavn",
+    "vault": "BkCTFeGZ19hGZCo6dG4uBXEF9cC5LbTEMpKxwJUsnFFM",
+    "decimals": 9
+  },
+  "FDUSD": {
+    "symbol": "FDUSD",
+    "underlying_mint": "9zNQRsGLjNKwCUU5Gq5LR8beUCPzQMVMqKAi3SSZh54u",
+    "vault": "77NygHBchudmJPaWi8ak4vNVmuJa1JD5rFDBthxhd6p3",
+    "decimals": 6
+  },
+  "fwdSOL": {
+    "symbol": "fwdSOL",
+    "underlying_mint": "cPQPBN7WubB3zyQDpzTK2ormx1BMdAym9xkrYUJsctm",
+    "vault": "CeaWp9abvGqdB4SBJufz7RpZbfHneuhQimKU7MKCayhx",
+    "decimals": 9
+  },
+  "CASH": {
+    "symbol": "CASH",
+    "underlying_mint": "CASHx9KJUStyftLFWGvEVf59SGeG9sh5FfcnZMVPCASH",
+    "vault": "7Emb9oP2pbrHvvfueXEbt1DbT9Qet454jgQmmz8yNZ3P",
+    "decimals": 6
+  },
+  "SOL": {
+    "symbol": "SOL",
+    "underlying_mint": "So11111111111111111111111111111111111111112",
+    "vault": "GafNuUXj9rxGLn4y79dPu6MHSuPWeJR6UtTWuexpGh3U",
+    "decimals": 9
+  },
+  "MSOL": {
+    "symbol": "MSOL",
+    "underlying_mint": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+    "vault": "CQWUdThEbNMjcoEjGyCMTGXHpKvW1aB8JF31hKa1FQQN",
+    "decimals": 9
+  },
+  "kSOLBSOLOrca": {
+    "symbol": "kSOLBSOLOrca",
+    "underlying_mint": "9HB4kAMLSYfGFfN142DKMyPyHyZQ8pXF8M1STbDudodY",
+    "vault": "7czHgMf1mgWWhLoXYy1FJtnLhvmCfnSUc4fRYLQkjcix",
+    "decimals": 6
+  },
+  "pSOL": {
+    "symbol": "pSOL",
+    "underlying_mint": "pSo1f9nQXWgXibFtKf7NWYxb5enAM4qfP6UJSiXRQfL",
+    "vault": "CorvqWkB9rRNQzwXXVyg52ASor8aDpFkEwaYnFhD2vnF",
+    "decimals": 9
+  },
+  "ETH": {
+    "symbol": "ETH",
+    "underlying_mint": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+    "vault": "GRGmgWor2PX3sNkoA5wZuNBBYoCnZPoiAufAVvG3WDEi",
+    "decimals": 8
+  },
+  "JLP": {
+    "symbol": "JLP",
+    "underlying_mint": "27G8MtK7VtTcCHkpASjSDdkWWYfoqT6ggEuKidVJidD4",
+    "vault": "7dD6bhVgWtxyQPDAuM6Vprd22K7H6xzDYdsUbg9B3KUC",
+    "decimals": 6
+  },
+  "wstETH": {
+    "symbol": "wstETH",
+    "underlying_mint": "ZScHuTtqZukUrtZS43teTKGs2VqkKL8k4QCouR2n6Uo",
+    "vault": "3VyrRzpif94xAATHxERnDyJuiVPJGXeNd4U77Kcq47M1",
+    "decimals": 8
+  },
+  "nxSOL": {
+    "symbol": "nxSOL",
+    "underlying_mint": "sctmTAsDn4tLUcemqoqYijfuRkiEfAMPi84PNq2EueR",
+    "vault": "6JbDFb63BrXoHf4XkVEpRZLS13gyC8Phb5YQmhEBLave",
+    "decimals": 9
+  },
+  "PYUSD": {
+    "symbol": "PYUSD",
+    "underlying_mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+    "vault": "Gm2itCNPBpBSSrgCA194pmErjwHAFVpvBBFvpdTF5LuJ",
+    "decimals": 6
+  },
+  "USDS": {
+    "symbol": "USDS",
+    "underlying_mint": "USDSwr9ApdHk5bvJKMjzff41FfuX8bSxdKcR81vTwcA",
+    "vault": "4aE6ow1YNDm9MRNdk8HRzFFzvs9FXBgEttWSMrH6hupD",
+    "decimals": 6
+  },
+  "vSOL": {
+    "symbol": "vSOL",
+    "underlying_mint": "vSoLxydx6akxyMD9XEcPvGYNGq6Nn66oqVb3UkGkei7",
+    "vault": "6P5r6VmS7FL8fZa3h2oGbEbc1mZppHq5orHFee6SL3UE",
+    "decimals": 9
+  },
+  "kSOLJITOSOLRaydium": {
+    "symbol": "kSOLJITOSOLRaydium",
+    "underlying_mint": "GYiUmJ8reqYAdTQtx6CRFawHqPXx9yzkUFvaUVE8PskP",
+    "vault": "4oFVUAYbkVZX6CqmfKPCYua3LpuKHxjCE6sgpbmcjXn1",
+    "decimals": 6
+  },
+  "JUP": {
+    "symbol": "JUP",
+    "underlying_mint": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+    "vault": "4AWAjssbahfbzS7Qs3DJ7588CsCKyNPYcVw9ztENtv23",
+    "decimals": 6
+  },
+  "dSOL": {
+    "symbol": "dSOL",
+    "underlying_mint": "Dso1bDeDjCQxTrWHqUUi63oBvV7Mdm6WaobLbQ7gnPQ",
+    "vault": "EyhsTc5zapEWfuigEfUmPAywmsq5VQDrWscj45cKrHo",
+    "decimals": 9
+  }
+}

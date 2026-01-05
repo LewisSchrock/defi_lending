@@ -1,0 +1,84 @@
+import { Address, GetAccountInfoApi, GetMultipleAccountsApi, Rpc } from "@solana/kit";
+import BN from "bn.js";
+import * as types from "../types";
+export interface PositionRequestFields {
+    owner: Address;
+    pool: Address;
+    custody: Address;
+    position: Address;
+    mint: Address;
+    openTime: BN;
+    updateTime: BN;
+    sizeUsdDelta: BN;
+    collateralDelta: BN;
+    requestChange: types.RequestChangeKind;
+    requestType: types.RequestTypeKind;
+    side: types.SideKind;
+    priceSlippage: BN | null;
+    jupiterMinimumOut: BN | null;
+    preSwapAmount: BN | null;
+    triggerPrice: BN | null;
+    triggerAboveThreshold: boolean | null;
+    entirePosition: boolean | null;
+    executed: boolean;
+    counter: BN;
+    bump: number;
+    referral: Address | null;
+}
+export interface PositionRequestJSON {
+    owner: string;
+    pool: string;
+    custody: string;
+    position: string;
+    mint: string;
+    openTime: string;
+    updateTime: string;
+    sizeUsdDelta: string;
+    collateralDelta: string;
+    requestChange: types.RequestChangeJSON;
+    requestType: types.RequestTypeJSON;
+    side: types.SideJSON;
+    priceSlippage: string | null;
+    jupiterMinimumOut: string | null;
+    preSwapAmount: string | null;
+    triggerPrice: string | null;
+    triggerAboveThreshold: boolean | null;
+    entirePosition: boolean | null;
+    executed: boolean;
+    counter: string;
+    bump: number;
+    referral: string | null;
+}
+export declare class PositionRequest {
+    readonly owner: Address;
+    readonly pool: Address;
+    readonly custody: Address;
+    readonly position: Address;
+    readonly mint: Address;
+    readonly openTime: BN;
+    readonly updateTime: BN;
+    readonly sizeUsdDelta: BN;
+    readonly collateralDelta: BN;
+    readonly requestChange: types.RequestChangeKind;
+    readonly requestType: types.RequestTypeKind;
+    readonly side: types.SideKind;
+    readonly priceSlippage: BN | null;
+    readonly jupiterMinimumOut: BN | null;
+    readonly preSwapAmount: BN | null;
+    readonly triggerPrice: BN | null;
+    readonly triggerAboveThreshold: boolean | null;
+    readonly entirePosition: boolean | null;
+    readonly executed: boolean;
+    readonly counter: BN;
+    readonly bump: number;
+    readonly referral: Address | null;
+    static readonly discriminator: Buffer<ArrayBuffer>;
+    static readonly layout: import("buffer-layout").Layout<PositionRequest>;
+    constructor(fields: PositionRequestFields);
+    static fetch(rpc: Rpc<GetAccountInfoApi>, address: Address, programId?: Address): Promise<PositionRequest | null>;
+    static fetchMultiple(rpc: Rpc<GetMultipleAccountsApi>, addresses: Address[], programId?: Address): Promise<Array<PositionRequest | null>>;
+    static decode(data: Buffer): PositionRequest;
+    toJSON(): PositionRequestJSON;
+    static fromJSON(obj: PositionRequestJSON): PositionRequest;
+}
+//# sourceMappingURL=PositionRequest.d.ts.map

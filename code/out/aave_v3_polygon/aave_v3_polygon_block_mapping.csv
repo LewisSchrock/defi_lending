@@ -1,0 +1,4 @@
+date_ny,chain,protocol,csu,ts_start_utc,ts_end_utc,block_number
+2025-11-12,polygon,aave,aave_v3_polygon,1762923600,1763010000,78952556
+2025-11-13,polygon,aave,aave_v3_polygon,1763010000,1763096400,78995750
+2025-11-14,polygon,aave,aave_v3_polygon,1763096400,1763182800,79038889

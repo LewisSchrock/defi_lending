@@ -1,0 +1,18 @@
+# chains.yaml (example CSUs)
+csus:
+  aave_v3_ethereum:
+    protocol: aave
+    version: v3
+    chain: ethereum
+    rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+    registry: "0xA97684ead0e402dC232d5A977953DF7ECBaB3CDb"  # Aave V3 AddressesProvider on Ethereum
+    outputs_dir: "./out/aave_v3_ethereum"
+
+  # Add more chains the same way (replace RPC and registry):
+  # aave_v3_polygon:
+  #   protocol: aave
+  #   version: v3
+  #   chain: polygon
+  #   rpc: "https://polygon-rpc.com"
+  #   registry: "0x..."   # Aave V3 AddressesProvider on Polygon
+  #   outputs_dir: "./out/aave_v3_polygon"

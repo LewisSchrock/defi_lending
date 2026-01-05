@@ -1,0 +1,87 @@
+import { Address, GetAccountInfoApi, GetMultipleAccountsApi, Rpc } from "@solana/kit";
+import BN from "bn.js";
+import * as types from "../types";
+export interface OracleQueueAccountDataFields {
+    name: Array<number>;
+    metadata: Array<number>;
+    authority: Address;
+    oracleTimeout: number;
+    reward: BN;
+    minStake: BN;
+    slashingEnabled: boolean;
+    varianceToleranceMultiplier: types.SwitchboardDecimalFields;
+    feedProbationPeriod: number;
+    currIdx: number;
+    size: number;
+    gcIdx: number;
+    consecutiveFeedFailureLimit: BN;
+    consecutiveOracleFailureLimit: BN;
+    unpermissionedFeedsEnabled: boolean;
+    unpermissionedVrfEnabled: boolean;
+    curatorRewardCut: types.SwitchboardDecimalFields;
+    lockLeaseFunding: boolean;
+    mint: Address;
+    enableBufferRelayers: boolean;
+    ebuf: Array<number>;
+    maxSize: number;
+    dataBuffer: Address;
+}
+export interface OracleQueueAccountDataJSON {
+    name: Array<number>;
+    metadata: Array<number>;
+    authority: string;
+    oracleTimeout: number;
+    reward: string;
+    minStake: string;
+    slashingEnabled: boolean;
+    varianceToleranceMultiplier: types.SwitchboardDecimalJSON;
+    feedProbationPeriod: number;
+    currIdx: number;
+    size: number;
+    gcIdx: number;
+    consecutiveFeedFailureLimit: string;
+    consecutiveOracleFailureLimit: string;
+    unpermissionedFeedsEnabled: boolean;
+    unpermissionedVrfEnabled: boolean;
+    curatorRewardCut: types.SwitchboardDecimalJSON;
+    lockLeaseFunding: boolean;
+    mint: string;
+    enableBufferRelayers: boolean;
+    ebuf: Array<number>;
+    maxSize: number;
+    dataBuffer: string;
+}
+export declare class OracleQueueAccountData {
+    readonly name: Array<number>;
+    readonly metadata: Array<number>;
+    readonly authority: Address;
+    readonly oracleTimeout: number;
+    readonly reward: BN;
+    readonly minStake: BN;
+    readonly slashingEnabled: boolean;
+    readonly varianceToleranceMultiplier: types.SwitchboardDecimal;
+    readonly feedProbationPeriod: number;
+    readonly currIdx: number;
+    readonly size: number;
+    readonly gcIdx: number;
+    readonly consecutiveFeedFailureLimit: BN;
+    readonly consecutiveOracleFailureLimit: BN;
+    readonly unpermissionedFeedsEnabled: boolean;
+    readonly unpermissionedVrfEnabled: boolean;
+    readonly curatorRewardCut: types.SwitchboardDecimal;
+    readonly lockLeaseFunding: boolean;
+    readonly mint: Address;
+    readonly enableBufferRelayers: boolean;
+    readonly ebuf: Array<number>;
+    readonly maxSize: number;
+    readonly dataBuffer: Address;
+    static readonly discriminator: Buffer<ArrayBuffer>;
+    static readonly layout: import("buffer-layout").Layout<OracleQueueAccountData>;
+    constructor(fields: OracleQueueAccountDataFields);
+    static fetch(rpc: Rpc<GetAccountInfoApi>, address: Address, programId?: Address): Promise<OracleQueueAccountData | null>;
+    static fetchMultiple(rpc: Rpc<GetMultipleAccountsApi>, addresses: Address[], programId?: Address): Promise<Array<OracleQueueAccountData | null>>;
+    static decode(data: Buffer): OracleQueueAccountData;
+    toJSON(): OracleQueueAccountDataJSON;
+    static fromJSON(obj: OracleQueueAccountDataJSON): OracleQueueAccountData;
+}
+//# sourceMappingURL=OracleQueueAccountData.d.ts.map

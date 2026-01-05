@@ -1,0 +1,4 @@
+coingecko_pro_api_key: 
+coingecko_demo_api_key: "CG-wR5BGRw246ZNhAynLnvtwoCR"             
+coingecko_min_interval_sec: 0.49                 # optional: seconds between CG calls
+alchemy_api: "cEHzRdgL5rGydq_YIokK2"
