@@ -1,0 +1,1 @@
+{"version":3,"file":"multisig.d.ts","sourceRoot":"","sources":["../../../src/manager/tx/multisig.ts"],"names":[],"mappings":"AAAA,OAAO,EACL,OAAO,EAOP,WAAW,EAIX,iBAAiB,EAClB,MAAM,aAAa,CAAC;AAErB,OAAO,EAAE,kBAAkB,EAAE,MAAM,sCAAsC,CAAC;AAK1E,wBAAsB,eAAe,CACnC,KAAK,EAAE,iBAAiB,EACxB,GAAG,EAAE,WAAW,EAAE,EAClB,IAAI,GAAE,OAAO,CAAC,kBAAkB,CAAC,EAAO,iBAuBzC"}

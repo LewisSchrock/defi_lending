@@ -1,0 +1,22 @@
+# csu_config.yaml
+# Minimal, human-editable config for DeFi CSUs.
+# Add your own RPC and registry addresses per CSU.
+# Then run: python defi_runner.py --config csu_config.yaml --csu aave_v3_ethereum --dataset liquidation_daily --from-date 2024-06-01 --to-date 2024-06-02
+
+csus:
+  aave_v3_ethereum:
+    protocol: aave
+    version: v3
+    chain: ethereum
+    rpc: "https://eth-mainnet.g.alchemy.com/v2/YOUR_KEY"   # <-- put your RPC here
+    registry: "0xA97684ead0e402dC232d5A977953DF7ECBaB3CDb"  # Aave V3 PoolAddressesProvider (Ethereum)
+    outputs_dir: "./out/aave_v3_ethereum"
+
+# (Optional) later you can add more CSUs, e.g.:
+#  aave_v3_polygon:
+#    protocol: aave
+#    version: v3
+#    chain: polygon
+#    rpc: "https://polygon-rpc.com"
+#    registry: "0x..."
+#    outputs_dir: "./out/aave_v3_polygon"

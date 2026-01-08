@@ -1,0 +1,53 @@
+name,id,chains,tvl,dislike,
+Aave V3,1599,Ethereum,32021000000,y
+Aave V3,1599,Plasma,2825000000,y
+Aave V3,1599,Polygon,248120000,y
+Aave V3,1599,Binance,317110000,y
+Aave V3,1599,Linea,730800000,y
+Aave V3,1599,Arbitrum,1258000000,y
+Aave V3,1599,Optimism,132370000,y
+Aave V3,1599,xDai,109440000,y
+Aave V3,1599,Base,846000000,y
+Aave V3,1599,Sonic,39000000,y
+SparkLend,2929,Ethereum,5944000000,y
+JustLend,494,Tron,4655900600.313012,x
+Kamino Lend,3770,Solana,3023562299.441824
+Compound V3,2088,Arbitrum,175970000,y
+Compound V3,2088,Ethereum,1916000000,y
+Compound V3,2088,Base,52500000,y
+Fluid Lending,4167,Ethereum,1047000000,y
+Fluid Lending,4167,Plasma,803120000,y
+Fluid Lending,4167,Arbitrum,23540000,y
+Fluid Lending,4167,Base,52080000,y
+Venus Core Pool,212,Binance,2005000000,y
+Euler V2,5044,Arbitrum,106750000,x
+Euler V2,5044,Avalanche,176880000,x
+Euler V2,5044,Plasma,354440000,x
+Euler V2,5044,Ethereum,800280000,x
+Lista Lending,6056,Binance,1116000000,y
+Jupiter Lend,6600,Solana,805515965.9147985
+HyperLend Pooled,5940,Hyperliquid L1,590042781.3300534
+Suilend,4274,Sui,543293115.8404815
+NAVI Lending,3323,Sui,428581076.59014386
+cap,6579,Ethereum,341653451.74593335,y
+Benqi Lending,467,Avalanche,272322262.10671884,y
+Echo Lending,5051,Aptos,251627342.2905011
+Gearbox,1108,Ethereum,151550000,y
+Tydro,6875,Ink,233058296.3868091
+YeiLend,4721,Sei,220729524.48298657
+EtherFi Borrowing Market,6372,Scroll,209746644.83050668
+Save,458,Solana,203600000
+Echelon Market,4367,Aptos,169210000
+Moonwell Lending,1853,Base,156640000,y
+marginfi Lending,2570,Solana,160185822.73138562
+AlphaLend,6153,Sui,148254540.166994
+Tectonic Main,1115,Cronos,142695534.31597745,y
+Tectonic Vero,1115,Cronos,142695534.31597745,y
+Tectonic DeFi,1115,Cronos,142695534.31597745,y
+Takara Lend,5783,Sei,124502148.42403711
+Hydration Lending,6271,HydraDX,123354404.90358837
+Kinetic,4915,Flare,115196839.95942424,y
+HypurrFi Pooled,5838,Hyperliquid L1,111788443.37662993
+Sumer.money,3814,CORE,106850000
+Rhea Lend,1546,Near,109700740.15154833,x
+Capyfi,5001,Ethereum,106830000,x

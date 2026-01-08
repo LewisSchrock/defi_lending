@@ -1,0 +1,307 @@
+Below is a fully comprehensive context prompt you can paste into a new ChatGPT thread so that the model will have EVERYTHING it needs from this conversation to continue building liquidation extraction for your thesis.
+
+It is structured, chronological, and includes all relevant architecture, decisions, schemas, constraints, and current state of your data pipeline.
+
+⸻
+
+✅ MASTER CONTEXT PROMPT FOR NEW CHAT STREAM
+
+(paste this into the new chat before asking anything)
+
+⸻
+
+🔵 PROJECT OVERVIEW
+
+I am building a DeFi lending liquidation + balance sheet dataset for an econometric panel VAR thesis.
+My cross-sectional unit (CSU) = protocol × chain × version.
+Target size = 30 CSU.
+
+I need:
+	•	TVL (balance sheet) data per CSU
+	•	total supplied
+	•	total borrowed
+	•	asset mix
+	•	collateral composition
+	•	Liquidation events per CSU
+	•	timestamp / block
+	•	protocol & market
+	•	repay token & amount
+	•	seized collateral token & amount
+	•	mapping to USD
+	•	daily aggregation
+
+I am building the entire pipeline myself, not relying on Dune or The Graph, due to rate limits and cost.
+The pipeline must scale across many different architectures: EVM, Solana, Sui, Aptos, Hyperliquid, etc.
+
+⸻
+
+🔵 CURRENT STATE OF PIPELINE (AS OF CONTEXT)
+
+1. EVM Side (working)
+	•	TVL extraction works for:
+	•	Aave V3 (Ethereum + Polygon)
+	•	Spark
+	•	Liquidation adapter base class defined:
+
+class LiquidationAdapter(ABC):
+    def resolve_market(...):
+    def fetch_events(...):
+    def normalize(...):
+
+
+	•	Strategy:
+	•	Use Web3
+	•	Event logs (eth_getLogs)
+	•	ABI decoding
+	•	Already implemented for Aave
+	•	Will reuse for all EVM protocols (Spark, Benqi, Moonwell, Fluid, Venus, etc.)
+
+⸻
+
+🔵 2. Solana Side (new & working)
+
+Kamino TVL (SUCCESSFUL)
+
+We wrote a full TVL adapter for Kamino Lend (Solana):
+	•	Created TS tool to decode Kamino market structure
+	•	Generated kamino_markets_main.json → list of reserves with:
+	•	symbol
+	•	underlying mint
+	•	vault token account
+	•	decimals
+	•	In Python, no solana-py.
+	•	We use direct JSON-RPC:
+
+{
+  "method": "getMultipleAccounts",
+  "params": [
+    [<list of vault accounts>],
+    {"encoding": "jsonParsed"}
+  ]
+}
+
+This is chunked in batches of 10, exactly matching a sandbox test that returned valid SPL-token parsed JSON.
+
+Kamino TVL adapter now returns:
+
+[
+  {
+    "symbol": "adraSOL",
+    "underlying_mint": "...",
+    "vault": "...",
+    "decimals": 9,
+    "raw_amount": 220_629_414_396
+  },
+  ...
+]
+
+Everything works.
+
+⸻
+
+🔵 3. Solana RPC Details (CRITICAL)
+	•	We use Alchemy Solana Mainnet RPC:
+https://solana-mainnet.g.alchemy.com/v2/<key>
+	•	Must use:
+	•	"encoding": "jsonParsed"
+	•	Simple HTTP requests.post
+	•	No constraint from solana-py or solders
+	•	Token balances can be extracted from:
+	•	parsed.info.tokenAmount.amount
+	•	decimals known from our reserves file
+
+⸻
+
+🔵 4. REMAINING CHAIN COVERAGE
+
+List of CSUs where registry or entry point identified:
+	•	EVM protocols (easy path):
+	•	Aave V3 (ETH, Polygon)
+	•	SparkLend (ETH)
+	•	Compound V3 (ETH, Arbitrum)
+	•	Fluid (ETH, Arbitrum, Plasma)
+	•	Benqi Lending (Avalanche)
+	•	Moonwell (Base)
+	•	Venus (BNB)
+	•	Capyfi (ETH)
+	•	etc.
+	•	Solana protocols (hard path, but solvable same way as Kamino):
+	•	Kamino Lend (Solana) → TVL working
+	•	Jupiter Lend
+	•	marginfi
+	•	Save
+	•	etc.
+	•	Sui (Move) protocols:
+	•	Suilend
+	•	NAVI
+	•	AlphaLend
+	•	Aptos (Move):
+	•	Echo
+	•	Echelon
+	•	Hyperliquid L1:
+	•	HypurrFi
+	•	HyperLend pooled
+	•	Other chains:
+	•	HydraDX (Substrate)
+	•	Sei (YeiLend, Takara)
+	•	CORE (Sumer)
+	•	Flare (Kinetic)
+	•	Near (Rhea Lend)
+
+We have registry addresses for many (from DefiLlama docs), or special insertion keys when no registry exists.
+
+⸻
+
+🔵 5. LIQUIDATION EXTRACTION – PROJECT REQUIREMENT
+
+I cannot rely on Dune / Flipside / proprietary indexers because they have rate limits and are expensive.
+I must build my own method for ALL CSUs, including non-EVM.
+
+The method must be:
+	•	On-chain only
+	•	RPC-based
+	•	Reusable across protocols
+	•	Good enough to compute daily liquidation volumes
+
+⸻
+
+🔵 6. GENERALIZED LIQUIDATION SCHEMA
+
+All protocols should normalize to:
+
+{
+  "chain": "solana" | "ethereum" | "aptos" | ...,
+  "protocol": "kamino_lend",
+  "csu": "kamino_lend_solana",
+  "block_or_slot": 1234567,
+  "timestamp": 1680000000,
+
+  "borrow_asset": "<mint or address>",
+  "borrow_amount": <float or integer>,
+  
+  "collateral_asset": "<mint or address>",
+  "collateral_amount": <float or integer>,
+
+  "liquidator": "<address or pubkey>",
+  "borrower": "<address or pubkey>"
+}
+
+Daily aggregation is performed afterwards.
+
+⸻
+
+🔵 7. HOW LIQUIDATION EXTRACTION MUST WORK — NO INDEXERS
+
+I need a generalized approach across chain-families:
+
+⸻
+
+🟣 EVM Method (straightforward)
+	1.	Identify liquidation event signature (per protocol).
+	2.	Use eth_getLogs over block ranges.
+	3.	Decode topics/data via ABI.
+	4.	Normalize to schema.
+
+This works for ~15+ EVM CSUs.
+
+⸻
+
+🟣 Solana Method (Kamino, Jupiter, marginfi, Save)
+
+(This is the hardest but most important family.)
+
+Required steps to build ourselves:
+	1.	Get all transaction signatures for the lending program:
+getSignaturesForAddress(program_id)
+	•	paginated
+	•	fetch until hitting earliest block needed.
+	2.	Fetch full transactions with getTransaction(signature, {"encoding":"jsonParsed"}).
+	3.	Detect liquidation transactions by:
+	•	matching instruction type names
+(Kamino uses "liquidateObligationAndRedeemReserveCollateral" and V2)
+	•	OR checking meta.logMessages for corresponding program logs.
+	4.	Reconstruct economic amounts using token balance deltas:
+	•	compare meta.preTokenBalances vs meta.postTokenBalances
+	•	map token accounts to reserve vaults using the JSON reserves file already generated
+	•	determine which tokens increased/decreased:
+	•	vault balance increase → debt repaid
+	•	vault balance decrease → collateral seized
+	•	assign to borrow/collateral fields.
+	5.	Normalize to liquidation schema
+	6.	Store to parquet or CSV.
+
+This does NOT depend on Dune, Flipside, or The Graph.
+It depends only on:
+	•	public or paid Solana RPC from Alchemy (works)
+	•	reserves/vault metadata we already extracted
+	•	a matching table of instruction names
+
+⸻
+
+🟣 Move chains (Aptos, Sui)
+
+General method:
+	1.	Identify the lending module’s event type for liquidations.
+	2.	Use chain RPC event queries (get_events, etc.)
+	3.	Parse amounts + coins involved.
+	4.	Normalize.
+
+This is significantly easier than Solana.
+
+⸻
+
+🟣 Other chains (Hyperliquid L1, HydraDX, Flare, Near, Sei, CORE)
+
+General approach:
+	•	If EVM-compatible → use EVM method.
+	•	If Substrate (HydraDX) → use events from system.events.
+	•	If Hyperliquid L1 → must use their REST API.
+	•	If custom chain (CORE, Sei) → identify on-chain liquidation events or RPC endpoints.
+
+⸻
+
+🔵 8. WHAT HAS BEEN DONE & WHAT COMES NEXT
+
+✔ Kamino TVL fully working
+
+— includes vault decoding, JSON-RPC batching, token amount extraction.
+
+Next major milestone:
+
+Build Kamino Lend liquidation extractor using:
+	•	getSignaturesForAddress(program_id)
+	•	getTransaction(signature, {encoding:"jsonParsed"})
+	•	token balance deltas vs vault accounts
+	•	instruction-type filtering
+
+Once this works in generality, it becomes the template for Jupiter, marginfi, Save, etc.
+
+⸻
+
+🔵 9. EXPECTED OUTPUTS FOR FUTURE STEPS
+
+The next chat should be able to:
+	•	Help design & implement the SolanaLiquidationExtractor class
+	•	Show how to fetch Kamino liquidation txs across a slot range
+	•	Decode repay + collateral amounts from token deltas
+	•	Normalize liquidation rows
+	•	Save to CSV
+	•	Document the method for thesis writeup
+
+⸻
+
+🔵 10. FINAL GOAL
+
+A complete historical liquidation + TVL dataset across ~30 CSU, built fully on-chain, feeding into a panel VAR to study:
+	•	leverage shocks
+	•	liquidation intensity
+	•	collateral volatility
+	•	protocol resilience across chains
+
+⸻
+
+END OF CONTEXT PROMPT
+
+⸻
+
+If you want, I can generate a second version of this that is shorter (“lean context prompt”) for ChatGPT-4 browsing mode.

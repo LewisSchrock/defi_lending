@@ -1,0 +1,56 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import {
+  Address,
+  isSome,
+  AccountMeta,
+  AccountSignerMeta,
+  Instruction,
+  Option,
+  TransactionSigner,
+} from "@solana/kit"
+/* eslint-enable @typescript-eslint/no-unused-vars */
+import BN from "bn.js" // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as borsh from "@coral-xyz/borsh" // eslint-disable-line @typescript-eslint/no-unused-vars
+import { borshAddress } from "../utils" // eslint-disable-line @typescript-eslint/no-unused-vars
+import * as types from "../types" // eslint-disable-line @typescript-eslint/no-unused-vars
+import { PROGRAM_ID } from "../programId"
+
+export const DISCRIMINATOR = Buffer.from([216, 87, 65, 125, 113, 110, 185, 120])
+
+export interface SetPoolConfigArgs {
+  params: types.SetPoolConfigParamsFields
+}
+
+export interface SetPoolConfigAccounts {
+  admin: TransactionSigner
+  perpetuals: Address
+  pool: Address
+}
+
+export const layout = borsh.struct<SetPoolConfigArgs>([
+  types.SetPoolConfigParams.layout("params"),
+])
+
+export function setPoolConfig(
+  args: SetPoolConfigArgs,
+  accounts: SetPoolConfigAccounts,
+  remainingAccounts: Array<AccountMeta | AccountSignerMeta> = [],
+  programAddress: Address = PROGRAM_ID
+) {
+  const keys: Array<AccountMeta | AccountSignerMeta> = [
+    { address: accounts.admin.address, role: 2, signer: accounts.admin },
+    { address: accounts.perpetuals, role: 0 },
+    { address: accounts.pool, role: 1 },
+    ...remainingAccounts,
+  ]
+  const buffer = Buffer.alloc(1000)
+  const len = layout.encode(
+    {
+      params: types.SetPoolConfigParams.toEncodable(args.params),
+    },
+    buffer
+  )
+  const data = Buffer.concat([DISCRIMINATOR, buffer]).slice(0, 8 + len)
+  const ix: Instruction = { accounts: keys, programAddress, data }
+  return ix
+}
