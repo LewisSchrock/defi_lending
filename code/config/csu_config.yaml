@@ -19,6 +19,14 @@ csus:
    registry: "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"
    outputs_dir: "./out/aave_v3_polygon"
 
+  aave_v3_avalanche:
+    protocol: aave
+    version: v3
+    chain: avalanche
+    rpc: ""
+    registry: "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"
+    outputs_dir: "./out/aave_v3_avalanche"
+
   aave_v3_plasma:
     protocol: aave
     version: v3
@@ -67,6 +75,30 @@ csus:
     registry: "0x36616cf17557639614c1cdDb356b1B83fc0B2132"
     outputs_dir: "./out/aave_v3_xdai"
 
+  aave_v3_base:
+    protocol: aave
+    version: v3
+    chain: base
+    rpc: ""
+    registry: "0xe20fCBdBfFC4Dd138cE8b2E6FBb6CB49777ad64D"
+    outputs_dir: "./out/aave_v3_base"
+
+  aave_v3_scroll:
+    protocol: aave
+    version: v3
+    chain: scroll
+    rpc: ""
+    registry: "0x69850D0B276776781C063771b161bd8894BCdD04"
+    outputs_dir: "./out/aave_v3_scroll"
+
+  aave_v3_sonic:
+    protocol: aave
+    version: v3
+    chain: sonic
+    rpc: ""
+    registry: "0x69850D0B276776781C063771b161bd8894BCdD04"
+    outputs_dir: "./out/aave_v3_sonic"
+
   sparklend_ethereum:
     protocol: sparklend
     version: v1
@@ -91,21 +123,167 @@ csus:
     registry: "7u3HeHxYDLhnCoErrtycNokbQYbWGzLs6JSDqGAv5PfF"
     outputs_dir: "./out/kamino_lend_solana"
 
-  compound_v3_arbitrum:
+  # ========================================
+  # Compound V3 Markets (19 total)
+  # Each market is a separate Comet contract
+  # ========================================
+
+  # Ethereum Markets (5)
+  compound_v3_eth_usdc:
+    protocol: compound
+    version: v3
+    chain: ethereum
+    rpc: ""
+    registry: "0xc3d688B66703497DAA19211EEdff47f25384cdc3"
+    outputs_dir: "./out/compound_v3_eth_usdc"
+
+  compound_v3_eth_weth:
+    protocol: compound
+    version: v3
+    chain: ethereum
+    rpc: ""
+    registry: "0xA17581A9E3356d9A858b789D68B4d866e593aE94"
+    outputs_dir: "./out/compound_v3_eth_weth"
+
+  compound_v3_eth_usdt:
+    protocol: compound
+    version: v3
+    chain: ethereum
+    rpc: ""
+    registry: "0x3Afdc9BCA9213A35503b077a6072F3D0d5AB0840"
+    outputs_dir: "./out/compound_v3_eth_usdt"
+
+  compound_v3_eth_wsteth:
+    protocol: compound
+    version: v3
+    chain: ethereum
+    rpc: ""
+    registry: "0x3D0bb1ccaB520A66e607822fC55BC921738fAFE3"
+    outputs_dir: "./out/compound_v3_eth_wsteth"
+
+  compound_v3_eth_usds:
+    protocol: compound
+    version: v3
+    chain: ethereum
+    rpc: ""
+    registry: "0x5D409e56D886231aDAf00c8775665AD0f9897b56"
+    outputs_dir: "./out/compound_v3_eth_usds"
+
+  # Arbitrum Markets (4)
+  compound_v3_arb_usdc:
     protocol: compound
     version: v3
     chain: arbitrum
     rpc: ""
-    registry: "0xa5EDBDD9646f8dFFBf0e057b274Bdb8E11D2f8E0"
-    outputs_dir: "./out/compound_v3_arbitrum"
+    registry: "0x9c4ec768c28520B50860ea7a15bd7213a9fF58bf"
+    outputs_dir: "./out/compound_v3_arb_usdc"
 
-  compound_v3_ethereum:
+  compound_v3_arb_usdc_e:
     protocol: compound
     version: v3
-    chain: ethereum
-    rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
-    registry: "0xc3d688B66703497DAA19211EEdff47f25384cdc3"
-    outputs_dir: "./out/compound_v3_ethereum"
+    chain: arbitrum
+    rpc: ""
+    registry: "0xA5EDBDD9646f8dFF606d7448e414884C7d905dCA"
+    outputs_dir: "./out/compound_v3_arb_usdc_e"
+
+  compound_v3_arb_weth:
+    protocol: compound
+    version: v3
+    chain: arbitrum
+    rpc: ""
+    registry: "0x6f7D514bbD4aFf3BcD1140B7344b32f063dEe486"
+    outputs_dir: "./out/compound_v3_arb_weth"
+
+  compound_v3_arb_usdt:
+    protocol: compound
+    version: v3
+    chain: arbitrum
+    rpc: ""
+    registry: "0xd98Be00b5D27fc98112BdE293e487f8D4cA57d07"
+    outputs_dir: "./out/compound_v3_arb_usdt"
+
+  # Base Markets (4)
+  compound_v3_base_usdc:
+    protocol: compound
+    version: v3
+    chain: base
+    rpc: ""
+    registry: "0xb125E6687d4313864e53df431d5425969c15Eb2F"
+    outputs_dir: "./out/compound_v3_base_usdc"
+
+  compound_v3_base_usdbc:
+    protocol: compound
+    version: v3
+    chain: base
+    rpc: ""
+    registry: "0x9c4ec768c28520B50860ea7a15bd7213a9fF58bf"
+    outputs_dir: "./out/compound_v3_base_usdbc"
+
+  compound_v3_base_weth:
+    protocol: compound
+    version: v3
+    chain: base
+    rpc: ""
+    registry: "0x46e6b214b524310239732D51387075E0e70970bf"
+    outputs_dir: "./out/compound_v3_base_weth"
+
+  compound_v3_base_aero:
+    protocol: compound
+    version: v3
+    chain: base
+    rpc: ""
+    registry: "0x784efeB622244d2348d4F2522f8860B96fbEcE89"
+    outputs_dir: "./out/compound_v3_base_aero"
+
+  # Optimism Markets (3)
+  compound_v3_op_usdc:
+    protocol: compound
+    version: v3
+    chain: optimism
+    rpc: ""
+    registry: "0x2e44e174f7D53F0212823acC11C01A11d58c5bCB"
+    outputs_dir: "./out/compound_v3_op_usdc"
+
+  compound_v3_op_usdt:
+    protocol: compound
+    version: v3
+    chain: optimism
+    rpc: ""
+    registry: "0x995E394b8B2437aC8Ce61Ee0bC610D617962B214"
+    outputs_dir: "./out/compound_v3_op_usdt"
+
+  compound_v3_op_weth:
+    protocol: compound
+    version: v3
+    chain: optimism
+    rpc: ""
+    registry: "0xE36A30D249f7761327fd973001A32010b521b6Fd"
+    outputs_dir: "./out/compound_v3_op_weth"
+
+  # Polygon Markets (3)
+  compound_v3_poly_usdc:
+    protocol: compound
+    version: v3
+    chain: polygon
+    rpc: ""
+    registry: "0xF25212E676D1F7F89Cd72fFEe66158f541246445"
+    outputs_dir: "./out/compound_v3_poly_usdc"
+
+  compound_v3_poly_usdc_e:
+    protocol: compound
+    version: v3
+    chain: polygon
+    rpc: ""
+    registry: "0xaeB0E0Ed3cE4Bf8001A38B1d2a7E8C3a27F61E4e"
+    outputs_dir: "./out/compound_v3_poly_usdc_e"
+
+  compound_v3_poly_usdt:
+    protocol: compound
+    version: v3
+    chain: polygon
+    rpc: ""
+    registry: "0xaeB0E0Ed3cE4Bf8001A38B1d2a7E8C3a27F61E4e"
+    outputs_dir: "./out/compound_v3_poly_usdt"
 
   fluid_lending_ethereum:
     protocol: fluid
@@ -133,6 +311,15 @@ csus:
     registry: "0xdF4d3272FfAE8036d9a2E1626Df2Db5863b4b302"
     liq_reg: "0x4D900e473785d09995D4f12e2c12Fa37D5BAda48"
     outputs_dir: "./out/fluid_lending_arbitrum"
+
+  fluid_lending_base:
+    protocol: fluid
+    version: v1
+    chain: base
+    rpc: ""
+    registry: "0x264786EF916af64a1DB19F513F24a3681734ce92"
+    liq_reg: "0xD0F95a6ed0112fbc6A200e5291bcDa9b55e84c9C"
+    outputs_dir: "./out/fluid_lending_base"
 
   venus_core_pool_binance:
     protocol: venus
@@ -233,63 +420,63 @@ csus:
   #   registry: "euler_v2_evc_plasma"
   #   outputs_dir: "./out/euler_v2_plasma"
 
-  euler_v2_ethereum:
-    protocol: euler
-    version: v2
-    chain: ethereum
-    rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
-    vaults:
-    - "0x2343b4bcb96ec35d8653fb154461fc673cb20a7e"  # EVK Vault eUSDT-1
-    - "0xb3b36220fa7d12f7055dab5c9fd18e860e9a6bf8"  # EVK Vault eWETH-1
-    - "0xf6e2efdf175e7a91c8847dade42f2d39a9ae57d4"  # EVK Vault ewstETH-1
-    - "0xb93d4928f39fbcd6c89a7dfbf0a867e6344561be"  # EVK Vault eUSDC-1
-    - "0xbc4b4ac47582c3e38ce5940b80da65401f4628f1"  # EVK Vault ewstETH-2
-    - "0x313603fa690301b0caeef8069c065862f9162162"  # EVK Vault eUSDT-2
-    - "0xd8b27cf359b7d15710a5be299af6e7bf904984c2"  # EVK Vault eWETH-2
-    - "0x797dd80692c3b2dadabce8e30c07fde5307d48a9"  # EVK Vault eUSDC-2
-    - "0x50E6bBa3847357e5ee2Cc55Cc2F5F5E69FdaBE36"
-    - "0x7c280DBDEf569e96c7919251bD2B0edF0734C5A8"
-    - "0xaabc07A47D2a63a9b06A7924a0780c2F3cAE7bf9"
-    - "0xe0a80d35bB6618CBA260120b279d357978c42BCE"
-    - "0xe1Ce9AF672f8854845E5474400B6ddC7AE458a10"
-    - "0xD8b27CF359b7D15710a5BE299AF6e7Bf904984C2"
-    - "0x797DD80692c3b2dAdabCe8e30C07fDE5307D48a9"
-    - "0x61aAC438453d6e3513C0c8dbb69F13860E2B5028"
-    - "0x313603FA690301b0CaeEf8069c065862f9162162"
-    - "0x1924D7fab80d0623f0836Cbf5258a7fa734EE9D9"
-    - "0xee944C7Dd107617550EC11AFCF652e14E7670A37"
-    - "0xbC4B4AC47582c3E38Ce5940B80Da65401F4628f1"
-    - "0xe47BABACfc9Ce5F85126fab7C7E211DA077d820E"
-    - "0x2a356443FeE07703266066c6Bb1B11b82d8246AD"
-    - "0xf8C84D6A51Cf24c9AC79ABcE2823255FFA871145"
-    - "0x998D761eC1BAdaCeb064624cc3A1d37A46C88bA4"
-    - "0x8aFF4fe319c30475D27eC623D7d44bD5eCFe9616"
-    - "0xA655D6F7550B43B73948fEbdE6cDC7bD201Ba218"
-    - "0x6f2598c99722428563F852F49002C6826316c751"
-    - "0x46BC453666BA11b4b08B0804E49A9D797546ee7D"
-    - "0x1F46186AF85A967416b17380800c69860B7C516F"
-    - "0x481D4909D7ca2eb27c4975f08dCE07DBeF0d3Fa7"
-    - "0xe01354f8A8fa44E87d96574D1E5Bcd78D61d6EbE"
-    - "0x1A5dd6D0A3B4F47d157f69365068d2e1df868825"
-    - "0x20622fcD4476fbc9d5Ef36EBd371307a56d9028c"
-    - "0xA28C23a459fF8773EB4dBe0e7250d93F79F1Fe2B"
-    - "0xF75D18F76859764aBe4D13cA2eBaCeFF0b90b262"
-    - "0xc2c4aBae84fbb5b7bAAB52301A924b1F986C66bd"
-    - "0x2daCa71Cb58285212Dc05D65Cfd4f59A82BC4cF6"
-    - "0xFBCc21fedd4C4e9097Ef1Baa65B7Ad386b59512D"
-    - "0x69a2fAD6AC96DDa502f7d240fB4EC88f85217705"
-    - "0x3573A84Bee11D49A1CbCe2b291538dE7a7dD81c6"
-    - "0x328646cdfBaD730432620d845B8F5A2f7D786C01"
-    - "0xf8973F8cA6623D55ba6D9c3FEB6a83Ad2d96d9d5"
-    - "0xa3e0943d0196F76db58d3549C9a7528Ef4ac335F"
-    - "0xbed968285CB7E32463dfc1324c329BA458dc650D"
-    - "0x056f3a2E41d2778D3a0c0714439c53af2987718E"
-    - "0xe846ca062aB869b66aE8DcD811973f628BA82eAf"
-    - "0xE067311975278b7e7b81Bf57d2a9e58E3eaD75b4"
-    - "0x6Fe7Fa90756434645F0b0428fDff78E99Dda0FBc"
-    - "0x2f94Bbe20ECa1e3f9332aA93A90920a0a5be0728"
-    - "0x0391d9029713B1E9Ee1e241CB53D6BC89bAf299d"
-    outputs_dir: "./out/euler_v2_ethereum"
+  # euler_v2_ethereum:  # EXCLUDED: No adapter implemented
+  #   protocol: euler
+  #   version: v2
+  #   chain: ethereum
+  #   rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+  #   vaults:
+  #   - "0x2343b4bcb96ec35d8653fb154461fc673cb20a7e"  # EVK Vault eUSDT-1
+  #   - "0xb3b36220fa7d12f7055dab5c9fd18e860e9a6bf8"  # EVK Vault eWETH-1
+  #   - "0xf6e2efdf175e7a91c8847dade42f2d39a9ae57d4"  # EVK Vault ewstETH-1
+  #   - "0xb93d4928f39fbcd6c89a7dfbf0a867e6344561be"  # EVK Vault eUSDC-1
+  #   - "0xbc4b4ac47582c3e38ce5940b80da65401f4628f1"  # EVK Vault ewstETH-2
+  #   - "0x313603fa690301b0caeef8069c065862f9162162"  # EVK Vault eUSDT-2
+  #   - "0xd8b27cf359b7d15710a5be299af6e7bf904984c2"  # EVK Vault eWETH-2
+  #   - "0x797dd80692c3b2dadabce8e30c07fde5307d48a9"  # EVK Vault eUSDC-2
+  #   - "0x50E6bBa3847357e5ee2Cc55Cc2F5F5E69FdaBE36"
+  #   - "0x7c280DBDEf569e96c7919251bD2B0edF0734C5A8"
+  #   - "0xaabc07A47D2a63a9b06A7924a0780c2F3cAE7bf9"
+  #   - "0xe0a80d35bB6618CBA260120b279d357978c42BCE"
+  #   - "0xe1Ce9AF672f8854845E5474400B6ddC7AE458a10"
+  #   - "0xD8b27CF359b7D15710a5BE299AF6e7Bf904984C2"
+  #   - "0x797DD80692c3b2dAdabCe8e30C07fDE5307D48a9"
+  #   - "0x61aAC438453d6e3513C0c8dbb69F13860E2B5028"
+  #   - "0x313603FA690301b0CaeEf8069c065862f9162162"
+  #   - "0x1924D7fab80d0623f0836Cbf5258a7fa734EE9D9"
+  #   - "0xee944C7Dd107617550EC11AFCF652e14E7670A37"
+  #   - "0xbC4B4AC47582c3E38Ce5940B80Da65401F4628f1"
+  #   - "0xe47BABACfc9Ce5F85126fab7C7E211DA077d820E"
+  #   - "0x2a356443FeE07703266066c6Bb1B11b82d8246AD"
+  #   - "0xf8C84D6A51Cf24c9AC79ABcE2823255FFA871145"
+  #   - "0x998D761eC1BAdaCeb064624cc3A1d37A46C88bA4"
+  #   - "0x8aFF4fe319c30475D27eC623D7d44bD5eCFe9616"
+  #   - "0xA655D6F7550B43B73948fEbdE6cDC7bD201Ba218"
+  #   - "0x6f2598c99722428563F852F49002C6826316c751"
+  #   - "0x46BC453666BA11b4b08B0804E49A9D797546ee7D"
+  #   - "0x1F46186AF85A967416b17380800c69860B7C516F"
+  #   - "0x481D4909D7ca2eb27c4975f08dCE07DBeF0d3Fa7"
+  #   - "0xe01354f8A8fa44E87d96574D1E5Bcd78D61d6EbE"
+  #   - "0x1A5dd6D0A3B4F47d157f69365068d2e1df868825"
+  #   - "0x20622fcD4476fbc9d5Ef36EBd371307a56d9028c"
+  #   - "0xA28C23a459fF8773EB4dBe0e7250d93F79F1Fe2B"
+  #   - "0xF75D18F76859764aBe4D13cA2eBaCeFF0b90b262"
+  #   - "0xc2c4aBae84fbb5b7bAAB52301A924b1F986C66bd"
+  #   - "0x2daCa71Cb58285212Dc05D65Cfd4f59A82BC4cF6"
+  #   - "0xFBCc21fedd4C4e9097Ef1Baa65B7Ad386b59512D"
+  #   - "0x69a2fAD6AC96DDa502f7d240fB4EC88f85217705"
+  #   - "0x3573A84Bee11D49A1CbCe2b291538dE7a7dD81c6"
+  #   - "0x328646cdfBaD730432620d845B8F5A2f7D786C01"
+  #   - "0xf8973F8cA6623D55ba6D9c3FEB6a83Ad2d96d9d5"
+  #   - "0xa3e0943d0196F76db58d3549C9a7528Ef4ac335F"
+  #   - "0xbed968285CB7E32463dfc1324c329BA458dc650D"
+  #   - "0x056f3a2E41d2778D3a0c0714439c53af2987718E"
+  #   - "0xe846ca062aB869b66aE8DcD811973f628BA82eAf"
+  #   - "0xE067311975278b7e7b81Bf57d2a9e58E3eaD75b4"
+  #   - "0x6Fe7Fa90756434645F0b0428fDff78E99Dda0FBc"
+  #   - "0x2f94Bbe20ECa1e3f9332aA93A90920a0a5be0728"
+  #   - "0x0391d9029713B1E9Ee1e241CB53D6BC89bAf299d"
+  #   outputs_dir: "./out/euler_v2_ethereum"
 
   jupiter_lend_solana:
     protocol: jupiter
@@ -328,7 +515,7 @@ csus:
     version: v1
     chain: ethereum
     rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
-    registry: ""
+    registry: "0x726B8d03D43E71c533ECBb2E5095D2e60dc8A30E"
     outputs_dir: "./out/cap_ethereum"
 
   benqi_lending_avalanche:
@@ -336,7 +523,7 @@ csus:
     version: v1
     chain: avalanche
     rpc: ""
-    registry: "0x7f1d2cE98240d5a9008CF0788c5C69A0d7F8FbB5"
+    registry: "0x486Af39519B4Dc9a7fCcd318217352830E8AD9b4"
     outputs_dir: "./out/benqi_lending_avalanche"
 
   echo_lending_aptos:
@@ -374,13 +561,13 @@ csus:
     registry: "yeilend_sei_main_market"
     outputs_dir: "./out/yeilend_sei"
 
-  etherfi_borrowing_market_scroll:
-    protocol: etherfi
-    version: v1
-    chain: scroll
-    rpc: "https://rpc.scroll.io"
-    registry: "etherfi_cash_scroll_l2_debt_manager"
-    outputs_dir: "./out/etherfi_borrowing_market_scroll"
+  # etherfi_borrowing_market_scroll:  # EXCLUDED: No adapter implemented
+  #   protocol: etherfi
+  #   version: v1
+  #   chain: scroll
+  #   rpc: "https://rpc.scroll.io"
+  #   registry: "etherfi_cash_scroll_l2_debt_manager"
+  #   outputs_dir: "./out/etherfi_borrowing_market_scroll"
 
   save_solana:
     protocol: save
@@ -487,6 +674,7 @@ csus:
     chain: meter
     rpc: "https://rpc.meter.io"
     comptroller: "0xcB4cdDA50C1B6B0E33F544c98420722093B7Aa88"
+    registry: "0xcB4cdDA50C1B6B0E33F544c98420722093B7Aa88"  # Same as comptroller
     outputs_dir: "./out/sumermoney_meter"
 
   rhea_lend_near:
@@ -497,10 +685,10 @@ csus:
     registry: "contract.main.burrow.near"
     outputs_dir: "./out/rhea_lend_near"
 
-  capyfi_ethereum:
-    protocol: capyfi
-    version: v1
-    chain: ethereum
-    rpc: "https://base-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
-    registry: "0x00dc4965916e03A734190fA382633657c71f867E"
-    outputs_dir: "./out/capyfi_ethereum"
+  # capyfi_ethereum:  # EXCLUDED: No adapter implemented
+  #   protocol: capyfi
+  #   version: v1
+  #   chain: ethereum
+  #   rpc: "https://base-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+  #   registry: "0x00dc4965916e03A734190fA382633657c71f867E"
+  #   outputs_dir: "./out/capyfi_ethereum"

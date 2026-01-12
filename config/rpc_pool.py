@@ -49,12 +49,13 @@ CHAIN_KEY_MAPPING = {
     "arbitrum": ["key_1", "key_2", "key_3", "key_5"],
     "optimism": ["key_1", "key_2", "key_3", "key_5"],
     "base": ["key_1", "key_2", "key_3", "key_4", "key_5"],
-    "polygon": ["key_1", "key_2", "key_3", "key_4", "key_5"],
+    "polygon": [],  # Force public RPC - Alchemy has state pruning issues
     "avalanche": ["key_1", "key_2", "key_3", "key_4", "key_5"],
     "binance": ["key_1", "key_2", "key_3", "key_5"],
     "linea": ["key_1", "key_2", "key_3", "key_5"],
     "gnosis": ["key_1", "key_2", "key_3", "key_5"],
     "plasma": [],  # NO WORKING KEYS - will use public RPC
+    "sonic": [],  # Force public RPC - new chain, unstable on Alchemy
 }
 
 # Alchemy chain patterns
@@ -92,6 +93,8 @@ PUBLIC_RPCS = {
     'polygon': [
         'https://polygon-rpc.com',
         'https://polygon.llamarpc.com',
+        'https://polygon-bor-rpc.publicnode.com',
+        'https://rpc.ankr.com/polygon',
     ],
     'avalanche': [
         'https://api.avax.network/ext/bc/C/rpc',
@@ -122,6 +125,13 @@ PUBLIC_RPCS = {
     ],
     'meter': [
         'https://rpc.meter.io',
+    ],
+    'scroll': [
+        'https://rpc.scroll.io',
+        'https://scroll.blockpi.network/v1/rpc/public',
+    ],
+    'sonic': [
+        'https://rpc.soniclabs.com',
     ],
 }
 

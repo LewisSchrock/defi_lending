@@ -1,0 +1,952 @@
+lewisschrock@Lewiss-MacBook-Air-2 thesis_v2.9 % python3 scripts/collect_tvl_parallel.py \   
+  --start-date 2024-12-01 \
+  --end-date 2024-12-31 \
+  --workers 5
+================================================================================
+TVL Parallel Collection
+================================================================================
+Date range: 2024-12-01 → 2024-12-31
+Workers: 5
+================================================================================
+
+Loading CSU configuration...
+Checking block cache availability...
+✅ 30 CSUs with complete block caches
+⚠️  Skipped 37 CSUs:
+   • aave_v3_ethereum (cache missing 30 dates)
+   • aave_v3_binance (cache missing 31 dates)
+   • aave_v3_xdai (cache missing 29 dates)
+   • sparklend_ethereum (cache missing 30 dates)
+   • justlend_tron (no cache for tron)
+   • kamino_lend_solana (no cache for solana)
+   • compound_v3_eth_usdc (cache missing 30 dates)
+   • compound_v3_eth_weth (cache missing 30 dates)
+   • compound_v3_eth_usdt (cache missing 30 dates)
+   • compound_v3_eth_wsteth (cache missing 30 dates)
+   ... and 27 more
+
+📊 Collection Plan:
+   Total tasks: 930 (30 CSUs × 31 days)
+   Already completed: 0
+   Remaining: 930
+   Failed (will retry): 0
+
+🚀 Starting parallel collection with 5 workers...
+
+[RPC Pool] polygon: 5 Alchemy connection(s)
+❌ [1/930] aave_v3_polygon:2024-12-05 - {'code': -32000, 'message': 'state 0xa0edc8f1d907fbac425be603576e3d245d873b470b5f410039824011f2cc8d77 is not available'}
+❌ [2/930] aave_v3_polygon:2024-12-03 - {'code': -32000, 'message': 'state 0x80c8c1d8e7286be8e5be19aac12a8bb09d33cd5175bfb05ec6e81120c754a51a is not available'}
+❌ [3/930] aave_v3_polygon:2024-12-01 - {'code': -32000, 'message': 'state 0x8661aabc5792505a35625a528eaf71055abfa8d7d31842d481ec59aa032cce6f is not available'}
+❌ [4/930] aave_v3_polygon:2024-12-02 - {'code': -32000, 'message': 'state 0x139122984a51f31953deadcc3942601dda1a263a149885949551c7d022c9738a is not available'}
+❌ [5/930] aave_v3_polygon:2024-12-04 - {'code': -32000, 'message': 'state 0x48f3c7a38c604c8e60f7e9b499d59a312a8a94d6876dfd13595bc0d41314cab8 is not available'}
+❌ [6/930] aave_v3_polygon:2024-12-07 - {'code': -32000, 'message': 'state 0xc6e0487918b11d541275155dc97edeae087753b045db3ba464e0b0976de046f4 is not available'}
+❌ [7/930] aave_v3_polygon:2024-12-06 - {'code': -32000, 'message': 'state 0x9ce6d9944b3c62bcc3346b03f31a375429be4e4ae07fa14cab63a0977cf6f50e is not available'}
+❌ [8/930] aave_v3_polygon:2024-12-08 - {'code': -32000, 'message': 'state 0x1a40282c96be71722a78c0b2279d7949440629b26e4f4777808c2b04627022cf is not available'}
+❌ [9/930] aave_v3_polygon:2024-12-09 - {'code': -32000, 'message': 'state 0x4a14b473b9f038766c15543f3302d8ff3e66acb06d7886e583d6354993dceb8c is not available'}
+❌ [10/930] aave_v3_polygon:2024-12-10 - {'code': -32000, 'message': 'state 0x097b4d51d37f304a3608f68c104d94971cc3e40ffb3d5708a8b9be0497f14adf is not available'}
+❌ [11/930] aave_v3_polygon:2024-12-12 - {'code': -32000, 'message': 'state 0x12c32b645eb0403eac94edab02006c74402751f64368e2fb4d6d4740e5bec9a7 is not available'}
+❌ [12/930] aave_v3_polygon:2024-12-11 - {'code': -32000, 'message': 'state 0xd042168dd21c7cbb2aac6e38a05ddd90dc61e02d1fc59c875307d1370b092dd0 is not available'}
+❌ [13/930] aave_v3_polygon:2024-12-13 - {'code': -32000, 'message': 'state 0x040e02ba49569d3484990e4b68786c3ba3551150fe07cc47c7973f0e1443ce65 is not available'}
+❌ [14/930] aave_v3_polygon:2024-12-15 - {'code': -32000, 'message': 'state 0x26e6b108cc61a52f12c3756d8621a79003f152dccddc5b1b5b553fe77175fef0 is not available'}
+❌ [15/930] aave_v3_polygon:2024-12-14 - {'code': -32000, 'message': 'state 0x64716e2afcaf0667c407d3305b840ee52fb300b8595362f298ef4cf6f343e411 is not available'}
+❌ [16/930] aave_v3_polygon:2024-12-16 - {'code': -32000, 'message': 'state 0x28143345ece0cf848fb9a7ee1e7961f5f9954d3e5c1b864e58f796f4b6ba4815 is not available'}
+❌ [17/930] aave_v3_polygon:2024-12-17 - {'code': -32000, 'message': 'state 0x053f8490ceb3103f10e98c0f2222652adaf2bb511d24aa4c9b9d06ffef75f7ed is not available'}
+❌ [18/930] aave_v3_polygon:2024-12-18 - {'code': -32000, 'message': 'state 0x05c204983d8130fed10104ee482df6a75c353ab69a0dc2ffb911d207b51dda16 is not available'}
+❌ [19/930] aave_v3_polygon:2024-12-20 - {'code': -32000, 'message': 'state 0x0e99adde2becd32f1a3ccf260c7ae8d456d86c427b3575260572f6115f06cd46 is not available'}
+❌ [20/930] aave_v3_polygon:2024-12-19 - {'code': -32000, 'message': 'state 0x7be64a9f93e1ef6d572d63ef4722d31d1ae1c46f6fadf2f3405dd43bc2b07fff is not available'}
+❌ [21/930] aave_v3_polygon:2024-12-21 - {'code': -32000, 'message': 'state 0x8ecbd2e86b2cca8862635b7449309c0911eec3c26baf4fcb348b544197719d14 is not available'}
+❌ [22/930] aave_v3_polygon:2024-12-22 - {'code': -32000, 'message': 'state 0xe01fb7e80160deca27b9a9c9a676dab5fa51237bcaf83886ae46dac0ef13acba is not available'}
+❌ [23/930] aave_v3_polygon:2024-12-24 - {'code': -32000, 'message': 'state 0x66d73e455d668d6f2bd256f804f630d9ad561c5a2a7928d9174a9ca9ef22f996 is not available'}
+❌ [24/930] aave_v3_polygon:2024-12-23 - {'code': -32000, 'message': 'state 0x87f2a2eb9c6e37bcd933d901a47740a3c8f6547838fefb00d169e1655ff7459f is not available'}
+❌ [25/930] aave_v3_polygon:2024-12-25 - {'code': -32000, 'message': 'state 0x7712a104a38abc6f158717d90f0027c2f7ea81eab294485c60fb52497115999c is not available'}
+❌ [26/930] aave_v3_polygon:2024-12-26 - {'code': -32000, 'message': 'state 0x3877006d2ce2bbe70d5112d554fc4b07cc85d082d7310e63c86d09ef543b61aa is not available'}
+[RPC Pool] avalanche: 5 Alchemy connection(s)
+❌ [27/930] aave_v3_polygon:2024-12-27 - {'code': -32000, 'message': 'state 0x9a6090577fd927eb269b94ddc8a2912001c3312227baacda4e0e135bea3509a4 is not available'}
+❌ [28/930] aave_v3_polygon:2024-12-28 - {'code': -32000, 'message': 'state 0x82744689b8ec8ae8543db1f79e7ed777f3ac4d26b5375f426d1b7e845c6840e7 is not available'}
+❌ [29/930] aave_v3_polygon:2024-12-29 - {'code': -32000, 'message': 'state 0x916ad6170122c1343b97f574ed932e11e9088a8e4eeac5bfe727aaaa250c2f34 is not available'}
+❌ [30/930] aave_v3_polygon:2024-12-30 - {'code': -32000, 'message': 'state 0x111239df31175f8eb07e82fb74bc01fc9e0f6c22826a036b1e2e028b383e34f3 is not available'}
+❌ [31/930] aave_v3_polygon:2024-12-31 - {'code': -32000, 'message': 'state 0xa7fc5a7b3e66a5ee18adf4ea0c8fbf859a769db8af5dfc960e24d9161ad1cccb is not available'}
+Warning: Failed to get token addresses for 0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x63a72806098Bd3D9520cC43356dD78afe5D386D9: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x2b2C81e08f1Af8835a78Bb2A90AE924ACE0eA4bE: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x2b2C81e08f1Af8835a78Bb2A90AE924ACE0eA4bE: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x2b2C81e08f1Af8835a78Bb2A90AE924ACE0eA4bE: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xD24C2Ad096400B6FBcd2ad8B24E7acBc21A1da64: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xD24C2Ad096400B6FBcd2ad8B24E7acBc21A1da64: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xD24C2Ad096400B6FBcd2ad8B24E7acBc21A1da64: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x5c49b268c9841AFF1Cc3B0a418ff5c3442eE3F3b: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x5c49b268c9841AFF1Cc3B0a418ff5c3442eE3F3b: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x63a72806098Bd3D9520cC43356dD78afe5D386D9: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x5c49b268c9841AFF1Cc3B0a418ff5c3442eE3F3b: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x152b9d0FdC40C096757F570A51E494bd4b943E50: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x152b9d0FdC40C096757F570A51E494bd4b943E50: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x152b9d0FdC40C096757F570A51E494bd4b943E50: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [37/930] aave_v3_avalanche:2024-12-07 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [38/930] aave_v3_avalanche:2024-12-08 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x2b2C81e08f1Af8835a78Bb2A90AE924ACE0eA4bE: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [39/930] aave_v3_avalanche:2024-12-10 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [40/930] aave_v3_avalanche:2024-12-11 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [41/930] aave_v3_avalanche:2024-12-12 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xD24C2Ad096400B6FBcd2ad8B24E7acBc21A1da64: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [42/930] aave_v3_avalanche:2024-12-13 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [43/930] aave_v3_avalanche:2024-12-14 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [44/930] aave_v3_avalanche:2024-12-15 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x5c49b268c9841AFF1Cc3B0a418ff5c3442eE3F3b: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [45/930] aave_v3_avalanche:2024-12-17 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [46/930] aave_v3_avalanche:2024-12-16 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [48/930] aave_v3_avalanche:2024-12-18 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x152b9d0FdC40C096757F570A51E494bd4b943E50: 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [50/930] aave_v3_avalanche:2024-12-19 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [51/930] aave_v3_avalanche:2024-12-20 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [52/930] aave_v3_avalanche:2024-12-22 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [53/930] aave_v3_avalanche:2024-12-23 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [54/930] aave_v3_avalanche:2024-12-24 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [55/930] aave_v3_avalanche:2024-12-25 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [56/930] aave_v3_avalanche:2024-12-26 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [57/930] aave_v3_avalanche:2024-12-27 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+[RPC Pool] ⚠️  plasma: No working Alchemy keys, using public RPC
+❌ [58/930] aave_v3_avalanche:2024-12-28 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+[RPC Pool] plasma: 1 public RPC connection(s)
+❌ [59/930] aave_v3_avalanche:2024-12-29 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [60/930] aave_v3_avalanche:2024-12-30 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [61/930] aave_v3_plasma:2024-12-01 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [62/930] aave_v3_avalanche:2024-12-31 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [63/930] aave_v3_plasma:2024-12-02 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [64/930] aave_v3_plasma:2024-12-03 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [65/930] aave_v3_plasma:2024-12-04 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [66/930] aave_v3_plasma:2024-12-05 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [67/930] aave_v3_plasma:2024-12-06 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [68/930] aave_v3_plasma:2024-12-08 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [69/930] aave_v3_plasma:2024-12-07 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [70/930] aave_v3_plasma:2024-12-09 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [72/930] aave_v3_plasma:2024-12-10 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [73/930] aave_v3_plasma:2024-12-11 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [74/930] aave_v3_plasma:2024-12-12 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [75/930] aave_v3_plasma:2024-12-13 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [76/930] aave_v3_plasma:2024-12-15 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [77/930] aave_v3_plasma:2024-12-14 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [78/930] aave_v3_plasma:2024-12-16 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [79/930] aave_v3_plasma:2024-12-17 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [80/930] aave_v3_plasma:2024-12-18 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [81/930] aave_v3_plasma:2024-12-19 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [82/930] aave_v3_plasma:2024-12-20 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [83/930] aave_v3_plasma:2024-12-21 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [84/930] aave_v3_plasma:2024-12-22 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [85/930] aave_v3_plasma:2024-12-23 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [86/930] aave_v3_plasma:2024-12-24 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [87/930] aave_v3_plasma:2024-12-25 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [88/930] aave_v3_plasma:2024-12-26 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+[RPC Pool] linea: 4 Alchemy connection(s)
+❌ [89/930] aave_v3_plasma:2024-12-28 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [90/930] aave_v3_plasma:2024-12-27 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [91/930] aave_v3_plasma:2024-12-29 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [92/930] aave_v3_plasma:2024-12-30 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [93/930] aave_v3_plasma:2024-12-31 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+✅ [95/930] aave_v3_linea:2024-12-06 (0.3 tasks/sec, ETA: 49.4m)
+✅ [105/930] aave_v3_linea:2024-12-15 (0.5 tasks/sec, ETA: 25.3m)
+❌ [107/930] aave_v3_linea:2024-12-03 - 429 Client Error: Too Many Requests for url: https://linea-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [108/930] aave_v3_linea:2024-12-01 - 429 Client Error: Too Many Requests for url: https://linea-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [111/930] aave_v3_linea:2024-12-04 - 429 Client Error: Too Many Requests for url: https://linea-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [118/930] aave_v3_linea:2024-12-28 (0.8 tasks/sec, ETA: 17.1m)
+[RPC Pool] arbitrum: 4 Alchemy connection(s)
+❌ [122/930] aave_v3_linea:2024-12-19 - 429 Client Error: Too Many Requests for url: https://linea-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [123/930] aave_v3_linea:2024-12-20 - 429 Client Error: Too Many Requests for url: https://linea-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [124/930] aave_v3_linea:2024-12-23 - 429 Client Error: Too Many Requests for url: https://linea-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [125/930] aave_v3_arbitrum:2024-12-01 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [126/930] aave_v3_arbitrum:2024-12-02 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [127/930] aave_v3_arbitrum:2024-12-04 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [128/930] aave_v3_arbitrum:2024-12-03 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [129/930] aave_v3_arbitrum:2024-12-06 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [130/930] aave_v3_arbitrum:2024-12-07 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [131/930] aave_v3_arbitrum:2024-12-08 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [132/930] aave_v3_arbitrum:2024-12-09 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [133/930] aave_v3_arbitrum:2024-12-10 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [134/930] aave_v3_arbitrum:2024-12-11 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [135/930] aave_v3_arbitrum:2024-12-13 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [136/930] aave_v3_arbitrum:2024-12-12 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [137/930] aave_v3_arbitrum:2024-12-14 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [138/930] aave_v3_arbitrum:2024-12-15 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [139/930] aave_v3_arbitrum:2024-12-17 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [140/930] aave_v3_arbitrum:2024-12-16 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [141/930] aave_v3_arbitrum:2024-12-18 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [142/930] aave_v3_arbitrum:2024-12-19 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [143/930] aave_v3_arbitrum:2024-12-20 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [144/930] aave_v3_arbitrum:2024-12-21 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [146/930] aave_v3_arbitrum:2024-12-23 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [147/930] aave_v3_arbitrum:2024-12-22 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [148/930] aave_v3_arbitrum:2024-12-24 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [149/930] aave_v3_arbitrum:2024-12-25 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [150/930] aave_v3_arbitrum:2024-12-27 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+[RPC Pool] optimism: 4 Alchemy connection(s)
+❌ [151/930] aave_v3_arbitrum:2024-12-28 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [152/930] aave_v3_arbitrum:2024-12-30 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [153/930] aave_v3_arbitrum:2024-12-29 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [154/930] aave_v3_arbitrum:2024-12-31 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [155/930] aave_v3_optimism:2024-12-01 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [156/930] aave_v3_optimism:2024-12-04 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [157/930] aave_v3_optimism:2024-12-05 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [158/930] aave_v3_optimism:2024-12-06 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [159/930] aave_v3_optimism:2024-12-07 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [160/930] aave_v3_optimism:2024-12-08 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [161/930] aave_v3_optimism:2024-12-09 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [163/930] aave_v3_optimism:2024-12-10 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [164/930] aave_v3_optimism:2024-12-11 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [166/930] aave_v3_optimism:2024-12-13 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [167/930] aave_v3_optimism:2024-12-14 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xdFA46478F9e5EA86d57387849598dbFB2e964b02: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x9Bcef72be871e61ED4fBbc7630889beE758eb81D: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [169/930] aave_v3_optimism:2024-12-18 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x76FB31fb4af56892A25e32cFC43De717950c9278: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [170/930] aave_v3_optimism:2024-12-19 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [171/930] aave_v3_optimism:2024-12-20 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x4200000000000000000000000000000000000042: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [172/930] aave_v3_optimism:2024-12-21 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x68f180fcCe6836688e9084f035309E29Bf0A2095: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [173/930] aave_v3_optimism:2024-12-22 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xc40F949F8a4e094D1b49a23ea9241D289B7b2819: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x4200000000000000000000000000000000000006: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [176/930] aave_v3_optimism:2024-12-23 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xdFA46478F9e5EA86d57387849598dbFB2e964b02: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x94b008aA00579c1307B0EF2c499aD98a8ce58e58: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [177/930] aave_v3_optimism:2024-12-26 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x9Bcef72be871e61ED4fBbc7630889beE758eb81D: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x76FB31fb4af56892A25e32cFC43De717950c9278: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [178/930] aave_v3_optimism:2024-12-27 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [179/930] aave_v3_optimism:2024-12-12 (0.5 tasks/sec, ETA: 26.7m)
+Warning: Failed to get token addresses for 0x8c6f28f2F1A3C87F0f938b96d27520d9751ec8d9: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [180/930] aave_v3_optimism:2024-12-28 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [181/930] aave_v3_optimism:2024-12-29 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x4200000000000000000000000000000000000042: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+[RPC Pool] base: 5 Alchemy connection(s)
+❌ [182/930] aave_v3_optimism:2024-12-30 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [183/930] aave_v3_optimism:2024-12-31 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [184/930] aave_v3_base:2024-12-01 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [185/930] aave_v3_base:2024-12-02 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xc40F949F8a4e094D1b49a23ea9241D289B7b2819: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [186/930] aave_v3_base:2024-12-03 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [187/930] aave_v3_base:2024-12-04 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xdFA46478F9e5EA86d57387849598dbFB2e964b02: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [190/930] aave_v3_base:2024-12-05 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [191/930] aave_v3_base:2024-12-06 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [192/930] aave_v3_base:2024-12-07 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [193/930] aave_v3_base:2024-12-08 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x9Bcef72be871e61ED4fBbc7630889beE758eb81D: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [194/930] aave_v3_base:2024-12-09 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [195/930] aave_v3_base:2024-12-10 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [196/930] aave_v3_base:2024-12-11 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [197/930] aave_v3_base:2024-12-12 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [199/930] aave_v3_base:2024-12-13 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [200/930] aave_v3_base:2024-12-14 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [201/930] aave_v3_base:2024-12-15 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [202/930] aave_v3_base:2024-12-16 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [203/930] aave_v3_base:2024-12-17 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [204/930] aave_v3_base:2024-12-18 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [205/930] aave_v3_base:2024-12-19 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [206/930] aave_v3_base:2024-12-20 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [207/930] aave_v3_base:2024-12-21 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [208/930] aave_v3_base:2024-12-22 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [209/930] aave_v3_base:2024-12-23 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [210/930] aave_v3_base:2024-12-24 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [211/930] aave_v3_base:2024-12-25 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [212/930] aave_v3_base:2024-12-26 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+[RPC Pool] scroll: 2 public RPC connection(s)
+❌ [213/930] aave_v3_base:2024-12-27 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [214/930] aave_v3_base:2024-12-28 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [215/930] aave_v3_base:2024-12-29 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [216/930] aave_v3_base:2024-12-30 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [217/930] aave_v3_base:2024-12-31 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [224/930] aave_v3_scroll:2024-12-07 (0.5 tasks/sec, ETA: 25.8m)
+✅ [234/930] aave_v3_scroll:2024-12-17 (0.5 tasks/sec, ETA: 22.1m)
+Warning: Failed to get token addresses for 0x5300000000000000000000000000000000000004: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0xd29687c813D741E2F938F4aC377128810E217b1b: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0xf610A9dfB7C89644979b4A0f27063E9e7d7Cda32: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0x01f0a31698C4d065659b9bdC21B3610292a1c506: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [238/930] aave_v3_scroll:2024-12-25 - 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0x01f0a31698C4d065659b9bdC21B3610292a1c506: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0xd29687c813D741E2F938F4aC377128810E217b1b: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0xf610A9dfB7C89644979b4A0f27063E9e7d7Cda32: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0xd29687c813D741E2F938F4aC377128810E217b1b: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0x01f0a31698C4d065659b9bdC21B3610292a1c506: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [241/930] aave_v3_scroll:2024-12-26 - 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [242/930] aave_v3_scroll:2024-12-27 - 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+[RPC Pool] sonic: 1 public RPC connection(s)
+Warning: Failed to get token addresses for 0x06eFdBFf2a14a7c8E15944D1F4A48F9F95F663A4: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [243/930] aave_v3_scroll:2024-12-28 - 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+Warning: Failed to get token addresses for 0xd29687c813D741E2F938F4aC377128810E217b1b: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [244/930] aave_v3_scroll:2024-12-30 - 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [246/930] aave_v3_scroll:2024-12-29 - 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [247/930] aave_v3_sonic:2024-12-03 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [248/930] aave_v3_sonic:2024-12-01 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [249/930] aave_v3_sonic:2024-12-05 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [250/930] aave_v3_sonic:2024-12-04 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [251/930] aave_v3_sonic:2024-12-06 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [252/930] aave_v3_sonic:2024-12-02 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [253/930] aave_v3_sonic:2024-12-07 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [254/930] aave_v3_sonic:2024-12-08 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [255/930] aave_v3_sonic:2024-12-10 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [256/930] aave_v3_sonic:2024-12-09 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [257/930] aave_v3_sonic:2024-12-12 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [258/930] aave_v3_sonic:2024-12-13 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [259/930] aave_v3_sonic:2024-12-11 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [260/930] aave_v3_sonic:2024-12-14 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [261/930] aave_v3_sonic:2024-12-15 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [262/930] aave_v3_sonic:2024-12-16 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [263/930] aave_v3_sonic:2024-12-17 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [264/930] aave_v3_sonic:2024-12-19 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [265/930] aave_v3_sonic:2024-12-20 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [266/930] aave_v3_sonic:2024-12-18 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+Warning: Failed to get token addresses for 0xf610A9dfB7C89644979b4A0f27063E9e7d7Cda32: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [267/930] aave_v3_scroll:2024-12-31 - 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [268/930] aave_v3_sonic:2024-12-21 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [269/930] aave_v3_sonic:2024-12-22 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [270/930] aave_v3_sonic:2024-12-23 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [271/930] aave_v3_sonic:2024-12-25 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [272/930] aave_v3_sonic:2024-12-26 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [273/930] aave_v3_sonic:2024-12-29 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [274/930] aave_v3_sonic:2024-12-24 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [275/930] aave_v3_sonic:2024-12-27 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [276/930] aave_v3_sonic:2024-12-28 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [277/930] aave_v3_sonic:2024-12-30 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [278/930] aave_v3_sonic:2024-12-31 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+Warning: Failed to get token addresses for 0x01f0a31698C4d065659b9bdC21B3610292a1c506: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [279/930] compound_v3_arb_usdc:2024-12-03 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get token addresses for 0xd29687c813D741E2F938F4aC377128810E217b1b: 429 Client Error: Too Many Requests for url: https://rpc.scroll.io/
+❌ [283/930] compound_v3_arb_usdc:2024-12-05 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [284/930] compound_v3_arb_usdc:2024-12-04 (0.5 tasks/sec, ETA: 20.7m)
+❌ [287/930] compound_v3_arb_usdc:2024-12-09 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [289/930] compound_v3_arb_usdc:2024-12-13 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 4: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [291/930] compound_v3_arb_usdc:2024-12-15 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 5: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [294/930] compound_v3_arb_usdc:2024-12-16 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [295/930] compound_v3_arb_usdc:2024-12-17 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 6: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [297/930] compound_v3_arb_usdc:2024-12-20 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [298/930] compound_v3_arb_usdc:2024-12-21 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [300/930] compound_v3_arb_usdc:2024-12-22 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [301/930] compound_v3_arb_usdc:2024-12-23 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [303/930] compound_v3_arb_usdc:2024-12-26 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [304/930] compound_v3_arb_usdc:2024-12-27 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [305/930] compound_v3_arb_usdc:2024-12-29 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [306/930] compound_v3_arb_usdc:2024-12-30 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 2: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [307/930] compound_v3_arb_usdc:2024-12-24 (0.5 tasks/sec, ETA: 19.5m)
+❌ [308/930] compound_v3_arb_usdc_e:2024-12-02 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [309/930] compound_v3_arb_usdc:2024-12-31 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 3: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [310/930] compound_v3_arb_usdc_e:2024-12-01 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [311/930] compound_v3_arb_usdc_e:2024-12-03 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [312/930] compound_v3_arb_usdc_e:2024-12-06 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [313/930] compound_v3_arb_usdc_e:2024-12-07 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [314/930] compound_v3_arb_usdc_e:2024-12-08 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [316/930] compound_v3_arb_usdc_e:2024-12-10 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [317/930] compound_v3_arb_usdc_e:2024-12-11 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [318/930] compound_v3_arb_usdc_e:2024-12-12 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [319/930] compound_v3_arb_usdc_e:2024-12-13 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [320/930] compound_v3_arb_usdc_e:2024-12-09 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [321/930] compound_v3_arb_usdc_e:2024-12-14 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [322/930] compound_v3_arb_usdc_e:2024-12-15 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [323/930] compound_v3_arb_usdc_e:2024-12-04 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [324/930] compound_v3_arb_usdc_e:2024-12-16 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+Warning: Failed to get collateral asset 4: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [325/930] compound_v3_arb_usdc_e:2024-12-05 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [326/930] compound_v3_arb_usdc_e:2024-12-17 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [327/930] compound_v3_arb_usdc_e:2024-12-21 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [328/930] compound_v3_arb_usdc_e:2024-12-19 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [329/930] compound_v3_arb_usdc_e:2024-12-22 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [330/930] compound_v3_arb_usdc_e:2024-12-23 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [331/930] compound_v3_arb_usdc_e:2024-12-24 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [332/930] compound_v3_arb_usdc_e:2024-12-25 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [333/930] compound_v3_arb_usdc_e:2024-12-26 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [334/930] compound_v3_arb_usdc_e:2024-12-28 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [335/930] compound_v3_arb_usdc_e:2024-12-29 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [336/930] compound_v3_arb_usdc_e:2024-12-30 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [337/930] compound_v3_arb_usdc_e:2024-12-27 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [338/930] compound_v3_arb_usdc_e:2024-12-31 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [339/930] compound_v3_arb_usdc_e:2024-12-18 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [340/930] compound_v3_arb_usdc_e:2024-12-20 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 5: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [341/930] compound_v3_arb_weth:2024-12-03 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 6: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [343/930] compound_v3_arb_weth:2024-12-04 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [344/930] compound_v3_arb_weth:2024-12-05 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [345/930] compound_v3_arb_weth:2024-12-06 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [346/930] compound_v3_arb_weth:2024-12-07 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 6: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [348/930] compound_v3_arb_weth:2024-12-08 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [349/930] compound_v3_arb_weth:2024-12-09 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [350/930] compound_v3_arb_weth:2024-12-10 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 7: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [353/930] compound_v3_arb_weth:2024-12-12 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [354/930] compound_v3_arb_weth:2024-12-13 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [355/930] compound_v3_arb_weth:2024-12-14 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [356/930] compound_v3_arb_weth:2024-12-16 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [357/930] compound_v3_arb_weth:2024-12-17 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [358/930] compound_v3_arb_weth:2024-12-19 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [359/930] compound_v3_arb_weth:2024-12-18 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [361/930] compound_v3_arb_weth:2024-12-20 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [362/930] compound_v3_arb_weth:2024-12-21 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [363/930] compound_v3_arb_weth:2024-12-22 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [364/930] compound_v3_arb_weth:2024-12-23 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [365/930] compound_v3_arb_weth:2024-12-25 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [366/930] compound_v3_arb_weth:2024-12-26 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [367/930] compound_v3_arb_weth:2024-12-27 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [368/930] compound_v3_arb_weth:2024-12-28 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [370/930] compound_v3_arb_weth:2024-12-29 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [371/930] compound_v3_arb_weth:2024-12-30 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [372/930] compound_v3_arb_weth:2024-12-31 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [373/930] compound_v3_arb_usdt:2024-12-01 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [375/930] compound_v3_arb_usdt:2024-12-03 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [376/930] compound_v3_arb_usdt:2024-12-04 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [377/930] compound_v3_arb_usdt:2024-12-05 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [378/930] compound_v3_arb_usdt:2024-12-06 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [380/930] compound_v3_arb_usdt:2024-12-08 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [381/930] compound_v3_arb_usdt:2024-12-09 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [382/930] compound_v3_arb_usdt:2024-12-10 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [383/930] compound_v3_arb_usdt:2024-12-11 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [384/930] compound_v3_arb_usdt:2024-12-12 (0.5 tasks/sec, ETA: 17.7m)
+❌ [385/930] compound_v3_arb_usdt:2024-12-13 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [386/930] compound_v3_arb_usdt:2024-12-14 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [387/930] compound_v3_arb_usdt:2024-12-15 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [388/930] compound_v3_arb_usdt:2024-12-16 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [390/930] compound_v3_arb_usdt:2024-12-18 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [391/930] compound_v3_arb_usdt:2024-12-19 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [392/930] compound_v3_arb_usdt:2024-12-20 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [393/930] compound_v3_arb_usdt:2024-12-21 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [395/930] compound_v3_arb_usdt:2024-12-23 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [396/930] compound_v3_arb_usdt:2024-12-25 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [397/930] compound_v3_arb_usdt:2024-12-24 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [398/930] compound_v3_arb_usdt:2024-12-26 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [400/930] compound_v3_arb_usdt:2024-12-28 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [401/930] compound_v3_arb_usdt:2024-12-29 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [402/930] compound_v3_arb_usdt:2024-12-30 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [403/930] compound_v3_arb_usdt:2024-12-31 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [405/930] compound_v3_base_usdc:2024-12-02 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [406/930] compound_v3_base_usdc:2024-12-04 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [407/930] compound_v3_base_usdc:2024-12-03 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [408/930] compound_v3_base_usdc:2024-12-05 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [410/930] compound_v3_base_usdc:2024-12-07 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [411/930] compound_v3_base_usdc:2024-12-08 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [412/930] compound_v3_base_usdc:2024-12-09 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [413/930] compound_v3_base_usdc:2024-12-10 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [415/930] compound_v3_base_usdc:2024-12-12 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [416/930] compound_v3_base_usdc:2024-12-13 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [417/930] compound_v3_base_usdc:2024-12-14 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [418/930] compound_v3_base_usdc:2024-12-15 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [420/930] compound_v3_base_usdc:2024-12-17 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [421/930] compound_v3_base_usdc:2024-12-18 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [422/930] compound_v3_base_usdc:2024-12-19 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [423/930] compound_v3_base_usdc:2024-12-20 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [425/930] compound_v3_base_usdc:2024-12-22 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [426/930] compound_v3_base_usdc:2024-12-23 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [427/930] compound_v3_base_usdc:2024-12-24 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [428/930] compound_v3_base_usdc:2024-12-25 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [430/930] compound_v3_base_usdc:2024-12-27 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [431/930] compound_v3_base_usdc:2024-12-28 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [432/930] compound_v3_base_usdc:2024-12-29 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [433/930] compound_v3_base_usdc:2024-12-30 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [434/930] compound_v3_base_usdc:2024-12-31 (0.5 tasks/sec, ETA: 16.1m)
+❌ [436/930] compound_v3_base_usdbc:2024-12-01 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [437/930] compound_v3_base_usdbc:2024-12-02 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [438/930] compound_v3_base_usdbc:2024-12-03 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [439/930] compound_v3_base_usdbc:2024-12-04 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [443/930] compound_v3_base_usdbc:2024-12-08 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [445/930] compound_v3_base_usdbc:2024-12-10 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [449/930] compound_v3_base_usdbc:2024-12-14 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [450/930] compound_v3_base_usdbc:2024-12-16 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [452/930] compound_v3_base_usdbc:2024-12-18 (0.5 tasks/sec, ETA: 14.6m)
+❌ [455/930] compound_v3_base_usdbc:2024-12-20 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [456/930] compound_v3_base_usdbc:2024-12-21 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [458/930] compound_v3_base_usdbc:2024-12-26 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [459/930] compound_v3_base_usdbc:2024-12-27 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [462/930] compound_v3_base_usdbc:2024-12-29 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [463/930] compound_v3_base_usdbc:2024-12-30 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 1: 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [466/930] compound_v3_base_weth:2024-12-03 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [467/930] compound_v3_base_weth:2024-12-04 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 0: 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [469/930] compound_v3_base_weth:2024-12-06 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [470/930] compound_v3_base_weth:2024-12-07 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 1: 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [471/930] compound_v3_base_weth:2024-12-09 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [472/930] compound_v3_base_weth:2024-12-10 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 2: 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [474/930] compound_v3_base_weth:2024-12-02 (0.6 tasks/sec, ETA: 13.5m)
+❌ [475/930] compound_v3_base_weth:2024-12-11 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [476/930] compound_v3_base_weth:2024-12-12 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 3: 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [477/930] compound_v3_base_weth:2024-12-14 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [479/930] compound_v3_base_weth:2024-12-15 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [480/930] compound_v3_base_weth:2024-12-16 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 4: 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [481/930] compound_v3_base_weth:2024-12-17 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [483/930] compound_v3_base_weth:2024-12-19 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [484/930] compound_v3_base_weth:2024-12-20 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 5: 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [485/930] compound_v3_base_weth:2024-12-21 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [486/930] compound_v3_base_weth:2024-12-24 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 6: 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [489/930] compound_v3_base_weth:2024-12-25 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [490/930] compound_v3_base_weth:2024-12-26 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [491/930] compound_v3_base_weth:2024-12-27 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 6: 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [493/930] compound_v3_base_weth:2024-12-29 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [495/930] compound_v3_base_weth:2024-12-30 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [496/930] compound_v3_base_weth:2024-12-31 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [497/930] compound_v3_base_aero:2024-12-01 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [498/930] compound_v3_base_aero:2024-12-02 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [500/930] compound_v3_base_aero:2024-12-04 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [501/930] compound_v3_base_aero:2024-12-05 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [502/930] compound_v3_base_aero:2024-12-06 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [503/930] compound_v3_base_aero:2024-12-07 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [505/930] compound_v3_base_aero:2024-12-09 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [506/930] compound_v3_base_aero:2024-12-10 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [507/930] compound_v3_base_aero:2024-12-11 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [508/930] compound_v3_base_aero:2024-12-12 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [510/930] compound_v3_base_aero:2024-12-14 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [511/930] compound_v3_base_aero:2024-12-15 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [512/930] compound_v3_base_aero:2024-12-16 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [513/930] compound_v3_base_aero:2024-12-17 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [514/930] compound_v3_base_aero:2024-12-18 (0.6 tasks/sec, ETA: 12.4m)
+❌ [515/930] compound_v3_base_aero:2024-12-19 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [516/930] compound_v3_base_aero:2024-12-20 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [517/930] compound_v3_base_aero:2024-12-21 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [519/930] compound_v3_base_aero:2024-12-22 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [520/930] compound_v3_base_aero:2024-12-24 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [521/930] compound_v3_base_aero:2024-12-25 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [523/930] compound_v3_base_aero:2024-12-26 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [524/930] compound_v3_base_aero:2024-12-28 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [525/930] compound_v3_base_aero:2024-12-29 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [527/930] compound_v3_base_aero:2024-12-30 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [528/930] compound_v3_op_usdc:2024-12-01 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [529/930] compound_v3_op_usdc:2024-12-02 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [530/930] compound_v3_op_usdc:2024-12-03 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [531/930] compound_v3_op_usdc:2024-12-04 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [532/930] compound_v3_op_usdc:2024-12-05 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [533/930] compound_v3_op_usdc:2024-12-06 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [534/930] compound_v3_op_usdc:2024-12-07 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [535/930] compound_v3_op_usdc:2024-12-08 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [536/930] compound_v3_op_usdc:2024-12-09 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [537/930] compound_v3_op_usdc:2024-12-10 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [538/930] compound_v3_op_usdc:2024-12-11 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [539/930] compound_v3_op_usdc:2024-12-12 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [540/930] compound_v3_op_usdc:2024-12-13 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [541/930] compound_v3_op_usdc:2024-12-14 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [542/930] compound_v3_op_usdc:2024-12-15 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [543/930] compound_v3_op_usdc:2024-12-16 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [544/930] compound_v3_op_usdc:2024-12-17 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [545/930] compound_v3_op_usdc:2024-12-18 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [546/930] compound_v3_op_usdc:2024-12-19 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [547/930] compound_v3_op_usdc:2024-12-20 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [548/930] compound_v3_op_usdc:2024-12-21 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [549/930] compound_v3_op_usdc:2024-12-22 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [550/930] compound_v3_op_usdc:2024-12-23 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [551/930] compound_v3_op_usdc:2024-12-24 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [552/930] compound_v3_op_usdc:2024-12-25 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [553/930] compound_v3_op_usdc:2024-12-26 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [554/930] compound_v3_op_usdc:2024-12-27 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [555/930] compound_v3_op_usdc:2024-12-28 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [556/930] compound_v3_op_usdc:2024-12-29 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [557/930] compound_v3_op_usdc:2024-12-30 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [558/930] compound_v3_op_usdc:2024-12-31 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [559/930] compound_v3_op_usdt:2024-12-01 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [560/930] compound_v3_op_usdt:2024-12-02 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [561/930] compound_v3_op_usdt:2024-12-03 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [562/930] compound_v3_op_usdt:2024-12-04 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [563/930] compound_v3_op_usdt:2024-12-05 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [564/930] compound_v3_op_usdt:2024-12-06 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [565/930] compound_v3_op_usdt:2024-12-07 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [566/930] compound_v3_op_usdt:2024-12-09 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [567/930] compound_v3_op_usdt:2024-12-08 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [568/930] compound_v3_op_usdt:2024-12-10 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [569/930] compound_v3_op_usdt:2024-12-11 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [570/930] compound_v3_op_usdt:2024-12-12 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [571/930] compound_v3_op_usdt:2024-12-13 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [572/930] compound_v3_op_usdt:2024-12-14 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [573/930] compound_v3_op_usdt:2024-12-15 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [574/930] compound_v3_op_usdt:2024-12-16 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [575/930] compound_v3_op_usdt:2024-12-17 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [576/930] compound_v3_op_usdt:2024-12-18 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [577/930] compound_v3_op_usdt:2024-12-19 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [578/930] compound_v3_op_usdt:2024-12-20 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [579/930] compound_v3_op_usdt:2024-12-21 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [580/930] compound_v3_op_usdt:2024-12-22 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [581/930] compound_v3_op_usdt:2024-12-24 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [582/930] compound_v3_op_usdt:2024-12-23 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [583/930] compound_v3_op_usdt:2024-12-25 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [584/930] compound_v3_op_usdt:2024-12-26 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [585/930] compound_v3_op_usdt:2024-12-27 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [586/930] compound_v3_op_usdt:2024-12-29 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [587/930] compound_v3_op_usdt:2024-12-28 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [588/930] compound_v3_op_usdt:2024-12-30 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [589/930] compound_v3_op_usdt:2024-12-31 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [590/930] compound_v3_op_weth:2024-12-01 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [591/930] compound_v3_op_weth:2024-12-03 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [592/930] compound_v3_op_weth:2024-12-02 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [593/930] compound_v3_op_weth:2024-12-05 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [594/930] compound_v3_op_weth:2024-12-07 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 1: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 0: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 3: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 2: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 1: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 4: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 3: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 2: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 4: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 5: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 4: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 3: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 5: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 6: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [601/930] compound_v3_op_weth:2024-12-16 (0.5 tasks/sec, ETA: 10.9m)
+Warning: Failed to get collateral asset 5: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 4: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 6: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 7: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 6: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 5: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 7: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [605/930] compound_v3_op_weth:2024-12-18 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 7: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 6: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [607/930] compound_v3_op_weth:2024-12-19 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [608/930] compound_v3_op_weth:2024-12-21 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [610/930] compound_v3_op_weth:2024-12-22 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to get collateral asset 7: 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [612/930] compound_v3_op_weth:2024-12-23 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [613/930] compound_v3_op_weth:2024-12-24 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [614/930] compound_v3_op_weth:2024-12-26 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [615/930] compound_v3_op_weth:2024-12-27 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [616/930] compound_v3_op_weth:2024-12-28 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [618/930] compound_v3_op_weth:2024-12-29 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [619/930] compound_v3_poly_usdc:2024-12-03 - {'code': -32000, 'message': 'state 0x80c8c1d8e7286be8e5be19aac12a8bb09d33cd5175bfb05ec6e81120c754a51a is not available'}
+❌ [620/930] compound_v3_poly_usdc:2024-12-04 - {'code': -32000, 'message': 'state 0x48f3c7a38c604c8e60f7e9b499d59a312a8a94d6876dfd13595bc0d41314cab8 is not available'}
+❌ [621/930] compound_v3_poly_usdc:2024-12-05 - {'code': -32000, 'message': 'state 0xa0edc8f1d907fbac425be603576e3d245d873b470b5f410039824011f2cc8d77 is not available'}
+❌ [622/930] compound_v3_poly_usdc:2024-12-06 - {'code': -32000, 'message': 'state 0x9ce6d9944b3c62bcc3346b03f31a375429be4e4ae07fa14cab63a0977cf6f50e is not available'}
+❌ [623/930] compound_v3_poly_usdc:2024-12-07 - {'code': -32000, 'message': 'state 0xc6e0487918b11d541275155dc97edeae087753b045db3ba464e0b0976de046f4 is not available'}
+❌ [624/930] compound_v3_poly_usdc:2024-12-08 - {'code': -32000, 'message': 'state 0x1a40282c96be71722a78c0b2279d7949440629b26e4f4777808c2b04627022cf is not available'}
+❌ [625/930] compound_v3_poly_usdc:2024-12-09 - {'code': -32000, 'message': 'state 0x4a14b473b9f038766c15543f3302d8ff3e66acb06d7886e583d6354993dceb8c is not available'}
+❌ [626/930] compound_v3_poly_usdc:2024-12-10 - {'code': -32000, 'message': 'state 0x097b4d51d37f304a3608f68c104d94971cc3e40ffb3d5708a8b9be0497f14adf is not available'}
+❌ [627/930] compound_v3_poly_usdc:2024-12-11 - {'code': -32000, 'message': 'state 0xd042168dd21c7cbb2aac6e38a05ddd90dc61e02d1fc59c875307d1370b092dd0 is not available'}
+❌ [628/930] compound_v3_poly_usdc:2024-12-12 - {'code': -32000, 'message': 'state 0x12c32b645eb0403eac94edab02006c74402751f64368e2fb4d6d4740e5bec9a7 is not available'}
+❌ [629/930] compound_v3_poly_usdc:2024-12-13 - {'code': -32000, 'message': 'state 0x040e02ba49569d3484990e4b68786c3ba3551150fe07cc47c7973f0e1443ce65 is not available'}
+❌ [630/930] compound_v3_poly_usdc:2024-12-14 - {'code': -32000, 'message': 'state 0x64716e2afcaf0667c407d3305b840ee52fb300b8595362f298ef4cf6f343e411 is not available'}
+❌ [631/930] compound_v3_poly_usdc:2024-12-15 - {'code': -32000, 'message': 'state 0x26e6b108cc61a52f12c3756d8621a79003f152dccddc5b1b5b553fe77175fef0 is not available'}
+❌ [632/930] compound_v3_poly_usdc:2024-12-16 - {'code': -32000, 'message': 'state 0x28143345ece0cf848fb9a7ee1e7961f5f9954d3e5c1b864e58f796f4b6ba4815 is not available'}
+❌ [633/930] compound_v3_poly_usdc:2024-12-17 - {'code': -32000, 'message': 'state 0x053f8490ceb3103f10e98c0f2222652adaf2bb511d24aa4c9b9d06ffef75f7ed is not available'}
+❌ [634/930] compound_v3_poly_usdc:2024-12-18 - {'code': -32000, 'message': 'state 0x05c204983d8130fed10104ee482df6a75c353ab69a0dc2ffb911d207b51dda16 is not available'}
+❌ [635/930] compound_v3_poly_usdc:2024-12-19 - {'code': -32000, 'message': 'state 0x7be64a9f93e1ef6d572d63ef4722d31d1ae1c46f6fadf2f3405dd43bc2b07fff is not available'}
+❌ [636/930] compound_v3_poly_usdc:2024-12-20 - {'code': -32000, 'message': 'state 0x0e99adde2becd32f1a3ccf260c7ae8d456d86c427b3575260572f6115f06cd46 is not available'}
+❌ [637/930] compound_v3_op_weth:2024-12-31 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [638/930] compound_v3_poly_usdc:2024-12-21 - {'code': -32000, 'message': 'state 0x8ecbd2e86b2cca8862635b7449309c0911eec3c26baf4fcb348b544197719d14 is not available'}
+❌ [639/930] compound_v3_op_weth:2024-12-30 - 429 Client Error: Too Many Requests for url: https://opt-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [640/930] compound_v3_poly_usdc:2024-12-23 - {'code': -32000, 'message': 'state 0x87f2a2eb9c6e37bcd933d901a47740a3c8f6547838fefb00d169e1655ff7459f is not available'}
+❌ [641/930] compound_v3_poly_usdc:2024-12-01 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [642/930] compound_v3_poly_usdc:2024-12-25 - {'code': -32000, 'message': 'state 0x7712a104a38abc6f158717d90f0027c2f7ea81eab294485c60fb52497115999c is not available'}
+❌ [643/930] compound_v3_poly_usdc:2024-12-27 - {'code': -32000, 'message': 'state 0x9a6090577fd927eb269b94ddc8a2912001c3312227baacda4e0e135bea3509a4 is not available'}
+❌ [644/930] compound_v3_poly_usdc:2024-12-28 - {'code': -32000, 'message': 'state 0x82744689b8ec8ae8543db1f79e7ed777f3ac4d26b5375f426d1b7e845c6840e7 is not available'}
+❌ [645/930] compound_v3_poly_usdc:2024-12-29 - {'code': -32000, 'message': 'state 0x916ad6170122c1343b97f574ed932e11e9088a8e4eeac5bfe727aaaa250c2f34 is not available'}
+❌ [646/930] compound_v3_poly_usdc:2024-12-02 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [647/930] compound_v3_poly_usdc:2024-12-30 - {'code': -32000, 'message': 'state 0x111239df31175f8eb07e82fb74bc01fc9e0f6c22826a036b1e2e028b383e34f3 is not available'}
+❌ [648/930] compound_v3_poly_usdc_e:2024-12-01 - {'code': -32000, 'message': 'state 0x8661aabc5792505a35625a528eaf71055abfa8d7d31842d481ec59aa032cce6f is not available'}
+❌ [649/930] compound_v3_poly_usdc_e:2024-12-02 - {'code': -32000, 'message': 'state 0x139122984a51f31953deadcc3942601dda1a263a149885949551c7d022c9738a is not available'}
+❌ [650/930] compound_v3_poly_usdc_e:2024-12-03 - {'code': -32000, 'message': 'state 0x80c8c1d8e7286be8e5be19aac12a8bb09d33cd5175bfb05ec6e81120c754a51a is not available'}
+❌ [651/930] compound_v3_poly_usdc_e:2024-12-04 - {'code': -32000, 'message': 'state 0x48f3c7a38c604c8e60f7e9b499d59a312a8a94d6876dfd13595bc0d41314cab8 is not available'}
+❌ [652/930] compound_v3_poly_usdc_e:2024-12-05 - {'code': -32000, 'message': 'state 0xa0edc8f1d907fbac425be603576e3d245d873b470b5f410039824011f2cc8d77 is not available'}
+❌ [653/930] compound_v3_poly_usdc_e:2024-12-06 - {'code': -32000, 'message': 'state 0x9ce6d9944b3c62bcc3346b03f31a375429be4e4ae07fa14cab63a0977cf6f50e is not available'}
+❌ [654/930] compound_v3_poly_usdc_e:2024-12-07 - {'code': -32000, 'message': 'state 0xc6e0487918b11d541275155dc97edeae087753b045db3ba464e0b0976de046f4 is not available'}
+❌ [655/930] compound_v3_poly_usdc_e:2024-12-08 - {'code': -32000, 'message': 'state 0x1a40282c96be71722a78c0b2279d7949440629b26e4f4777808c2b04627022cf is not available'}
+❌ [656/930] compound_v3_poly_usdc_e:2024-12-09 - {'code': -32000, 'message': 'state 0x4a14b473b9f038766c15543f3302d8ff3e66acb06d7886e583d6354993dceb8c is not available'}
+❌ [657/930] compound_v3_poly_usdc_e:2024-12-10 - {'code': -32000, 'message': 'state 0x097b4d51d37f304a3608f68c104d94971cc3e40ffb3d5708a8b9be0497f14adf is not available'}
+❌ [658/930] compound_v3_poly_usdc_e:2024-12-11 - {'code': -32000, 'message': 'state 0xd042168dd21c7cbb2aac6e38a05ddd90dc61e02d1fc59c875307d1370b092dd0 is not available'}
+❌ [659/930] compound_v3_poly_usdc_e:2024-12-12 - {'code': -32000, 'message': 'state 0x12c32b645eb0403eac94edab02006c74402751f64368e2fb4d6d4740e5bec9a7 is not available'}
+❌ [660/930] compound_v3_poly_usdc_e:2024-12-13 - {'code': -32000, 'message': 'state 0x040e02ba49569d3484990e4b68786c3ba3551150fe07cc47c7973f0e1443ce65 is not available'}
+❌ [661/930] compound_v3_poly_usdc_e:2024-12-14 - {'code': -32000, 'message': 'state 0x64716e2afcaf0667c407d3305b840ee52fb300b8595362f298ef4cf6f343e411 is not available'}
+❌ [662/930] compound_v3_poly_usdc_e:2024-12-15 - {'code': -32000, 'message': 'state 0x26e6b108cc61a52f12c3756d8621a79003f152dccddc5b1b5b553fe77175fef0 is not available'}
+❌ [663/930] compound_v3_poly_usdc_e:2024-12-16 - {'code': -32000, 'message': 'state 0x28143345ece0cf848fb9a7ee1e7961f5f9954d3e5c1b864e58f796f4b6ba4815 is not available'}
+❌ [664/930] compound_v3_poly_usdc_e:2024-12-17 - {'code': -32000, 'message': 'state 0x053f8490ceb3103f10e98c0f2222652adaf2bb511d24aa4c9b9d06ffef75f7ed is not available'}
+❌ [665/930] compound_v3_poly_usdc_e:2024-12-18 - {'code': -32000, 'message': 'state 0x05c204983d8130fed10104ee482df6a75c353ab69a0dc2ffb911d207b51dda16 is not available'}
+❌ [666/930] compound_v3_poly_usdc:2024-12-22 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [667/930] compound_v3_poly_usdc:2024-12-24 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [668/930] compound_v3_poly_usdc_e:2024-12-19 - {'code': -32000, 'message': 'state 0x7be64a9f93e1ef6d572d63ef4722d31d1ae1c46f6fadf2f3405dd43bc2b07fff is not available'}
+❌ [669/930] compound_v3_poly_usdc_e:2024-12-22 - {'code': -32000, 'message': 'state 0xe01fb7e80160deca27b9a9c9a676dab5fa51237bcaf83886ae46dac0ef13acba is not available'}
+❌ [670/930] compound_v3_poly_usdc:2024-12-26 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [671/930] compound_v3_poly_usdc_e:2024-12-23 - {'code': -32000, 'message': 'state 0x87f2a2eb9c6e37bcd933d901a47740a3c8f6547838fefb00d169e1655ff7459f is not available'}
+❌ [672/930] compound_v3_poly_usdc_e:2024-12-25 - {'code': -32000, 'message': 'state 0x7712a104a38abc6f158717d90f0027c2f7ea81eab294485c60fb52497115999c is not available'}
+❌ [673/930] compound_v3_poly_usdc_e:2024-12-26 - {'code': -32000, 'message': 'state 0x3877006d2ce2bbe70d5112d554fc4b07cc85d082d7310e63c86d09ef543b61aa is not available'}
+❌ [674/930] compound_v3_poly_usdc:2024-12-31 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [675/930] compound_v3_poly_usdc_e:2024-12-27 - {'code': -32000, 'message': 'state 0x9a6090577fd927eb269b94ddc8a2912001c3312227baacda4e0e135bea3509a4 is not available'}
+❌ [676/930] compound_v3_poly_usdc_e:2024-12-29 - {'code': -32000, 'message': 'state 0x916ad6170122c1343b97f574ed932e11e9088a8e4eeac5bfe727aaaa250c2f34 is not available'}
+❌ [677/930] compound_v3_poly_usdc_e:2024-12-30 - {'code': -32000, 'message': 'state 0x111239df31175f8eb07e82fb74bc01fc9e0f6c22826a036b1e2e028b383e34f3 is not available'}
+❌ [678/930] compound_v3_poly_usdc_e:2024-12-31 - {'code': -32000, 'message': 'state 0xa7fc5a7b3e66a5ee18adf4ea0c8fbf859a769db8af5dfc960e24d9161ad1cccb is not available'}
+❌ [679/930] compound_v3_poly_usdt:2024-12-01 - {'code': -32000, 'message': 'state 0x8661aabc5792505a35625a528eaf71055abfa8d7d31842d481ec59aa032cce6f is not available'}
+❌ [680/930] compound_v3_poly_usdt:2024-12-02 - {'code': -32000, 'message': 'state 0x139122984a51f31953deadcc3942601dda1a263a149885949551c7d022c9738a is not available'}
+❌ [681/930] compound_v3_poly_usdt:2024-12-03 - {'code': -32000, 'message': 'state 0x80c8c1d8e7286be8e5be19aac12a8bb09d33cd5175bfb05ec6e81120c754a51a is not available'}
+❌ [682/930] compound_v3_poly_usdt:2024-12-04 - {'code': -32000, 'message': 'state 0x48f3c7a38c604c8e60f7e9b499d59a312a8a94d6876dfd13595bc0d41314cab8 is not available'}
+❌ [683/930] compound_v3_poly_usdt:2024-12-05 - {'code': -32000, 'message': 'state 0xa0edc8f1d907fbac425be603576e3d245d873b470b5f410039824011f2cc8d77 is not available'}
+❌ [684/930] compound_v3_poly_usdt:2024-12-06 - {'code': -32000, 'message': 'state 0x9ce6d9944b3c62bcc3346b03f31a375429be4e4ae07fa14cab63a0977cf6f50e is not available'}
+❌ [685/930] compound_v3_poly_usdt:2024-12-07 - {'code': -32000, 'message': 'state 0xc6e0487918b11d541275155dc97edeae087753b045db3ba464e0b0976de046f4 is not available'}
+❌ [686/930] compound_v3_poly_usdt:2024-12-08 - {'code': -32000, 'message': 'state 0x1a40282c96be71722a78c0b2279d7949440629b26e4f4777808c2b04627022cf is not available'}
+❌ [687/930] compound_v3_poly_usdt:2024-12-09 - {'code': -32000, 'message': 'state 0x4a14b473b9f038766c15543f3302d8ff3e66acb06d7886e583d6354993dceb8c is not available'}
+❌ [688/930] compound_v3_poly_usdt:2024-12-10 - {'code': -32000, 'message': 'state 0x097b4d51d37f304a3608f68c104d94971cc3e40ffb3d5708a8b9be0497f14adf is not available'}
+❌ [689/930] compound_v3_poly_usdt:2024-12-11 - {'code': -32000, 'message': 'state 0xd042168dd21c7cbb2aac6e38a05ddd90dc61e02d1fc59c875307d1370b092dd0 is not available'}
+❌ [690/930] compound_v3_poly_usdt:2024-12-12 - {'code': -32000, 'message': 'state 0x12c32b645eb0403eac94edab02006c74402751f64368e2fb4d6d4740e5bec9a7 is not available'}
+❌ [691/930] compound_v3_poly_usdt:2024-12-13 - {'code': -32000, 'message': 'state 0x040e02ba49569d3484990e4b68786c3ba3551150fe07cc47c7973f0e1443ce65 is not available'}
+❌ [692/930] compound_v3_poly_usdt:2024-12-14 - {'code': -32000, 'message': 'state 0x64716e2afcaf0667c407d3305b840ee52fb300b8595362f298ef4cf6f343e411 is not available'}
+❌ [693/930] compound_v3_poly_usdt:2024-12-15 - {'code': -32000, 'message': 'state 0x26e6b108cc61a52f12c3756d8621a79003f152dccddc5b1b5b553fe77175fef0 is not available'}
+❌ [694/930] compound_v3_poly_usdc_e:2024-12-20 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [695/930] compound_v3_poly_usdt:2024-12-16 - {'code': -32000, 'message': 'state 0x28143345ece0cf848fb9a7ee1e7961f5f9954d3e5c1b864e58f796f4b6ba4815 is not available'}
+❌ [696/930] compound_v3_poly_usdc_e:2024-12-21 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [697/930] compound_v3_poly_usdt:2024-12-18 - {'code': -32000, 'message': 'state 0x05c204983d8130fed10104ee482df6a75c353ab69a0dc2ffb911d207b51dda16 is not available'}
+❌ [698/930] compound_v3_poly_usdt:2024-12-20 - {'code': -32000, 'message': 'state 0x0e99adde2becd32f1a3ccf260c7ae8d456d86c427b3575260572f6115f06cd46 is not available'}
+❌ [699/930] compound_v3_poly_usdc_e:2024-12-24 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [700/930] compound_v3_poly_usdt:2024-12-21 - {'code': -32000, 'message': 'state 0x8ecbd2e86b2cca8862635b7449309c0911eec3c26baf4fcb348b544197719d14 is not available'}
+❌ [701/930] compound_v3_poly_usdt:2024-12-23 - {'code': -32000, 'message': 'state 0x87f2a2eb9c6e37bcd933d901a47740a3c8f6547838fefb00d169e1655ff7459f is not available'}
+❌ [702/930] compound_v3_poly_usdt:2024-12-24 - {'code': -32000, 'message': 'state 0x66d73e455d668d6f2bd256f804f630d9ad561c5a2a7928d9174a9ca9ef22f996 is not available'}
+❌ [703/930] compound_v3_poly_usdc_e:2024-12-28 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [704/930] compound_v3_poly_usdt:2024-12-25 - {'code': -32000, 'message': 'state 0x7712a104a38abc6f158717d90f0027c2f7ea81eab294485c60fb52497115999c is not available'}
+❌ [705/930] compound_v3_poly_usdt:2024-12-27 - {'code': -32000, 'message': 'state 0x9a6090577fd927eb269b94ddc8a2912001c3312227baacda4e0e135bea3509a4 is not available'}
+❌ [706/930] compound_v3_poly_usdt:2024-12-28 - {'code': -32000, 'message': 'state 0x82744689b8ec8ae8543db1f79e7ed777f3ac4d26b5375f426d1b7e845c6840e7 is not available'}
+❌ [707/930] compound_v3_poly_usdt:2024-12-29 - {'code': -32000, 'message': 'state 0x916ad6170122c1343b97f574ed932e11e9088a8e4eeac5bfe727aaaa250c2f34 is not available'}
+❌ [708/930] compound_v3_poly_usdt:2024-12-30 - {'code': -32000, 'message': 'state 0x111239df31175f8eb07e82fb74bc01fc9e0f6c22826a036b1e2e028b383e34f3 is not available'}
+❌ [709/930] compound_v3_poly_usdt:2024-12-31 - {'code': -32000, 'message': 'state 0xa7fc5a7b3e66a5ee18adf4ea0c8fbf859a769db8af5dfc960e24d9161ad1cccb is not available'}
+❌ [710/930] fluid_lending_plasma:2024-12-01 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [711/930] fluid_lending_plasma:2024-12-02 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [712/930] compound_v3_poly_usdt:2024-12-17 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [713/930] compound_v3_poly_usdt:2024-12-19 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [714/930] compound_v3_poly_usdt:2024-12-22 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [715/930] fluid_lending_plasma:2024-12-03 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [716/930] fluid_lending_plasma:2024-12-04 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [717/930] fluid_lending_plasma:2024-12-05 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [718/930] compound_v3_poly_usdt:2024-12-26 - 429 Client Error: Too Many Requests for url: https://polygon-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [719/930] fluid_lending_plasma:2024-12-07 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [720/930] fluid_lending_plasma:2024-12-06 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [721/930] fluid_lending_plasma:2024-12-08 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [722/930] fluid_lending_plasma:2024-12-09 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [723/930] fluid_lending_plasma:2024-12-10 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [724/930] fluid_lending_plasma:2024-12-12 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [725/930] fluid_lending_plasma:2024-12-11 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [726/930] fluid_lending_plasma:2024-12-13 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [727/930] fluid_lending_plasma:2024-12-14 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [728/930] fluid_lending_plasma:2024-12-15 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [729/930] fluid_lending_plasma:2024-12-16 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [730/930] fluid_lending_plasma:2024-12-17 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [731/930] fluid_lending_plasma:2024-12-18 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [732/930] fluid_lending_plasma:2024-12-20 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [733/930] fluid_lending_plasma:2024-12-19 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [734/930] fluid_lending_plasma:2024-12-21 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [735/930] fluid_lending_plasma:2024-12-22 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [736/930] fluid_lending_plasma:2024-12-23 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [737/930] fluid_lending_plasma:2024-12-24 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [738/930] fluid_lending_plasma:2024-12-25 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [739/930] fluid_lending_plasma:2024-12-26 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [740/930] fluid_lending_plasma:2024-12-27 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [741/930] fluid_lending_plasma:2024-12-28 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [742/930] fluid_lending_plasma:2024-12-29 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [743/930] fluid_lending_plasma:2024-12-30 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [744/930] fluid_lending_plasma:2024-12-31 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [745/930] fluid_lending_arbitrum:2024-12-04 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [746/930] fluid_lending_arbitrum:2024-12-06 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to process fToken 0xbE3860FD4c3facDf8ad57Aa8c1A36D6dc4390a49: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [749/930] fluid_lending_arbitrum:2024-12-07 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [750/930] fluid_lending_arbitrum:2024-12-05 (0.5 tasks/sec, ETA: 6.1m)
+❌ [751/930] fluid_lending_arbitrum:2024-12-09 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [752/930] fluid_lending_arbitrum:2024-12-10 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [753/930] fluid_lending_arbitrum:2024-12-12 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to process fToken 0xbE3860FD4c3facDf8ad57Aa8c1A36D6dc4390a49: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [755/930] fluid_lending_arbitrum:2024-12-13 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [757/930] fluid_lending_arbitrum:2024-12-14 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [758/930] fluid_lending_arbitrum:2024-12-15 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [760/930] fluid_lending_arbitrum:2024-12-16 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [761/930] fluid_lending_arbitrum:2024-12-18 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [762/930] fluid_lending_arbitrum:2024-12-19 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [763/930] fluid_lending_arbitrum:2024-12-21 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [764/930] fluid_lending_arbitrum:2024-12-22 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [765/930] fluid_lending_arbitrum:2024-12-23 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [766/930] fluid_lending_arbitrum:2024-12-24 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [768/930] fluid_lending_arbitrum:2024-12-25 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [769/930] fluid_lending_arbitrum:2024-12-26 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [770/930] fluid_lending_arbitrum:2024-12-27 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [771/930] fluid_lending_arbitrum:2024-12-29 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [772/930] fluid_lending_arbitrum:2024-12-30 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [773/930] fluid_lending_base:2024-12-02 - ('execution reverted', 'no data')
+❌ [774/930] fluid_lending_base:2024-12-03 - ('execution reverted', 'no data')
+❌ [775/930] fluid_lending_base:2024-12-04 - ('execution reverted', 'no data')
+❌ [776/930] fluid_lending_arbitrum:2024-12-31 - 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [777/930] fluid_lending_base:2024-12-05 - ('execution reverted', 'no data')
+❌ [778/930] fluid_lending_base:2024-12-06 - ('execution reverted', 'no data')
+❌ [780/930] fluid_lending_base:2024-12-08 - ('execution reverted', 'no data')
+❌ [781/930] fluid_lending_base:2024-12-07 - ('execution reverted', 'no data')
+❌ [782/930] fluid_lending_base:2024-12-10 - ('execution reverted', 'no data')
+❌ [783/930] fluid_lending_base:2024-12-11 - ('execution reverted', 'no data')
+❌ [784/930] fluid_lending_base:2024-12-12 - ('execution reverted', 'no data')
+❌ [785/930] fluid_lending_base:2024-12-13 - ('execution reverted', 'no data')
+❌ [786/930] fluid_lending_base:2024-12-15 - ('execution reverted', 'no data')
+❌ [787/930] fluid_lending_base:2024-12-14 - ('execution reverted', 'no data')
+❌ [788/930] fluid_lending_base:2024-12-17 - ('execution reverted', 'no data')
+❌ [789/930] fluid_lending_base:2024-12-16 - ('execution reverted', 'no data')
+❌ [790/930] fluid_lending_base:2024-12-19 - ('execution reverted', 'no data')
+❌ [791/930] fluid_lending_base:2024-12-18 - ('execution reverted', 'no data')
+❌ [792/930] fluid_lending_base:2024-12-21 - ('execution reverted', 'no data')
+❌ [793/930] fluid_lending_base:2024-12-20 - ('execution reverted', 'no data')
+❌ [794/930] fluid_lending_base:2024-12-23 - ('execution reverted', 'no data')
+❌ [795/930] fluid_lending_base:2024-12-22 - ('execution reverted', 'no data')
+❌ [796/930] fluid_lending_base:2024-12-25 - ('execution reverted', 'no data')
+❌ [797/930] fluid_lending_base:2024-12-24 - ('execution reverted', 'no data')
+❌ [798/930] fluid_lending_base:2024-12-27 - ('execution reverted', 'no data')
+❌ [799/930] fluid_lending_base:2024-12-26 - ('execution reverted', 'no data')
+❌ [800/930] fluid_lending_base:2024-12-29 - ('execution reverted', 'no data')
+❌ [801/930] fluid_lending_base:2024-12-28 - ('execution reverted', 'no data')
+❌ [802/930] fluid_lending_base:2024-12-01 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [803/930] fluid_lending_base:2024-12-30 - ('execution reverted', 'no data')
+❌ [804/930] fluid_lending_base:2024-12-31 - ('execution reverted', 'no data')
+❌ [805/930] benqi_lending_avalanche:2024-12-03 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [806/930] benqi_lending_avalanche:2024-12-04 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [807/930] benqi_lending_avalanche:2024-12-02 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [808/930] benqi_lending_avalanche:2024-12-05 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [809/930] benqi_lending_avalanche:2024-12-06 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [810/930] benqi_lending_avalanche:2024-12-07 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [811/930] benqi_lending_avalanche:2024-12-08 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [812/930] benqi_lending_avalanche:2024-12-09 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [813/930] fluid_lending_base:2024-12-09 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [814/930] benqi_lending_avalanche:2024-12-11 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [815/930] benqi_lending_avalanche:2024-12-13 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [816/930] benqi_lending_avalanche:2024-12-14 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [817/930] benqi_lending_avalanche:2024-12-15 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [818/930] benqi_lending_avalanche:2024-12-16 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [819/930] benqi_lending_avalanche:2024-12-17 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [820/930] benqi_lending_avalanche:2024-12-01 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [821/930] benqi_lending_avalanche:2024-12-18 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [822/930] benqi_lending_avalanche:2024-12-20 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [823/930] benqi_lending_avalanche:2024-12-21 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [824/930] benqi_lending_avalanche:2024-12-22 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [825/930] benqi_lending_avalanche:2024-12-23 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [826/930] benqi_lending_avalanche:2024-12-24 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [827/930] benqi_lending_avalanche:2024-12-25 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [828/930] benqi_lending_avalanche:2024-12-26 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [829/930] benqi_lending_avalanche:2024-12-10 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [830/930] benqi_lending_avalanche:2024-12-27 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [831/930] benqi_lending_avalanche:2024-12-12 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [832/930] benqi_lending_avalanche:2024-12-29 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [833/930] benqi_lending_avalanche:2024-12-31 - Could not transact with/call contract function, is contract deployed correctly and chain synced?
+❌ [834/930] etherfi_borrowing_market_scroll:2024-12-01 - No adapter found for protocol: etherfi
+❌ [835/930] etherfi_borrowing_market_scroll:2024-12-02 - No adapter found for protocol: etherfi
+❌ [836/930] etherfi_borrowing_market_scroll:2024-12-03 - No adapter found for protocol: etherfi
+❌ [837/930] etherfi_borrowing_market_scroll:2024-12-04 - No adapter found for protocol: etherfi
+❌ [838/930] etherfi_borrowing_market_scroll:2024-12-05 - No adapter found for protocol: etherfi
+❌ [839/930] etherfi_borrowing_market_scroll:2024-12-06 - No adapter found for protocol: etherfi
+❌ [840/930] etherfi_borrowing_market_scroll:2024-12-07 - No adapter found for protocol: etherfi
+❌ [841/930] etherfi_borrowing_market_scroll:2024-12-08 - No adapter found for protocol: etherfi
+❌ [842/930] etherfi_borrowing_market_scroll:2024-12-09 - No adapter found for protocol: etherfi
+❌ [843/930] etherfi_borrowing_market_scroll:2024-12-10 - No adapter found for protocol: etherfi
+❌ [844/930] etherfi_borrowing_market_scroll:2024-12-11 - No adapter found for protocol: etherfi
+❌ [845/930] etherfi_borrowing_market_scroll:2024-12-12 - No adapter found for protocol: etherfi
+❌ [846/930] etherfi_borrowing_market_scroll:2024-12-13 - No adapter found for protocol: etherfi
+❌ [847/930] etherfi_borrowing_market_scroll:2024-12-14 - No adapter found for protocol: etherfi
+❌ [848/930] etherfi_borrowing_market_scroll:2024-12-15 - No adapter found for protocol: etherfi
+❌ [849/930] etherfi_borrowing_market_scroll:2024-12-16 - No adapter found for protocol: etherfi
+❌ [850/930] etherfi_borrowing_market_scroll:2024-12-17 - No adapter found for protocol: etherfi
+❌ [851/930] etherfi_borrowing_market_scroll:2024-12-18 - No adapter found for protocol: etherfi
+❌ [852/930] etherfi_borrowing_market_scroll:2024-12-19 - No adapter found for protocol: etherfi
+❌ [853/930] etherfi_borrowing_market_scroll:2024-12-20 - No adapter found for protocol: etherfi
+❌ [854/930] etherfi_borrowing_market_scroll:2024-12-21 - No adapter found for protocol: etherfi
+❌ [855/930] etherfi_borrowing_market_scroll:2024-12-22 - No adapter found for protocol: etherfi
+❌ [856/930] etherfi_borrowing_market_scroll:2024-12-23 - No adapter found for protocol: etherfi
+❌ [857/930] etherfi_borrowing_market_scroll:2024-12-24 - No adapter found for protocol: etherfi
+❌ [858/930] etherfi_borrowing_market_scroll:2024-12-25 - No adapter found for protocol: etherfi
+❌ [859/930] etherfi_borrowing_market_scroll:2024-12-26 - No adapter found for protocol: etherfi
+❌ [860/930] etherfi_borrowing_market_scroll:2024-12-27 - No adapter found for protocol: etherfi
+❌ [861/930] etherfi_borrowing_market_scroll:2024-12-28 - No adapter found for protocol: etherfi
+❌ [862/930] etherfi_borrowing_market_scroll:2024-12-29 - No adapter found for protocol: etherfi
+❌ [863/930] etherfi_borrowing_market_scroll:2024-12-30 - No adapter found for protocol: etherfi
+❌ [864/930] etherfi_borrowing_market_scroll:2024-12-31 - No adapter found for protocol: etherfi
+❌ [865/930] benqi_lending_avalanche:2024-12-19 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to process fToken 0x66C25Cd75EBdAA7E04816F643d8E46cecd3183c9: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [866/930] benqi_lending_avalanche:2024-12-28 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [867/930] benqi_lending_avalanche:2024-12-30 - 429 Client Error: Too Many Requests for url: https://avax-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [868/930] moonwell_lending_base:2024-12-02 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [869/930] moonwell_lending_base:2024-12-03 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [870/930] moonwell_lending_base:2024-12-04 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [871/930] moonwell_lending_base:2024-12-05 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [872/930] moonwell_lending_base:2024-12-06 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [873/930] moonwell_lending_base:2024-12-07 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [874/930] moonwell_lending_base:2024-12-08 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to process fToken 0x0D00C4A2f766b7AFE2cc8F6467E296400A32B239: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [875/930] moonwell_lending_base:2024-12-09 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [876/930] moonwell_lending_base:2024-12-10 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [878/930] moonwell_lending_base:2024-12-12 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [879/930] moonwell_lending_base:2024-12-13 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [880/930] moonwell_lending_base:2024-12-15 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [881/930] moonwell_lending_base:2024-12-16 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+Warning: Failed to process fToken 0xbE3860FD4c3facDf8ad57Aa8c1A36D6dc4390a49: 429 Client Error: Too Many Requests for url: https://arb-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [883/930] moonwell_lending_base:2024-12-17 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [884/930] moonwell_lending_base:2024-12-18 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [885/930] moonwell_lending_base:2024-12-20 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [886/930] moonwell_lending_base:2024-12-21 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [887/930] moonwell_lending_base:2024-12-22 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [888/930] moonwell_lending_base:2024-12-23 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [889/930] moonwell_lending_base:2024-12-24 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [890/930] moonwell_lending_base:2024-12-25 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [891/930] moonwell_lending_base:2024-12-26 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [892/930] moonwell_lending_base:2024-12-27 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [894/930] moonwell_lending_base:2024-12-28 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [895/930] moonwell_lending_base:2024-12-29 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+❌ [896/930] sumermoney_meter:2024-12-01 - 'registry'
+❌ [897/930] sumermoney_meter:2024-12-02 - 'registry'
+❌ [898/930] sumermoney_meter:2024-12-03 - 'registry'
+❌ [899/930] sumermoney_meter:2024-12-04 - 'registry'
+❌ [900/930] sumermoney_meter:2024-12-05 - 'registry'
+❌ [901/930] sumermoney_meter:2024-12-06 - 'registry'
+❌ [902/930] sumermoney_meter:2024-12-07 - 'registry'
+❌ [903/930] sumermoney_meter:2024-12-08 - 'registry'
+❌ [904/930] sumermoney_meter:2024-12-09 - 'registry'
+❌ [905/930] sumermoney_meter:2024-12-10 - 'registry'
+❌ [906/930] sumermoney_meter:2024-12-11 - 'registry'
+❌ [907/930] sumermoney_meter:2024-12-12 - 'registry'
+❌ [908/930] sumermoney_meter:2024-12-13 - 'registry'
+❌ [909/930] sumermoney_meter:2024-12-14 - 'registry'
+❌ [910/930] sumermoney_meter:2024-12-15 - 'registry'
+❌ [911/930] sumermoney_meter:2024-12-16 - 'registry'
+❌ [912/930] sumermoney_meter:2024-12-17 - 'registry'
+❌ [913/930] sumermoney_meter:2024-12-18 - 'registry'
+❌ [914/930] sumermoney_meter:2024-12-19 - 'registry'
+❌ [915/930] sumermoney_meter:2024-12-20 - 'registry'
+❌ [916/930] sumermoney_meter:2024-12-21 - 'registry'
+❌ [917/930] sumermoney_meter:2024-12-22 - 'registry'
+❌ [918/930] sumermoney_meter:2024-12-23 - 'registry'
+❌ [919/930] sumermoney_meter:2024-12-24 - 'registry'
+❌ [920/930] sumermoney_meter:2024-12-25 - 'registry'
+❌ [921/930] sumermoney_meter:2024-12-26 - 'registry'
+❌ [922/930] sumermoney_meter:2024-12-27 - 'registry'
+❌ [923/930] sumermoney_meter:2024-12-28 - 'registry'
+❌ [924/930] sumermoney_meter:2024-12-29 - 'registry'
+❌ [925/930] sumermoney_meter:2024-12-30 - 'registry'
+❌ [926/930] sumermoney_meter:2024-12-31 - 'registry'
+❌ [927/930] moonwell_lending_base:2024-12-31 - 429 Client Error: Too Many Requests for url: https://base-mainnet.g.alchemy.com/v2/f3xoB8jQS-527ELqWlevy
+✅ [929/930] moonwell_lending_base:2024-12-11 (0.4 tasks/sec, ETA: 0.0m)
+
+================================================================================
+Collection Complete!
+================================================================================
+✅ Completed: 161/930
+❌ Failed: 769/930
+⏱️  Time: 6.6 minutes
+📊 Rate: 2.3 tasks/second
+💾 Output: data/bronze/tvl/{csu}/{date}.json
+
+⚠️  769 tasks failed. Run with --resume to retry.
+   Failed tasks saved in: data/.checkpoint_tvl.json
+================================================================================

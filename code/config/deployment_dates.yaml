@@ -1,0 +1,35 @@
+# CSU Deployment Dates
+#
+# Records the deployment date for each CSU to avoid querying blocks
+# before the contract existed (which causes decode errors).
+#
+# Format:
+#   csu_name: "YYYY-MM-DD"
+#
+# These dates were found using scripts/find_contract_deployment.py
+
+csus:
+  # Compound V3 Markets
+  compound_v3_base_usdc: "2024-03-11"
+  compound_v3_op_usdc: "2024-04-06"
+  compound_v3_op_usdt: "2024-05-20"
+  compound_v3_arb_weth: "2024-06-07"
+  compound_v3_fluid_lending_arbitrum: "2024-06-11"
+  compound_v3_arb_usdt: "2024-06-20"
+  compound_v3_eth_usdt: "2024-06-28"
+  compound_v3_op_weth: "2024-07-15"
+  compound_v3_eth_wsteth: "2024-09-05"
+  compound_v3_base_aero: "2024-10-09"
+  compound_v3_eth_usds: "2024-10-17"
+
+  # Fluid Lending
+  fluid_lending_arbitrum: "2024-06-11"
+  fluid_lending_base: "2024-08-01"  # TODO: Verify exact date
+  fluid_lending_ethereum: "2024-02-01"  # TODO: Verify exact date
+
+  # Aave V3 (deployed mid-2024 on new chains)
+  aave_v3_linea: "2024-07-01"  # TODO: Verify exact date from block 12430823
+  aave_v3_scroll: "2023-10-01"  # TODO: Verify exact date from block 2618760
+
+  # Note: CSUs not listed here are assumed to have been deployed before 2024-01-01
+  # and can be queried for the full year.

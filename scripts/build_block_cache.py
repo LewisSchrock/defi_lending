@@ -10,19 +10,37 @@ Usage:
 """
 from __future__ import annotations
 import sys
-import os
 from pathlib import Path
-import json
-from datetime import date, timedelta
-import argparse
-from config.rpc_pool import get_web3
-from datetime import datetime, timedelta, timezone
-import pytz
 
-# Add parent to path
+# Add parent to path BEFORE importing project modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import os
+import json
+from datetime import date, datetime, timedelta, timezone
+import argparse
+import pytz
+from config.rpc_pool import get_web3
+
+# Import POA middleware (path changed in web3.py v6+)
+try:
+    from web3.middleware import ExtraDataToPOAMiddleware as geth_poa_middleware
+except ImportError:
+    try:
+        from web3.middleware import geth_poa_middleware
+    except ImportError:
+        # Fallback for very old versions
+        geth_poa_middleware = None
+
 NY_TZ = pytz.timezone("America/New_York")
+
+# Chains that use POA (Proof of Authority) or have non-standard extraData
+POA_CHAINS = ['binance', 'polygon', 'gnosis', 'avalanche', 'optimism', 'linea', 'scroll', 'xdai', 'cronos', 'meter', 'flare', 'sonic']
+
+# Chain name aliases (config name -> RPC pool name)
+CHAIN_ALIASES = {
+    'xdai': 'gnosis',  # xdai in config, but gnosis in RPC pool
+}
 
 
 def to_dt(ts: int) -> datetime:
@@ -92,7 +110,7 @@ def iterate_dates(start_str: str, end_str: str):
 def build_cache_for_chain(chain: str, dates: list, output_file: Path):
     """
     Build date→block cache for a specific chain.
-    
+
     Args:
         chain: Chain name (e.g., 'ethereum')
         dates: List of date strings (YYYY-MM-DD)
@@ -101,8 +119,27 @@ def build_cache_for_chain(chain: str, dates: list, output_file: Path):
     print(f"\n{'='*60}")
     print(f"Building block cache for {chain}")
     print(f"{'='*60}\n")
-    
-    w3 = get_web3(chain)
+
+    # Resolve chain alias if needed
+    rpc_chain = CHAIN_ALIASES.get(chain, chain)
+    if chain != rpc_chain:
+        print(f"[Alias] Using RPC chain name '{rpc_chain}' for config chain '{chain}'\n")
+
+    w3 = get_web3(rpc_chain)
+
+    # Inject POA middleware for chains that need it
+    if chain in POA_CHAINS and geth_poa_middleware:
+        try:
+            # web3.py v7+ uses different middleware API
+            if hasattr(w3, 'middleware_onion'):
+                w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+            else:
+                # Fallback for older versions
+                from web3.middleware import middleware_stack_factory
+                w3.middleware_onion = middleware_stack_factory(w3, [geth_poa_middleware])
+            print(f"[POA] Injected POA middleware for {chain}\n")
+        except Exception as e:
+            print(f"[POA] Warning: Could not inject POA middleware for {chain}: {e}\n")
     
     # Test connection
     try:
