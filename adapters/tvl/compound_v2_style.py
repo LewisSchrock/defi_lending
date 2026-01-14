@@ -102,12 +102,18 @@ ERC20_ABI = [
 ]
 
 
-def _safe_call(func, default=None):
-    """Safely call a contract function."""
-    try:
-        return func()
-    except Exception:
-        return default
+def _safe_call(func, default=None, retries=2):
+    """Safely call a contract function. Retries on connection errors."""
+    import time
+    for attempt in range(retries + 1):
+        try:
+            return func()
+        except Exception as e:
+            error_str = str(e).lower()
+            if attempt < retries and ('connection' in error_str or 'remote' in error_str or 'timeout' in error_str):
+                time.sleep(0.5 * (attempt + 1))
+                continue
+            return default
 
 
 def get_compound_style_tvl(
@@ -143,11 +149,25 @@ def get_compound_style_tvl(
     """
     comptroller_address = Web3.to_checksum_address(comptroller_address)
     comptroller = web3.eth.contract(address=comptroller_address, abi=COMPTROLLER_ABI)
-    
+
     call_kwargs = {'block_identifier': block} if block is not None else {}
-    
-    # Get all markets
-    market_addresses = comptroller.functions.getAllMarkets().call(**call_kwargs)
+
+    # Get all markets (with retry for connection errors)
+    import time
+    market_addresses = None
+    for attempt in range(3):
+        try:
+            market_addresses = comptroller.functions.getAllMarkets().call(**call_kwargs)
+            break
+        except Exception as e:
+            error_str = str(e).lower()
+            if attempt < 2 and ('connection' in error_str or 'remote' in error_str or 'timeout' in error_str):
+                time.sleep(1 * (attempt + 1))
+                continue
+            raise
+
+    if market_addresses is None:
+        return []
     
     results = []
     

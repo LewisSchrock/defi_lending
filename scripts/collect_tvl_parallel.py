@@ -5,10 +5,15 @@ Parallel TVL Collector
 Collects TVL snapshots for all CSUs across a date range using cached blocks.
 Uses ThreadPoolExecutor for parallel collection with rate limiting.
 
+Features:
+- Puzzle-piece collection: Run any date range, fills in missing pieces
+- Global completion tracking: Scans data/bronze/tvl/ for existing data
+- Automatic key blacklisting: 401 errors permanently remove keys from rotation
+
 Usage:
-    python scripts/collect_tvl_parallel.py --start-date 2024-12-01 --end-date 2024-12-31
-    python scripts/collect_tvl_parallel.py --start-date 2024-12-01 --end-date 2024-12-31 --csus aave_v3_ethereum compound_v3_ethereum
-    python scripts/collect_tvl_parallel.py --resume  # Resume from checkpoint
+    python scripts/collect_tvl_parallel.py --start-date 2024-01-01 --end-date 2024-12-31
+    python scripts/collect_tvl_parallel.py --start-date 2024-06-01 --end-date 2024-06-30 --csus aave_v3_ethereum
+    python scripts/collect_tvl_parallel.py --start-date 2024-01-01 --end-date 2024-12-31 --workers 3
 """
 from __future__ import annotations
 import sys
@@ -22,9 +27,9 @@ import argparse
 from datetime import date, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Set
 import yaml
-from config.rpc_pool import get_web3
+from config.rpc_pool import get_web3_with_key_info, blacklist_key, report_rpc_error, is_chain_backing_off
 
 # Import TVL adapters
 from adapters.tvl.aave_v3 import get_aave_v3_tvl
@@ -76,6 +81,9 @@ ADAPTER_MAP = {
     'tectonic': get_tectonic_tvl,
     'sumer': get_sumer_tvl,
 }
+
+# Bronze data directory
+BRONZE_DIR = Path('data/bronze/tvl')
 
 
 def load_block_cache(chain: str, start_date: str, end_date: str) -> Dict[str, Dict]:
@@ -173,6 +181,38 @@ def iterate_dates(start_str: str, end_str: str):
         d += timedelta(days=1)
 
 
+def scan_existing_data() -> Set[str]:
+    """
+    Scan bronze data directory to find all completed tasks.
+
+    Returns:
+        Set of task IDs like "aave_v3_ethereum:2024-01-15"
+    """
+    completed = set()
+
+    if not BRONZE_DIR.exists():
+        return completed
+
+    # Scan all CSU directories
+    for csu_dir in BRONZE_DIR.iterdir():
+        if not csu_dir.is_dir():
+            continue
+
+        csu_name = csu_dir.name
+
+        # Scan all date files
+        for json_file in csu_dir.glob('*.json'):
+            # Extract date from filename (e.g., "2024-01-15.json" -> "2024-01-15")
+            date_str = json_file.stem
+
+            # Validate it looks like a date
+            if len(date_str) == 10 and date_str[4] == '-' and date_str[7] == '-':
+                task_id = f"{csu_name}:{date_str}"
+                completed.add(task_id)
+
+    return completed
+
+
 def get_adapter_for_csu(csu_config: Dict) -> Optional[callable]:
     """
     Get the appropriate TVL adapter function for a CSU.
@@ -202,7 +242,7 @@ def get_adapter_for_csu(csu_config: Dict) -> Optional[callable]:
     return None
 
 
-def setup_web3_for_chain(chain: str):
+def setup_web3_for_chain(chain: str) -> Tuple:
     """
     Setup Web3 instance for a chain with appropriate middleware.
 
@@ -210,13 +250,13 @@ def setup_web3_for_chain(chain: str):
         chain: Chain name
 
     Returns:
-        Web3 instance
+        Tuple of (Web3 instance, key_name or None for public RPC)
     """
     # Resolve chain alias
     rpc_chain = CHAIN_ALIASES.get(chain, chain)
 
-    # Get web3 instance
-    w3 = get_web3(rpc_chain)
+    # Get web3 instance with key info (returns w3, key_name, rate_limiter)
+    w3, key_name, _ = get_web3_with_key_info(rpc_chain)
 
     # Inject POA middleware if needed
     if chain in POA_CHAINS and geth_poa_middleware:
@@ -224,9 +264,9 @@ def setup_web3_for_chain(chain: str):
             if hasattr(w3, 'middleware_onion'):
                 w3.middleware_onion.inject(geth_poa_middleware, layer=0)
         except Exception as e:
-            print(f"[Warning] Could not inject POA middleware for {chain}: {e}")
+            pass  # May already be injected
 
-    return w3
+    return w3, key_name
 
 
 def is_retryable_error(error_str: str) -> bool:
@@ -256,26 +296,31 @@ def is_retryable_error(error_str: str) -> bool:
     return any(pattern.lower() in error_lower for pattern in retryable_patterns)
 
 
+def is_auth_error(error_str: str) -> bool:
+    """Check if error is an authentication/authorization error (401)."""
+    return '401' in error_str or 'Unauthorized' in error_str
+
+
 def collect_tvl_snapshot_with_retry(
     csu_name: str,
     csu_config: Dict,
     date_str: str,
     block_info: Dict,
-    w3_cache: Dict,
-    max_retries: int = 3,
-    max_backoff: float = 5.0
+    max_retries: int = 5,
+    max_backoff: float = 10.0
 ) -> Tuple[str, str, Optional[Dict], Optional[str]]:
     """
     Collect TVL snapshot with automatic retry for rate limits and connection errors.
 
     Uses exponential backoff: 1s, 2s, 4s... capped at max_backoff.
+    Automatically blacklists keys that return 401 Unauthorized.
+    Skips chains that are currently in backoff mode (returns special error).
 
     Args:
         csu_name: CSU identifier
         csu_config: CSU configuration
         date_str: Date string (YYYY-MM-DD)
         block_info: Block information for the date
-        w3_cache: Cache of Web3 instances by chain (NOT USED - kept for compatibility)
         max_retries: Maximum number of retry attempts
         max_backoff: Maximum backoff time in seconds (default 5s)
 
@@ -283,18 +328,35 @@ def collect_tvl_snapshot_with_retry(
         Tuple of (csu_name, date_str, data_dict, error_message)
     """
     last_error = None
+    chain = csu_config['chain']
+
+    # Check if chain is in backoff mode - skip immediately to let other chains proceed
+    is_backing_off, remaining = is_chain_backing_off(chain)
+    if is_backing_off:
+        return (csu_name, date_str, None, f"DEFERRED:chain_backoff:{remaining:.0f}s")
 
     for attempt in range(max_retries + 1):
-        result = collect_tvl_snapshot(csu_name, csu_config, date_str, block_info, w3_cache)
+        result = collect_tvl_snapshot(csu_name, csu_config, date_str, block_info)
         _csu, _date, data, error = result
 
         # Success
         if data is not None:
             return result
 
+        # Check for 401 Unauthorized - blacklist the key
+        if error and is_auth_error(error):
+            # We need to figure out which key was used
+            # The error message from requests often contains the URL
+            # For now, just log and don't retry 401s
+            print(f"  ⚠️  Auth error detected for {chain}. Check your API keys.")
+            return result
+
         # Check if error is retryable
         if error and is_retryable_error(error):
             last_error = error
+            # Report rate limit errors to trigger RPC pool backoff
+            if '429' in error or '503' in error or 'too many' in error.lower():
+                report_rpc_error(chain, error)
             if attempt < max_retries:
                 # Exponential backoff: 1s, 2s, 4s... capped at max_backoff
                 backoff = min(2 ** attempt, max_backoff)
@@ -312,8 +374,7 @@ def collect_tvl_snapshot(
     csu_name: str,
     csu_config: Dict,
     date_str: str,
-    block_info: Dict,
-    w3_cache: Dict
+    block_info: Dict
 ) -> Tuple[str, str, Optional[Dict], Optional[str]]:
     """
     Collect TVL snapshot for a single CSU on a specific date.
@@ -323,7 +384,6 @@ def collect_tvl_snapshot(
         csu_config: CSU configuration
         date_str: Date string (YYYY-MM-DD)
         block_info: Block information for the date
-        w3_cache: Cache of Web3 instances by chain (NOT USED - kept for compatibility)
 
     Returns:
         Tuple of (csu_name, date_str, data_dict, error_message)
@@ -334,9 +394,8 @@ def collect_tvl_snapshot(
         block_number = block_info['block']
         protocol = csu_config.get('protocol', '')
 
-        # CRITICAL: Get a FRESH Web3 instance on every call to rotate through API keys
-        # This ensures we distribute load across all 5 Alchemy accounts
-        w3 = setup_web3_for_chain(chain)
+        # Get a fresh Web3 instance with key info
+        w3, key_name = setup_web3_for_chain(chain)
 
         # Get appropriate adapter
         adapter = get_adapter_for_csu(csu_config)
@@ -344,7 +403,16 @@ def collect_tvl_snapshot(
             return (csu_name, date_str, None, f"No adapter found for protocol: {protocol}")
 
         # Call adapter to get TVL data
-        tvl_data = adapter(w3, registry, block_number)
+        try:
+            tvl_data = adapter(w3, registry, block_number)
+        except Exception as e:
+            error_str = str(e)
+
+            # Check for 401 - blacklist the key
+            if is_auth_error(error_str) and key_name:
+                blacklist_key(chain, key_name, error_str[:100])
+
+            raise
 
         # Build bronze output
         output = {
@@ -376,28 +444,13 @@ def save_bronze_data(csu_name: str, date_str: str, data: Dict):
         date_str: Date string
         data: TVL data dict
     """
-    output_dir = Path(f'data/bronze/tvl/{csu_name}')
+    output_dir = BRONZE_DIR / csu_name
     output_dir.mkdir(parents=True, exist_ok=True)
 
     output_file = output_dir / f'{date_str}.json'
 
     with open(output_file, 'w') as f:
         json.dump(data, f, indent=2)
-
-
-def load_checkpoint(checkpoint_file: Path) -> Dict:
-    """Load checkpoint state."""
-    if checkpoint_file.exists():
-        with open(checkpoint_file) as f:
-            return json.load(f)
-    return {'completed': [], 'failed': []}
-
-
-def save_checkpoint(checkpoint_file: Path, state: Dict):
-    """Save checkpoint state."""
-    checkpoint_file.parent.mkdir(parents=True, exist_ok=True)
-    with open(checkpoint_file, 'w') as f:
-        json.dump(state, f, indent=2)
 
 
 def filter_csus_by_cache_availability(
@@ -459,37 +512,17 @@ def filter_csus_by_cache_availability(
 
 def main():
     parser = argparse.ArgumentParser(description='Collect TVL snapshots in parallel')
-    parser.add_argument('--start-date', help='Start date (YYYY-MM-DD)')
-    parser.add_argument('--end-date', help='End date (YYYY-MM-DD)')
+    parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
+    parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
     parser.add_argument('--csus', nargs='+', help='Specific CSUs to collect (default: all)')
-    parser.add_argument('--workers', type=int, default=5, help='Number of parallel workers (default: 5)')
-    parser.add_argument('--resume', action='store_true', help='Resume from checkpoint')
-    parser.add_argument('--checkpoint-file', default='data/.checkpoint_tvl.json', help='Checkpoint file path')
+    parser.add_argument('--chains', nargs='+', help='Only collect CSUs on these chains (e.g., --chains ethereum base)')
+    parser.add_argument('--exclude-chains', nargs='+', help='Exclude CSUs on these chains')
+    parser.add_argument('--workers', type=int, default=2, help='Number of parallel workers (default: 2)')
 
     args = parser.parse_args()
 
-    checkpoint_file = Path(args.checkpoint_file)
-
-    # Load or initialize checkpoint
-    if args.resume:
-        checkpoint = load_checkpoint(checkpoint_file)
-        if not checkpoint.get('start_date') or not checkpoint.get('end_date'):
-            print("❌ No checkpoint found or checkpoint missing date range. Please specify --start-date and --end-date")
-            return
-        start_date = checkpoint['start_date']
-        end_date = checkpoint['end_date']
-        print(f"📂 Resuming from checkpoint: {len(checkpoint['completed'])} completed, {len(checkpoint['failed'])} failed")
-    else:
-        if not args.start_date or not args.end_date:
-            parser.error("--start-date and --end-date are required (unless using --resume)")
-        start_date = args.start_date
-        end_date = args.end_date
-        checkpoint = {
-            'start_date': start_date,
-            'end_date': end_date,
-            'completed': [],
-            'failed': []
-        }
+    start_date = args.start_date
+    end_date = args.end_date
 
     print("="*80)
     print("TVL Parallel Collection")
@@ -499,7 +532,13 @@ def main():
     print("="*80)
     print()
 
-    # Load CSU configuration
+    # Step 1: Scan existing data to find completed tasks
+    print("Scanning existing data...")
+    completed_tasks = scan_existing_data()
+    print(f"Found {len(completed_tasks)} existing data files")
+    print()
+
+    # Step 2: Load CSU configuration
     print("Loading CSU configuration...")
     all_csus_config = load_csu_config()
 
@@ -512,7 +551,21 @@ def main():
     else:
         csus_config = all_csus_config
 
-    # Filter by cache availability
+    # Filter by chain if specified
+    if args.chains:
+        chains_set = set(args.chains)
+        csus_config = {name: cfg for name, cfg in csus_config.items()
+                       if cfg.get('chain') in chains_set}
+        print(f"Filtering to chains: {', '.join(args.chains)}")
+
+    # Exclude chains if specified
+    if args.exclude_chains:
+        exclude_set = set(args.exclude_chains)
+        csus_config = {name: cfg for name, cfg in csus_config.items()
+                       if cfg.get('chain') not in exclude_set}
+        print(f"Excluding chains: {', '.join(args.exclude_chains)}")
+
+    # Step 3: Filter by cache availability
     print("Checking block cache availability...")
     csus_config, skipped_csus = filter_csus_by_cache_availability(csus_config, start_date, end_date)
 
@@ -525,11 +578,11 @@ def main():
             print(f"   ... and {len(skipped_csus) - 10} more")
     print()
 
-    # Load deployment dates to skip tasks before contracts were deployed
+    # Step 4: Load deployment dates to skip tasks before contracts were deployed
     deployment_dates = load_deployment_dates()
     skipped_by_deployment = 0
 
-    # Build task list
+    # Step 5: Build task list (only tasks not already completed)
     dates = list(iterate_dates(start_date, end_date))
     tasks = []
 
@@ -546,8 +599,8 @@ def main():
         for date_str in dates:
             task_id = f"{csu_name}:{date_str}"
 
-            # Skip if already completed
-            if task_id in checkpoint['completed']:
+            # Skip if already completed (found in existing data)
+            if task_id in completed_tasks:
                 continue
 
             # Skip if contract wasn't deployed yet on this date
@@ -562,36 +615,42 @@ def main():
 
             tasks.append((csu_name, csu_config, date_str, block_info))
 
-    total_tasks = len(csus_config) * len(dates)
+    # Calculate stats
+    total_possible = len(csus_config) * len(dates)
+    already_completed = sum(1 for csu in csus_config for d in dates
+                            if f"{csu}:{d}" in completed_tasks)
     remaining_tasks = len(tasks)
-    completed_count = len(checkpoint['completed'])
 
     print(f"📊 Collection Plan:")
-    print(f"   Total tasks: {total_tasks} ({len(csus_config)} CSUs × {len(dates)} days)")
-    print(f"   Already completed: {completed_count}")
+    print(f"   Total possible: {total_possible} ({len(csus_config)} CSUs × {len(dates)} days)")
+    print(f"   Already completed: {already_completed}")
     if skipped_by_deployment > 0:
         print(f"   Skipped (pre-deployment): {skipped_by_deployment}")
-    print(f"   Remaining: {remaining_tasks}")
-    print(f"   Failed (will retry): {len(checkpoint['failed'])}")
+    print(f"   Remaining to collect: {remaining_tasks}")
     print()
 
     if remaining_tasks == 0:
         print("✅ All tasks already completed!")
         return
 
-    # Execute collection in parallel
+    # Step 6: Execute collection in parallel
     print(f"🚀 Starting parallel collection with {args.workers} workers...")
     print()
 
-    w3_cache = {}  # Reuse Web3 instances
     completed = 0
     failed = 0
+    deferred = 0
+    failed_tasks = []
+    deferred_tasks = []  # Tasks to retry after backoff clears
     start_time = time.time()
+
+    # Build a lookup for task data
+    task_data = {f"{t[0]}:{t[2]}": t for t in tasks}  # key: "csu:date", value: (csu, config, date, block)
 
     with ThreadPoolExecutor(max_workers=args.workers) as executor:
         # Submit all tasks (using retry wrapper for automatic 429/connection error handling)
         future_to_task = {
-            executor.submit(collect_tvl_snapshot_with_retry, csu_name, csu_config, date_str, block_info, w3_cache):
+            executor.submit(collect_tvl_snapshot_with_retry, csu_name, csu_config, date_str, block_info):
             (csu_name, date_str)
             for csu_name, csu_config, date_str, block_info in tasks
         }
@@ -605,34 +664,70 @@ def main():
                 csu_name_result, date_str_result, data, error = future.result()
 
                 if error:
-                    print(f"❌ [{completed + failed + 1}/{remaining_tasks}] {csu_name}:{date_str} - {error}")
-                    failed += 1
-                    checkpoint['failed'].append({'task': task_id, 'error': error})
+                    # Check if this was deferred due to backoff
+                    if error.startswith("DEFERRED:"):
+                        deferred += 1
+                        deferred_tasks.append(task_id)
+                        # Don't print every deferred task - too noisy
+                        if deferred <= 3:
+                            print(f"⏸️  [{completed + failed + deferred}/{remaining_tasks}] {csu_name}:{date_str} - {error}")
+                        elif deferred == 4:
+                            print(f"⏸️  ... more tasks deferred (chain in backoff)")
+                    else:
+                        print(f"❌ [{completed + failed + deferred}/{remaining_tasks}] {csu_name}:{date_str} - {error[:80]}")
+                        failed += 1
+                        failed_tasks.append({'task': task_id, 'error': error})
                 else:
                     # Save to bronze
                     save_bronze_data(csu_name, date_str, data)
                     completed += 1
-                    checkpoint['completed'].append(task_id)
 
                     # Progress update every 10 tasks
                     if completed % 10 == 0:
                         elapsed = time.time() - start_time
                         rate = completed / elapsed if elapsed > 0 else 0
-                        eta = (remaining_tasks - completed - failed) / rate if rate > 0 else 0
-                        print(f"✅ [{completed + failed}/{remaining_tasks}] {csu_name}:{date_str} "
+                        remaining = remaining_tasks - completed - failed - deferred
+                        eta = remaining / rate if rate > 0 else 0
+                        print(f"✅ [{completed + failed + deferred}/{remaining_tasks}] {csu_name}:{date_str} "
                               f"({rate:.1f} tasks/sec, ETA: {eta/60:.1f}m)")
 
-                # Save checkpoint every 50 tasks
-                if (completed + failed) % 50 == 0:
-                    save_checkpoint(checkpoint_file, checkpoint)
-
             except Exception as e:
-                print(f"❌ [{completed + failed + 1}/{remaining_tasks}] {csu_name}:{date_str} - Exception: {e}")
+                print(f"❌ [{completed + failed + deferred}/{remaining_tasks}] {csu_name}:{date_str} - Exception: {e}")
                 failed += 1
-                checkpoint['failed'].append({'task': task_id, 'error': str(e)})
+                failed_tasks.append({'task': task_id, 'error': str(e)})
 
-    # Final checkpoint save
-    save_checkpoint(checkpoint_file, checkpoint)
+    # Retry deferred tasks if any (backoff should have cleared by now)
+    if deferred_tasks:
+        print(f"\n🔄 Retrying {len(deferred_tasks)} deferred tasks...")
+        retry_completed = 0
+        retry_failed = 0
+
+        with ThreadPoolExecutor(max_workers=args.workers) as executor:
+            retry_futures = {}
+            for task_id in deferred_tasks:
+                if task_id in task_data:
+                    csu_name, csu_config, date_str, block_info = task_data[task_id]
+                    future = executor.submit(collect_tvl_snapshot_with_retry, csu_name, csu_config, date_str, block_info)
+                    retry_futures[future] = (csu_name, date_str)
+
+            for future in as_completed(retry_futures):
+                csu_name, date_str = retry_futures[future]
+                try:
+                    _, _, data, error = future.result()
+                    if data:
+                        save_bronze_data(csu_name, date_str, data)
+                        retry_completed += 1
+                    else:
+                        retry_failed += 1
+                        if error and not error.startswith("DEFERRED:"):
+                            failed_tasks.append({'task': f"{csu_name}:{date_str}", 'error': error})
+                except Exception as e:
+                    retry_failed += 1
+
+        completed += retry_completed
+        failed += retry_failed
+        deferred = deferred - retry_completed - retry_failed
+        print(f"   Retry results: {retry_completed} completed, {retry_failed} failed")
 
     # Summary
     elapsed = time.time() - start_time
@@ -642,13 +737,21 @@ def main():
     print("="*80)
     print(f"✅ Completed: {completed}/{remaining_tasks}")
     print(f"❌ Failed: {failed}/{remaining_tasks}")
+    if deferred > 0:
+        print(f"⏸️  Still deferred: {deferred}/{remaining_tasks}")
     print(f"⏱️  Time: {elapsed/60:.1f} minutes")
-    print(f"📊 Rate: {(completed + failed)/elapsed:.1f} tasks/second")
+    if elapsed > 0:
+        print(f"📊 Rate: {(completed + failed)/elapsed:.1f} tasks/second")
     print(f"💾 Output: data/bronze/tvl/{{csu}}/{{date}}.json")
 
-    if failed > 0:
-        print(f"\n⚠️  {failed} tasks failed. Run with --resume to retry.")
-        print(f"   Failed tasks saved in: {checkpoint_file}")
+    if failed > 0 or deferred > 0:
+        print(f"\n⚠️  {failed + deferred} tasks need retry. Re-run to retry.")
+
+        # Categorize failures
+        auth_errors = [t for t in failed_tasks if is_auth_error(t['error'])]
+        if auth_errors:
+            print(f"\n🔐 {len(auth_errors)} authentication errors (401):")
+            print("   Check your API keys in .env")
 
     print("="*80)
 

@@ -84,12 +84,19 @@ ERC20_ABI = [
 ]
 
 
-def _safe_call(func, default=None):
-    """Safely call a contract function, return default on error."""
-    try:
-        return func()
-    except Exception:
-        return default
+def _safe_call(func, default=None, retries=2):
+    """Safely call a contract function, return default on error. Retries on connection errors."""
+    import time
+    for attempt in range(retries + 1):
+        try:
+            return func()
+        except Exception as e:
+            error_str = str(e).lower()
+            # Retry on connection errors
+            if attempt < retries and ('connection' in error_str or 'remote' in error_str or 'timeout' in error_str):
+                time.sleep(0.5 * (attempt + 1))
+                continue
+            return default
 
 
 def get_aave_v3_tvl(web3: Web3, registry: str, block: Optional[int] = None) -> List[Dict[str, Any]]:
@@ -140,17 +147,29 @@ def get_aave_v3_tvl(web3: Web3, registry: str, block: Optional[int] = None) -> L
     for asset in reserves:
         asset = Web3.to_checksum_address(asset)
         
-        # Get associated token addresses
-        try:
-            a_token, stable_debt, variable_debt = data_provider.functions.getReserveTokensAddresses(asset).call(**call_kwargs)
-            
-            a_token = Web3.to_checksum_address(a_token)
-            stable_debt = Web3.to_checksum_address(stable_debt)
-            variable_debt = Web3.to_checksum_address(variable_debt)
-            
-        except Exception as e:
-            print(f"Warning: Failed to get token addresses for {asset}: {e}")
+        # Get associated token addresses with retry
+        token_addresses = None
+        for attempt in range(3):
+            try:
+                a_token, stable_debt, variable_debt = data_provider.functions.getReserveTokensAddresses(asset).call(**call_kwargs)
+                a_token = Web3.to_checksum_address(a_token)
+                stable_debt = Web3.to_checksum_address(stable_debt)
+                variable_debt = Web3.to_checksum_address(variable_debt)
+                token_addresses = (a_token, stable_debt, variable_debt)
+                break
+            except Exception as e:
+                error_str = str(e).lower()
+                if attempt < 2 and ('connection' in error_str or 'remote' in error_str or 'timeout' in error_str):
+                    import time
+                    time.sleep(0.5 * (attempt + 1))
+                    continue
+                # Skip this reserve on persistent failure
+                break
+
+        if token_addresses is None:
             continue
+
+        a_token, stable_debt, variable_debt = token_addresses
         
         # Get underlying asset metadata
         underlying_contract = web3.eth.contract(address=asset, abi=ERC20_ABI)

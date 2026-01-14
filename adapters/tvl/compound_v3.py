@@ -103,12 +103,18 @@ ERC20_ABI = [
 ]
 
 
-def _safe_call(func, default=None):
-    """Safely call a contract function."""
-    try:
-        return func()
-    except Exception:
-        return default
+def _safe_call(func, default=None, retries=2):
+    """Safely call a contract function. Retries on connection errors."""
+    import time
+    for attempt in range(retries + 1):
+        try:
+            return func()
+        except Exception as e:
+            error_str = str(e).lower()
+            if attempt < retries and ('connection' in error_str or 'remote' in error_str or 'timeout' in error_str):
+                time.sleep(0.5 * (attempt + 1))
+                continue
+            return default
 
 
 def get_compound_v3_tvl(web3: Web3, comet_address: str, block: Optional[int] = None) -> List[Dict[str, Any]]:
@@ -157,33 +163,43 @@ def get_compound_v3_tvl(web3: Web3, comet_address: str, block: Optional[int] = N
     num_assets = _safe_call(lambda: comet.functions.numAssets().call(**call_kwargs), 0)
     
     for i in range(num_assets):
-        try:
-            asset_info = comet.functions.getAssetInfo(i).call(**call_kwargs)
-            
-            # asset_info is a tuple: (offset, asset, priceFeed, scale, borrowCF, liquidateCF, liquidationFactor, supplyCap)
-            collateral_address = Web3.to_checksum_address(asset_info[1])
-            
-            # Get collateral metadata
-            collateral_token = web3.eth.contract(address=collateral_address, abi=ERC20_ABI)
-            symbol = _safe_call(lambda: collateral_token.functions.symbol().call(**call_kwargs), f"COLLATERAL_{i}")
-            decimals = _safe_call(lambda: collateral_token.functions.decimals().call(**call_kwargs), 18)
-            
-            # Get total collateral supplied
-            collateral_totals = comet.functions.totalsCollateral(collateral_address).call(**call_kwargs)
-            total_supply_collateral = collateral_totals[0]  # First element is totalSupplyAsset
-            
-            results.append({
-                'asset_type': 'collateral',
-                'underlying': collateral_address,
-                'symbol': symbol,
-                'decimals': decimals,
-                'supplied_raw': total_supply_collateral,
-                'borrowed_raw': 0,  # Collateral cannot be borrowed in V3
-            })
-            
-        except Exception as e:
-            print(f"Warning: Failed to get collateral asset {i}: {e}")
-            continue
+        # Retry logic for connection errors
+        import time
+        asset_data = None
+        for attempt in range(3):
+            try:
+                asset_info = comet.functions.getAssetInfo(i).call(**call_kwargs)
+
+                # asset_info is a tuple: (offset, asset, priceFeed, scale, borrowCF, liquidateCF, liquidationFactor, supplyCap)
+                collateral_address = Web3.to_checksum_address(asset_info[1])
+
+                # Get collateral metadata
+                collateral_token = web3.eth.contract(address=collateral_address, abi=ERC20_ABI)
+                symbol = _safe_call(lambda: collateral_token.functions.symbol().call(**call_kwargs), f"COLLATERAL_{i}")
+                decimals = _safe_call(lambda: collateral_token.functions.decimals().call(**call_kwargs), 18)
+
+                # Get total collateral supplied
+                collateral_totals = comet.functions.totalsCollateral(collateral_address).call(**call_kwargs)
+                total_supply_collateral = collateral_totals[0]  # First element is totalSupplyAsset
+
+                asset_data = {
+                    'asset_type': 'collateral',
+                    'underlying': collateral_address,
+                    'symbol': symbol,
+                    'decimals': decimals,
+                    'supplied_raw': total_supply_collateral,
+                    'borrowed_raw': 0,  # Collateral cannot be borrowed in V3
+                }
+                break
+            except Exception as e:
+                error_str = str(e).lower()
+                if attempt < 2 and ('connection' in error_str or 'remote' in error_str or 'timeout' in error_str):
+                    time.sleep(0.5 * (attempt + 1))
+                    continue
+                break
+
+        if asset_data:
+            results.append(asset_data)
     
     return results
 

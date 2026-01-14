@@ -22,14 +22,14 @@ csus:
   compound_v3_base_aero: "2024-10-09"
   compound_v3_eth_usds: "2024-10-17"
 
-  # Fluid Lending
+  # Fluid Lending (uses getAllFTokens resolver - deployed mid-2024)
   fluid_lending_arbitrum: "2024-06-11"
-  fluid_lending_base: "2024-08-01"  # TODO: Verify exact date
-  fluid_lending_ethereum: "2024-02-01"  # TODO: Verify exact date
+  fluid_lending_base: "2025-01-01"  # FluidLendingResolver not deployed on Base in 2024
+  fluid_lending_ethereum: "2024-05-31"  # Verified from successful data collection
 
   # Aave V3 (deployed mid-2024 on new chains)
-  aave_v3_linea: "2024-07-01"  # TODO: Verify exact date from block 12430823
-  aave_v3_scroll: "2023-10-01"  # TODO: Verify exact date from block 2618760
+  aave_v3_linea: "2024-11-23"  # Verified from successful data collection (contract empty before)
+  aave_v3_scroll: "2024-01-20"  # Verified: deployment block 2,618,760
 
   # Note: CSUs not listed here are assumed to have been deployed before 2024-01-01
   # and can be queried for the full year.
