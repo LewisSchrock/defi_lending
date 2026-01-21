@@ -20,7 +20,7 @@ import json
 from datetime import date, datetime, timedelta, timezone
 import argparse
 import pytz
-from config.rpc_pool import get_web3
+from config.rpc_pool import get_web3, get_web3_with_key_info
 
 # Import POA middleware (path changed in web3.py v6+)
 try:
@@ -42,6 +42,35 @@ CHAIN_ALIASES = {
     'xdai': 'gnosis',  # xdai in config, but gnosis in RPC pool
 }
 
+# Track which Web3 instances have POA middleware injected
+_poa_injected = set()
+
+
+def get_web3_with_poa(chain: str, rpc_chain: str = None):
+    """
+    Get a Web3 connection with POA middleware injected if needed.
+
+    This ensures every connection returned has proper middleware for POA chains.
+    """
+    if rpc_chain is None:
+        rpc_chain = CHAIN_ALIASES.get(chain, chain)
+
+    w3 = get_web3(rpc_chain)
+
+    # Inject POA middleware if this chain needs it and this instance hasn't been configured
+    if chain in POA_CHAINS and geth_poa_middleware:
+        # Use id() to track which Web3 instances have been configured
+        w3_id = id(w3)
+        if w3_id not in _poa_injected:
+            try:
+                if hasattr(w3, 'middleware_onion'):
+                    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+                    _poa_injected.add(w3_id)
+            except Exception:
+                pass  # May already be injected or not supported
+
+    return w3
+
 
 def to_dt(ts: int) -> datetime:
     """
@@ -50,12 +79,31 @@ def to_dt(ts: int) -> datetime:
     """
     return datetime.fromtimestamp(int(ts), tz=timezone.utc)
 
-def block_for_ts(w3, ts):
+def block_for_ts(w3, ts, chain=None, rpc_chain=None, rotate_keys=True):
+    """
+    Binary search for block at timestamp.
+
+    Args:
+        w3: Web3 instance (used if rotate_keys=False)
+        ts: Target timestamp
+        chain: Chain name for POA detection (required if rotate_keys=True)
+        rpc_chain: RPC chain name if different from chain
+        rotate_keys: If True, rotate to fresh connection every few RPC calls
+    """
     lo, hi = 1, w3.eth.block_number
     ans = hi
+    call_count = 0
+
     while lo <= hi:
         mid = (lo + hi) // 2
+
+        # Rotate to fresh connection every 3 calls to distribute load across keys
+        if rotate_keys and chain and call_count > 0 and call_count % 3 == 0:
+            w3 = get_web3_with_poa(chain, rpc_chain)  # Gets connection with POA middleware
+
         t = w3.eth.get_block(mid)["timestamp"]
+        call_count += 1
+
         if t >= ts:
             ans = mid
             hi = mid - 1
@@ -107,85 +155,119 @@ def iterate_dates(start_str: str, end_str: str):
         d += timedelta(days=1)
 
 
-def build_cache_for_chain(chain: str, dates: list, output_file: Path):
+def load_existing_cache(output_file: Path) -> dict:
+    """Load existing cache from file if it exists."""
+    if output_file.exists():
+        try:
+            with open(output_file) as f:
+                return json.load(f)
+        except (json.JSONDecodeError, Exception) as e:
+            print(f"[Warning] Could not load existing cache: {e}")
+    return {}
+
+
+def build_cache_for_chain(chain: str, dates: list, output_file: Path, save_interval: int = 10):
     """
-    Build date→block cache for a specific chain.
+    Build date→block cache for a specific chain with incremental support.
 
     Args:
         chain: Chain name (e.g., 'ethereum')
         dates: List of date strings (YYYY-MM-DD)
         output_file: Path to save cache JSON
+        save_interval: Save cache to disk every N dates (for crash recovery)
     """
     print(f"\n{'='*60}")
     print(f"Building block cache for {chain}")
     print(f"{'='*60}\n")
+
+    # Load existing cache (incremental support)
+    cache = load_existing_cache(output_file)
+    existing_count = len(cache)
+    if existing_count > 0:
+        print(f"[Incremental] Loaded {existing_count} existing dates from cache")
+
+    # Filter to only dates we don't have yet
+    missing_dates = [d for d in dates if d not in cache]
+    if not missing_dates:
+        print(f"[Complete] All {len(dates)} dates already cached!")
+        return
+
+    print(f"[Missing] Need to fetch {len(missing_dates)}/{len(dates)} dates\n")
 
     # Resolve chain alias if needed
     rpc_chain = CHAIN_ALIASES.get(chain, chain)
     if chain != rpc_chain:
         print(f"[Alias] Using RPC chain name '{rpc_chain}' for config chain '{chain}'\n")
 
-    w3 = get_web3(rpc_chain)
+    # Test connection with POA middleware
+    w3 = get_web3_with_poa(chain, rpc_chain)
+    if chain in POA_CHAINS:
+        print(f"[POA] Using POA middleware for {chain}")
 
-    # Inject POA middleware for chains that need it
-    if chain in POA_CHAINS and geth_poa_middleware:
-        try:
-            # web3.py v7+ uses different middleware API
-            if hasattr(w3, 'middleware_onion'):
-                w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-            else:
-                # Fallback for older versions
-                from web3.middleware import middleware_stack_factory
-                w3.middleware_onion = middleware_stack_factory(w3, [geth_poa_middleware])
-            print(f"[POA] Injected POA middleware for {chain}\n")
-        except Exception as e:
-            print(f"[POA] Warning: Could not inject POA middleware for {chain}: {e}\n")
-    
-    # Test connection
     try:
         latest = w3.eth.block_number
         print(f"Connected to {chain}: latest block = {latest}\n")
     except Exception as e:
         print(f"❌ Failed to connect to {chain}: {e}")
         return
-    
-    cache = {}
-    
-    for i, date_str in enumerate(dates, 1):
+
+    fetched_count = 0
+    error_count = 0
+
+    for i, date_str in enumerate(missing_dates, 1):
         try:
+            # Get fresh connection with POA middleware (rotates through API keys)
+            w3 = get_web3_with_poa(chain, rpc_chain)
+
             # Get UTC window for this NY date
             ts_start_utc, ts_end_utc = ny_date_to_utc_window(date_str)
-            
-            # Find block at end of day (snapshot time)
-            block_num = block_for_ts(w3, ts_end_utc)
-            
+
+            # Find block at end of day (snapshot time) - rotates keys during binary search
+            block_num = block_for_ts(w3, ts_end_utc, chain=chain, rpc_chain=rpc_chain, rotate_keys=True)
+
             # Safety: subtract 1 to ensure block is from target day
             block_num = max(1, block_num - 1)
-            
-            # Get block timestamp for verification
+
+            # Get block timestamp for verification (rotates to next key)
+            w3 = get_web3_with_poa(chain, rpc_chain)
             block = w3.eth.get_block(block_num)
             block_ts = block['timestamp']
-            
+
             cache[date_str] = {
                 'block': block_num,
                 'timestamp': block_ts,
                 'ts_start_utc': ts_start_utc,
                 'ts_end_utc': ts_end_utc,
             }
-            
-            print(f"[{i}/{len(dates)}] {date_str} → block {block_num} (ts={block_ts})")
-            
+
+            fetched_count += 1
+            print(f"[{i}/{len(missing_dates)}] {date_str} → block {block_num} (ts={block_ts})")
+
+            # Periodic save for crash recovery
+            if fetched_count % save_interval == 0:
+                output_file.parent.mkdir(parents=True, exist_ok=True)
+                with open(output_file, 'w') as f:
+                    json.dump(cache, f, indent=2)
+                print(f"    [Checkpoint] Saved {len(cache)} dates to cache")
+
         except Exception as e:
-            print(f"❌ Failed to get block for {date_str}: {e}")
+            error_count += 1
+            print(f"❌ [{i}/{len(missing_dates)}] Failed to get block for {date_str}: {e}")
+            # Save on error too, to preserve progress
+            if fetched_count > 0:
+                output_file.parent.mkdir(parents=True, exist_ok=True)
+                with open(output_file, 'w') as f:
+                    json.dump(cache, f, indent=2)
             continue
-    
-    # Save to file
+
+    # Final save
     output_file.parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, 'w') as f:
         json.dump(cache, f, indent=2)
-    
+
     print(f"\n✅ Saved cache to {output_file}")
-    print(f"   Cached {len(cache)}/{len(dates)} dates\n")
+    print(f"   Total cached: {len(cache)}/{len(dates)} dates")
+    print(f"   This run: +{fetched_count} fetched, {error_count} errors\n")
 
 
 def main():

@@ -25,6 +25,16 @@ Usage:
 """
 
 import os
+from pathlib import Path
+
+# Auto-load .env file for API keys
+try:
+    from dotenv import load_dotenv
+    # Look for .env in project root (parent of config/)
+    env_path = Path(__file__).parent.parent / '.env'
+    load_dotenv(env_path)
+except ImportError:
+    pass  # dotenv not installed, rely on shell exports
 import json
 import threading
 import time
@@ -60,7 +70,7 @@ CHAIN_KEY_MAPPING = {
     "binance": ["key_1", "key_2", "key_3", "key_5", "key_6"],
     "linea": ["key_1", "key_2", "key_3", "key_5", "key_6"],
     "gnosis": ["key_1", "key_2", "key_3", "key_5", "key_6"],
-    "plasma": ["key_1", "key_2", "key_3", "key_4", "key_5", "key_6"],
+    "plasma": ["key_1", "key_2", "key_3", "key_5"],  # key_4 rate limited, key_6 not set
     "sonic": [],  # Force public RPC - new chain, unstable on Alchemy
 }
 

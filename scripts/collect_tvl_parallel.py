@@ -29,7 +29,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from typing import Dict, List, Tuple, Optional, Set
 import yaml
-from config.rpc_pool import get_web3_with_key_info, blacklist_key, report_rpc_error, is_chain_backing_off
+from config.rpc_pool_v2 import get_web3_with_info, blacklist_key, report_rpc_error, is_chain_backing_off
 
 # Import TVL adapters
 from adapters.tvl.aave_v3 import get_aave_v3_tvl
@@ -101,22 +101,30 @@ def load_block_cache(chain: str, start_date: str, end_date: str) -> Dict[str, Di
     """
     # Apply chain alias if needed (e.g., xdai -> gnosis)
     cache_chain = CHAIN_ALIASES.get(chain, chain)
+    cache_dir = Path('data/cache')
 
-    # First try exact match
-    cache_file = Path(f'data/cache/{cache_chain}_blocks_{start_date}_{end_date}.json')
+    # Try exact match with aliased name first
+    cache_file = cache_dir / f'{cache_chain}_blocks_{start_date}_{end_date}.json'
+
+    # Also try exact match with original chain name
+    if not cache_file.exists() and chain != cache_chain:
+        cache_file = cache_dir / f'{chain}_blocks_{start_date}_{end_date}.json'
 
     # If not found, try to find any cache file for this chain
     if not cache_file.exists():
-        cache_dir = Path('data/cache')
         cache_pattern = f'{cache_chain}_blocks_*.json'
         matching_caches = list(cache_dir.glob(cache_pattern))
+
+        # Also check original chain name
+        if chain != cache_chain:
+            matching_caches.extend(cache_dir.glob(f'{chain}_blocks_*.json'))
 
         if matching_caches:
             # Sort by file size (descending) to prefer larger/fuller caches
             matching_caches.sort(key=lambda p: p.stat().st_size, reverse=True)
             cache_file = matching_caches[0]
         else:
-            raise FileNotFoundError(f"No block cache found for {chain} (looked for {cache_chain})")
+            raise FileNotFoundError(f"No block cache found for {chain} (looked for {cache_chain} and {chain})")
 
     with open(cache_file) as f:
         cache = json.load(f)
@@ -256,7 +264,7 @@ def setup_web3_for_chain(chain: str) -> Tuple:
     rpc_chain = CHAIN_ALIASES.get(chain, chain)
 
     # Get web3 instance with key info (returns w3, key_name, rate_limiter)
-    w3, key_name, _ = get_web3_with_key_info(rpc_chain)
+    w3, key_name, _ = get_web3_with_info(rpc_chain)
 
     # Inject POA middleware if needed
     if chain in POA_CHAINS and geth_poa_middleware:
@@ -478,32 +486,43 @@ def filter_csus_by_cache_availability(
             skipped.append(f"{csu_name} (no chain specified)")
             continue
 
-        # Apply chain alias if needed (e.g., xdai -> gnosis)
+        # Try to find cache files for this chain (check both original name and alias)
         cache_chain = CHAIN_ALIASES.get(chain, chain)
-
-        # Try to find any cache file for this chain
         cache_dir = Path('data/cache')
-        cache_pattern = f'{cache_chain}_blocks_*.json'
-        matching_caches = list(cache_dir.glob(cache_pattern))
+
+        # Try both the aliased name and original chain name for cache lookup
+        matching_caches = list(cache_dir.glob(f'{cache_chain}_blocks_*.json'))
+        if chain != cache_chain:
+            matching_caches.extend(cache_dir.glob(f'{chain}_blocks_*.json'))
 
         if matching_caches:
-            # Check if cache covers the requested dates
+            # Check each cache file to find one that covers the requested dates
             # Sort by file size (descending) to prefer larger/fuller caches
             matching_caches.sort(key=lambda p: p.stat().st_size, reverse=True)
 
-            try:
-                with open(matching_caches[0]) as f:
-                    cache = json.load(f)
-                    requested_dates = set(iterate_dates(start_date, end_date))
-                    cached_dates = set(cache.keys())
+            requested_dates = set(iterate_dates(start_date, end_date))
+            found_valid_cache = False
+            best_missing = 365  # Track the best (smallest) missing count
 
-                    if requested_dates.issubset(cached_dates):
-                        filtered[csu_name] = csu_config
-                    else:
-                        missing = requested_dates - cached_dates
-                        skipped.append(f"{csu_name} (cache missing {len(missing)} dates)")
-            except Exception as e:
-                skipped.append(f"{csu_name} (invalid cache: {e})")
+            for cache_file in matching_caches:
+                try:
+                    with open(cache_file) as f:
+                        cache = json.load(f)
+                        cached_dates = set(cache.keys())
+
+                        if requested_dates.issubset(cached_dates):
+                            filtered[csu_name] = csu_config
+                            found_valid_cache = True
+                            break
+                        else:
+                            missing = len(requested_dates - cached_dates)
+                            if missing < best_missing:
+                                best_missing = missing
+                except Exception:
+                    continue
+
+            if not found_valid_cache:
+                skipped.append(f"{csu_name} (cache missing {best_missing} dates)")
         else:
             skipped.append(f"{csu_name} (no cache for {cache_chain})")
 
