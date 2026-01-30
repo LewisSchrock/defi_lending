@@ -193,6 +193,30 @@ DEFILLAMA_IDS = {
     'QI': 'coingecko:benqi',
     'SCR': 'coingecko:scroll',
     'COMP': 'coingecko:compound-governance-token',
+
+    # BNB Chain
+    'BNB': 'coingecko:binancecoin',
+    'BTCB': 'coingecko:bitcoin-bep2',
+    'XVS': 'coingecko:venus',
+    'SXP': 'coingecko:swipe',
+    'DOT': 'coingecko:polkadot',
+    'ADA': 'coingecko:cardano',
+    'DOGE': 'coingecko:dogecoin',
+    'LTC': 'coingecko:litecoin',
+    'XRP': 'coingecko:ripple',
+    'BCH': 'coingecko:bitcoin-cash',
+    'FIL': 'coingecko:filecoin',
+    'BETH': 'coingecko:binance-eth',
+    'TRX': 'coingecko:tron',
+    'FLOKI': 'coingecko:floki',
+    'UNI': 'coingecko:uniswap',
+    'TWT': 'coingecko:trust-wallet-token',
+
+    # Meter chain
+    'MTRG': 'coingecko:meter-governance',
+
+    # Wrapped staked BNB
+    'wBETH': 'coingecko:wrapped-beacon-eth',
 }
 
 # Stablecoins (assume $1.00 USD)

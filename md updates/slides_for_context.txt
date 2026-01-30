@@ -1,0 +1,1139 @@
+\documentclass[aspectratio=169,11pt]{beamer}
+
+% ----------------------------
+% Williams-ish theme settings
+% ----------------------------
+\usetheme{default}
+\useinnertheme{rounded}
+\useoutertheme{miniframes}
+
+% Colors (approximate "Williams" vibe)
+\definecolor{WilliamsPurple}{HTML}{512888} % deep purple
+\definecolor{WilliamsGold}{HTML}{FFC72C}   % warm gold
+\definecolor{DarkGray}{HTML}{2B2B2B}
+\definecolor{LightGray}{HTML}{F7F7F7}
+
+% Beamer color hooks
+\setbeamercolor{normal text}{fg=DarkGray,bg=white}
+\setbeamercolor{structure}{fg=WilliamsPurple}
+\setbeamercolor{frametitle}{fg=white,bg=WilliamsPurple}
+\setbeamercolor{title}{fg=WilliamsPurple}
+\setbeamercolor{subtitle}{fg=DarkGray}
+\setbeamercolor{itemize item}{fg=WilliamsPurple}
+\setbeamercolor{itemize subitem}{fg=WilliamsPurple}
+\setbeamercolor{block title}{fg=white,bg=WilliamsPurple}
+\setbeamercolor{block body}{fg=DarkGray,bg=LightGray}
+\setbeamercolor{footline}{fg=DarkGray,bg=white}
+
+% Fonts (safe defaults; works with pdflatex)
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{pifont}
+
+
+
+% Graphics
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Slightly tighter lists
+\setlength{\parskip}{3pt}
+\setlength{\itemsep}{4pt}
+
+% Custom footline: left = author, center = short title, right = slide #
+\setbeamertemplate{footline}{
+  \leavevmode%
+  \hbox{%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.6ex,dp=1.2ex,left]{footline}%
+      \hspace*{1em}\insertshortauthor
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.34\paperwidth,ht=2.6ex,dp=1.2ex,center]{footline}%
+      \insertshorttitle
+    \end{beamercolorbox}%
+    \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.6ex,dp=1.2ex,right]{footline}%
+      \insertframenumber{}\hspace*{1em}
+    \end{beamercolorbox}%
+  }%
+  \vskip0pt%
+}
+
+% Title page with purple banner + seal placeholder
+\setbeamertemplate{title page}{
+  \begin{tikzpicture}[remember picture,overlay]
+    % Purple header band
+    \fill[WilliamsPurple] (current page.north west)
+      rectangle ([yshift=-2.8cm]current page.north east);
+
+    % Thin gold rule
+    \fill[WilliamsGold] ([yshift=-2.8cm]current page.north west)
+      rectangle ([yshift=-2.9cm]current page.north east);
+
+    % Title block anchored to bottom of PURPLE (slightly above gold)
+    \node[anchor=north west, text=white, align=left] at
+      ([xshift=0.9cm,yshift=-0.15cm]current page.north west |- {[yshift=-2.8cm]current page.north west})
+      {\usebeamerfont{title}\inserttitle\\[-0.1em]
+       \usebeamerfont{subtitle}\insertsubtitle};
+
+    % Optional seal/logo (top-right) -- PNG version
+    \node[anchor=north east] at ([xshift=-0.9cm,yshift=-0.30cm]current page.north east)
+      {\includegraphics[height=2.2cm]{pictures/white_logo_cropped.png}};
+    \end{tikzpicture}
+
+
+  % Author block below header
+  \vspace*{3.2cm}
+  {\usebeamerfont{author}\insertauthor\par}
+  {\usebeamerfont{institute}\insertinstitute\par}
+  {\usebeamerfont{date}\insertdate\par}
+  \vfill
+}
+
+% ----------------------------
+% Metadata
+% ----------------------------
+\title[Thesis]{Leverage Driven Cascading Liquidations in DeFi}
+
+\author[L. Schrock]{Lewis Schrock}
+\institute{Williams College \\ Advised by Professor Pedroni}
+\date{\today}
+
+% ----------------------------
+% Document
+% ----------------------------
+\begin{document}
+
+
+
+
+
+% ----------------------------
+% Slide 1 — Title
+% ----------------------------
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+% ----------------------------
+% Slide — What is DeFi?
+% ----------------------------
+\begin{frame}{Context}
+
+\begin{itemize}
+    \item \textbf{Decentralized Finance (DeFi)} provides financial services—such as lending, borrowing, and trading—directly on a blockchain.
+
+    \vspace{0.4cm}
+    
+    \item A \textbf{blockchain} is a decentralized, distributed ledger.
+\end{itemize}
+
+\vspace{0.4cm}
+
+\end{frame}
+
+
+\begin{frame}{Blockchain 101}
+
+\begin{itemize}
+    \item A blockchain is a decentralized, distributed ledger.
+\end{itemize}
+
+\vspace{0.4cm}
+
+\end{frame}
+
+
+\begin{frame}{Blockchain 101}
+
+\begin{columns}[T]
+
+% ---- LEFT: TEXT ----
+\begin{column}{0.50\textwidth}
+\begin{itemize}
+    \item A blockchain is a \textbf{decentralized}, distributed ledger
+\end{itemize}
+\end{column}
+
+% ---- RIGHT: IMAGE ----
+\begin{column}{0.50\textwidth}
+\centering
+\includegraphics[width=1.0\textwidth]{pictures/soccer_scoreboard.jpg}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+
+% ---- new picture ----
+
+\begin{frame}{Blockchain 101}
+
+\begin{columns}[T]
+
+% ---- LEFT: TEXT ----
+\begin{column}{0.50\textwidth}
+\begin{itemize}
+    \item A blockchain is a \textbf{decentralized}, distributed ledger
+    \itemsep
+    \begin{itemize}
+        \item Avoid coordination 
+        \item Align independent incentives to tell truth
+        \item Process to reaching consensus
+    \end{itemize}
+\end{itemize}
+\end{column}
+
+% ---- RIGHT: IMAGE ----
+\begin{column}{0.50\textwidth}
+\centering
+\includegraphics[width=\textwidth]{pictures/soccer_scoreboard.jpg}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+
+
+% ----------------------------
+% Slide 2 — Context: What is DeFi? 
+% ----------------------------
+
+\begin{frame}{Blockchain 101}
+
+\begin{itemize}
+    \item A blockchain is a decentralized, \textbf{distributed ledger}
+\end{itemize}
+
+\vspace{0.4cm}
+
+\end{frame}
+
+\begin{frame}{Blockchain 101}
+
+\begin{columns}[T]
+
+% ---- LEFT: TEXT ----
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+    \item A blockchain is a decentralized, \textbf{distributed ledger}
+\end{itemize}
+\end{column}
+
+% ---- RIGHT: IMAGE ----
+\begin{column}{0.45\textwidth}
+\centering
+\includegraphics[width=0.60\textwidth]{pictures/venmo.jpg}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}{Blockchain 101}
+
+\begin{columns}[T]
+
+% ---- LEFT: TEXT ----
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+    \item A blockchain is a decentralized, \textbf{distributed ledger}
+    \begin{itemize}
+        \item Transaction amount
+        \item When people move money in or out of the system (not pictured)
+    \end{itemize}
+\end{itemize}
+\end{column}
+
+% ---- RIGHT: IMAGE ----
+\begin{column}{0.45\textwidth}
+\centering
+\includegraphics[width=0.60\textwidth]{pictures/venmo2.png}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}{Blockchain 101}
+
+\begin{columns}[T]
+
+% ---- LEFT: TEXT ----
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+    \item A blockchain is a decentralized, \textbf{distributed ledger}
+    \begin{itemize}
+        \item Transaction amount
+        \item When people move money in or out of the system (not pictured)
+    \end{itemize}
+\end{itemize}
+\end{column}
+
+% ---- RIGHT: IMAGE ----
+\begin{column}{0.45\textwidth}
+\centering
+\includegraphics[width=0.60\textwidth]{pictures/venmo2.png}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}{Blockchain 101}
+
+\begin{columns}[T]
+
+% ---- LEFT: TEXT ----
+\begin{column}{0.70\textwidth}
+\begin{itemize}
+    \item A blockchain is a decentralized, distributed ledger
+\end{itemize}
+\vspace{0.3cm}
+\centering
+    \includegraphics[width=0.7\textwidth]{pictures/soccer_scoreboard.jpg}
+\begin{block}{Takeaway}
+    Blockchain enables secure transactions through consensus among network participants (without intermediaries).
+\end{block}
+\end{column}
+
+% ---- RIGHT: IMAGE ----
+\begin{column}{0.30\textwidth}
+\centering
+\includegraphics[width=0.90\textwidth]{pictures/venmo3.png}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}{DeFi 101}
+
+\begin{itemize}
+    \item \ding{51} Blockchain: decentralized, distributed ledger 
+    \item \ding{55} DeFi: Financial services built on a Blockchain
+\end{itemize}
+
+\vspace{0.4cm}
+
+\end{frame}
+
+
+\begin{frame}{DeFi 101}
+\begin{itemize}
+    \item DeFi: Financial Services on a Blockchain
+\end{itemize}
+
+\vspace{0.4cm}
+
+\end{frame}
+
+
+\begin{frame}{DeFi 101}
+
+% think about human systems, for example the financial system. Human decisions are enabled through pre-programmed logic (this is essentially what any software is) a combination of logic interactions which construct a system that operates. 
+% Can use the example of course registration to help people understand.
+
+\begin{columns}[T]
+
+% ---- LEFT: TEXT ----
+\begin{column}{0.55\textwidth}
+\begin{itemize}
+    \item We have seen the ability to change / update the state of something.
+\end{itemize}
+\end{column}
+
+% ---- RIGHT: IMAGE ----
+\begin{column}{0.45\textwidth}
+\centering
+\includegraphics[width=0.60\textwidth]{pictures/venmo3.png}
+\end{column}
+
+\end{columns}
+
+\vspace{0.4cm}
+\end{frame}
+
+\begin{frame}{DeFi 101}
+
+\begin{columns}[T]
+
+% ---- LEFT: TEXT ----
+\begin{column}{0.65\textwidth}
+\begin{itemize}
+    \item We have seen the ability to change / update the state of something.
+    \item One last piece: Ability to add logic (i.e. functions)
+\end{itemize}
+
+\includegraphics[]{pictures/code.png}
+\end{column}
+
+% ---- RIGHT: IMAGE ----
+\begin{column}{0.35\textwidth}
+\centering
+\includegraphics[width=0.60\textwidth]{pictures/venmo3.png}
+\end{column}
+
+\end{columns}
+
+\vspace{0.4cm}
+\end{frame}
+
+
+\begin{frame}{DeFi 101}
+
+\begin{itemize}
+    \item Utilize logic to align incentives. Create roles and functions analogous to traditional, centralized systems.
+    \begin{itemize}
+        \item ex. DeFi lending seeks to offer (somewhat) analogous services to traditional financial lending markets.
+    \end{itemize}
+    \item Logic is encapsulated on the blockchain in what is known as a \textbf{smart contract}. 
+    \item A combination of smart contracts which seeks to create a wholistic service or function is known as a \textbf{protocol}.
+\end{itemize}
+
+
+\vspace{0.4cm}
+
+\end{frame}
+
+
+
+% =========================================================
+% SERIES 1: 3 slides
+% Slide 1: Top half split L/R (image only in top-left). Bottom half empty.
+% Slide 2: Top half split L/R (images in both). Bottom half empty.
+% Slide 3: Same top images + one image spanning bottom half.
+% =========================================================
+
+\begin{frame}{Liquidation Mechanism 1.1}
+\begin{columns}[T,onlytextwidth]
+  % LEFT: top-left image with some whitespace around it
+  \begin{column}{0.48\textwidth}
+    \vspace{0.2cm}
+    \includegraphics[width=\linewidth]{pictures/liq_mech/1.1.png}
+    \vspace{0.2cm}
+  \end{column}
+
+  % RIGHT: empty
+  \begin{column}{0.48\textwidth}
+    % intentionally blank
+  \end{column}
+\end{columns}
+
+\vspace{0.6cm} % space between top and bottom halves
+
+% Bottom section (empty)
+\vfill
+\end{frame}
+
+
+\begin{frame}{Liquidation Mechanism 1.2}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{pictures/liq_mech/1.1.png}
+  \end{column}
+  \begin{column}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{pictures/liq_mech/1.2.png}
+  \end{column}
+\end{columns}
+
+\vspace{0.6cm}
+
+% Bottom section (empty)
+\vfill
+\end{frame}
+
+
+\begin{frame}{Liquidation Mechanism 1.3}
+    \begin{center}
+  \includegraphics[width=0.78\textwidth]{pictures/liq_mech/1.3.png}
+\end{center}
+\end{frame}
+
+\begin{frame}{Liquidation Mechanism 1.4}
+    \begin{center}
+  \includegraphics[width=0.78\textwidth]{pictures/liq_mech/1.4.png}
+\end{center}
+\end{frame}
+
+% =========================================================
+% SERIES 2: 3 slides (three horizontal bands: top/mid/bottom)
+% Slide 1: band1 has img1; band2 has img2; band3 has img3.
+% Slide 2: band1 has img1; band2 has img1+img2; band3 has img3.
+% Slide 3: band1 has img1; band2 has img1+img2; band3 has img1+img2+img3.
+% =========================================================
+
+\begin{frame}{Liquidation Mechanism 2.1}
+% --- Band 1 ---
+\begin{center}
+  \includegraphics[height=0.28\textheight]{pictures/liq_mech/inital_state.png}
+\end{center}
+
+
+% --- Band 2 ---
+\begin{center}
+
+\end{center}
+
+
+% --- Band 3 ---
+\begin{center}
+
+\end{center}
+\end{frame}
+
+
+
+
+\begin{frame}{Liquidation Mechanism 2.2}
+% --- Band 1: img1 ---
+\begin{center}
+  \includegraphics[height=0.28\textheight]{pictures/liq_mech/inital_state.png}
+\end{center}
+
+
+% --- Band 2: img1 + img2 (side-by-side) ---
+\begin{center}
+
+\includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{pictures/liq_mech/decrease_10.png}
+ 
+\end{center}
+
+% --- Band 3: img3 ---
+\begin{center}
+  
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Liquidation Mechanism 2.3}
+% --- Band 1: img1 ---
+\begin{center}
+  \includegraphics[height=0.28\textheight]{pictures/liq_mech/inital_state.png}
+\end{center}
+% --- Band 2: img1 + img2 ---
+\begin{center}
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{pictures/liq_mech/decrease_10.png}
+\end{center}
+\begin{center}
+    \includegraphics[width=\linewidth,height=0.25\textheight,keepaspectratio]{pictures/liq_mech/tokenA90.png}
+\end{center}
+\end{frame}
+
+
+% =========================================================
+% SERIES 2: 3 slides (three horizontal bands: top/mid/bottom)
+% Slide 1: band1 has img1; band2 has img2; band3 has img3.
+% Slide 2: band1 has img1; band2 has img1+img2; band3 has img3.
+% Slide 3: band1 has img1; band2 has img1+img2; band3 has img1+img2+img3.
+% =========================================================
+
+\begin{frame}{Liquidation Mechanism 3.1}
+% --- Band 1 ---
+\begin{center}
+  \includegraphics[height=0.28\textheight]{pictures/liq_mech/tokenA90.png}
+\end{center}
+
+
+
+% --- Band 2 ---
+\begin{center}
+
+\end{center}
+
+
+% --- Band 3 ---
+\begin{center}
+
+\end{center}
+\end{frame}
+
+
+
+
+\begin{frame}{Liquidation Mechanism 3.2}
+% --- Band 1: img1 ---
+\begin{center}
+  \includegraphics[height=0.28\textheight]{pictures/liq_mech/tokenA90.png}
+\end{center}
+
+\begin{center}
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{pictures/liq_mech/decrease_30.png}
+\end{center}
+
+
+% --- Band 3: img3 ---
+\begin{center}
+  
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Liquidation Mechanism 3.3}
+% --- Band 1: img1 ---
+\begin{center}
+  \includegraphics[height=0.28\textheight]{pictures/liq_mech/tokenA90.png}
+\end{center}
+
+\begin{center}
+    \includegraphics[width=\linewidth,height=0.23\textheight,keepaspectratio]{pictures/liq_mech/decrease_30.png}
+\end{center}
+
+  \begin{center}
+    \includegraphics[width=\linewidth,height=0.28\textheight,keepaspectratio]{pictures/liq_mech/tokenA_62.46.png}
+  \end{center}
+
+
+\end{frame}
+
+
+
+
+% =========================================================
+% SERIES 3: 2 slides (Left/Right)
+% Slide 1: left image only.
+% Slide 2: same left image + new right image.
+% =========================================================
+
+\begin{frame}{Liquidation Mechanism 4.1}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{pictures/liq_mech/proto_looks_sell.png}
+  \end{column}
+  \begin{column}{0.48\textwidth}
+    % intentionally blank
+  \end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Liquidation Mechanism 4.2}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{pictures/liq_mech/proto_looks_sell.png}
+  \end{column}
+  \begin{column}{0.48\textwidth}
+    \includegraphics[width=\linewidth]{pictures/liq_mech/proto_sells.png}
+  \end{column}
+\end{columns}
+\end{frame}
+
+
+
+% =========================================================
+% SERIES 4: 2 slides (Left/Right)
+% Slide 1: left image only.
+% Slide 2: same left image + new right image.
+% =========================================================
+
+\begin{frame}{Liquidation Mechanism 5.1}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{0.30\textwidth}
+    \includegraphics[width=\linewidth]{pictures/liq_mech/liq_sale.png}
+  \end{column}
+  \begin{column}{0.7\textwidth}
+    % intentionally blank
+  \end{column}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}{Liquidation Mechanism 5.2}
+\begin{columns}[T,onlytextwidth]
+  \begin{column}{0.3\textwidth}
+    \includegraphics[width=\linewidth]{pictures/liq_mech/liq_sale.png}
+  \end{column}
+  \begin{column}{0.7\textwidth}
+    \includegraphics[width=\linewidth]{pictures/liq_mech/last.png}
+  \end{column}
+\end{columns}
+\end{frame}
+
+
+
+
+
+% ----------------------------
+% Slide 2 — Motivation
+% ----------------------------
+\begin{frame}{DeFi: Who Cares?}
+
+% Nobody uses somebody else's resources as carefully as he uses his own. - Milton Friedman (I don't totally love it, but I think it is ok).
+
+\vspace{0.3cm}
+
+DeFi automates financial structures by encoding rules into smart contracts, raising a question about the necessity of centralized banking institutions.
+
+\vspace{0.5cm}
+
+\begin{block}{Important Idea}
+Should DeFi be treated as a legitimate financial system?
+\end{block}
+\begin{itemize}
+    \item Are DeFi markets more efficient than TradFi?
+    \item Does protocol governance truly enable decentralized, effective management?
+    \item \textbf{Are DeFi Lending markets stable?}
+\end{itemize}
+
+
+\end{frame}
+
+
+
+
+% ----------------------------
+% Slide 3 — Motivation 2
+% ----------------------------
+\begin{frame}{Lending Stability: Who Cares?}
+
+\begin{columns}[T] % top-aligned columns
+
+% ---- Left column (text) ----
+\begin{column}{0.62\textwidth}
+
+\textbf{Lending reallocates resources across time.}
+
+\vspace{0.3cm}
+
+Instability in lending markets can lead to:
+\begin{itemize}
+    \item inefficient intertemporal allocation of capital
+    \item amplification of exogenous shocks
+    \item reduced participation and market liquidity
+    \item propagation of financial risk across the economy
+\end{itemize}
+
+
+\end{column}
+
+% ---- Right column (image) ----
+\begin{column}{0.38\textwidth}
+\centering
+\includegraphics[width=\textwidth]{pictures/lending_market_stability.jpg}
+\end{column}
+
+\end{columns}
+
+\vspace{0.4cm}
+
+\begin{block}{Important Idea}
+Is DeFi lending stable?
+\end{block}
+
+\end{frame}
+
+
+
+
+
+
+
+% ----------------------------
+% Slide 1 — Context: What is DeFi? 
+% ----------------------------
+\begin{frame}{DeFi Lending}
+
+% ---- TOP: DIAGRAM ----
+\centering
+\includegraphics[width=0.60\textwidth]{pictures/defi_diagram_5.png}
+
+\vspace{0.15cm}
+
+% ---- BOTTOM: TABLE (wider columns) ----
+\renewcommand{\arraystretch}{1.05}
+\footnotesize
+\begin{tabular}{p{3.6cm}p{4.2cm} p{4.2cm}}
+\toprule
+\textbf{} & \textbf{DeFi Lending} & \textbf{Traditional Lending} \\
+\midrule
+Borrower gives
+& Tokens upfront
+& Future cash flows + interest \\
+
+Collateralization
+& Over-collateralized
+& Under-collateralized \\
+
+Underwriting basis
+& Collateral value
+& Borrower personal information \\
+
+Loan Failure
+& Automatic liquidation
+& Default \\
+
+\bottomrule
+\end{tabular}
+
+\vspace{0.12cm}
+\end{frame}
+
+\begin{frame}{Research Motivation}
+    \begin{itemize}
+        \item Pseudonymity
+        \begin{itemize}
+            \item No check on leveraging assets
+        \end{itemize}
+                \item Risk-seeking users
+        \begin{itemize}
+            \item Inherently more risky than traditional financial markets 
+        \end{itemize}
+        \item Correlated asset prices
+                \item Automatic liquidation mechanism
+        \begin{itemize}
+            \item If collateral value drops threshold, loan automatically becomes available for liquidation
+        \end{itemize}
+    \end{itemize}
+
+    \begin{block}{Levered Positions}
+        Since users can fully lever their positions, leaving them with thin coverage, an adverse price should bring those accounts to liquidation.
+    \end{block}
+
+    
+    \begin{block}{Cascading Liquidations}
+        If liquidations lead to the collateral asset sale, that should further cause downward pressure of asset prices, potentially causing more liquidations.
+    \end{block}
+\end{frame}
+
+
+
+% ----------------------------
+% Slide 4 — Research Question & Contribution
+% ----------------------------
+\begin{frame}{Research Question}
+
+\begin{block}{Research question}
+Do leverage strategies in DeFi lending  introduce destabilizing volatility through cascading liquidations?
+\end{block}
+
+\begin{itemize}
+    \item 1. Leverage --> Liquidations
+    \item 2. Liquidations --> Collateral Asset Volatility
+\end{itemize}
+
+\vspace{0.2cm}
+
+
+\end{frame}
+
+% ----------------------------
+% Slide — Leverage Cycle Precedent
+% ----------------------------
+\begin{frame}{[DRAFT] Foundational Research}
+
+\textbf{Endogenous leverage is central to financial instability.}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item \textbf{Geanakoplos (2010)} formalizes the \emph{leverage cycle}:
+    \begin{itemize}
+        \item leverage, asset prices, and volatility are jointly determined
+        \item falling margins inflate prices; tightening margins trigger fire sales
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+    \item Small shocks can generate large downturns through
+    \begin{itemize}
+        \item forced deleveraging
+        \item collateral constraints
+        \item feedback between prices and borrowing capacity
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+    \item The framework has shaped research on
+    \begin{itemize}
+        \item housing and mortgage markets
+        \item repo and shadow banking
+        \item margin-based securities lending
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{[DRAFT] DeFi as an Extension of the Leverage Cycle}
+
+\textbf{DeFi lending protocols operationalize the leverage cycle mechanically.}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item Collateral constraints are explicit and rule-based
+    \begin{itemize}
+        \item loan-to-value ratios
+        \item automated liquidation thresholds
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+    \item Deleveraging occurs through \textbf{automatic, on-chain liquidations}
+    \begin{itemize}
+        \item no discretion, no negotiation
+        \item immediate collateral sales
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+    \item All components of the leverage cycle are \textbf{observable}
+    \begin{itemize}
+        \item leverage (utilization, borrowed vs.\ supplied)
+        \item liquidation flows
+        \item collateral price volatility
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+    \item \textbf{Implication:}
+    DeFi provides a laboratory to empirically test leverage-cycle dynamics
+    across multiple financial systems in real time.
+\end{itemize}
+
+\end{frame}
+
+% ----------------------------
+% Slide — PVAR Framework
+% ----------------------------
+\begin{frame}{[DRAFT] Econometric Framework: Panel VAR (Pedroni)}
+
+\textbf{The analysis uses a Pedroni-style Panel Vector Autoregression (PVAR).}
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item Developed to study \textbf{dynamic interactions} across heterogeneous units
+    \item Combines:
+    \begin{itemize}
+        \item time-series dynamics (VAR)
+        \item cross-sectional information (panel structure)
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+    \item Allows all variables to be \textbf{jointly endogenous}
+    \begin{itemize}
+        \item leverage
+        \item liquidation activity
+        \item collateral volatility
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+    \item Fixed effects capture \textbf{persistent protocol-level heterogeneity}
+    \begin{itemize}
+        \item risk parameters
+        \item liquidation design
+        \item asset composition
+    \end{itemize}
+\end{itemize}
+
+\end{frame}
+
+% ----------------------------
+% Slide — Identification and Limits
+% ----------------------------
+\begin{frame}{[DRAFT] What the PVAR Can (and Cannot) Speak To}
+
+\textbf{What this approach is well-suited to identify}
+
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item Dynamic responses to shocks via impulse response functions
+    \item Direction and persistence of feedback effects
+    \item Average behavior across protocols over time
+    \item Evidence of amplification versus stabilization dynamics
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Key constraints of the methodology}
+
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item Reduced-form identification
+    \item No structural interpretation without additional restrictions (explains how variables move together, not mechanism which drives those movements)
+\end{itemize}
+
+
+\end{frame}
+
+% ----------------------------
+% Slide 5 — Data & Empirical Approach
+% ----------------------------
+\begin{frame}{[DRAFT] Data and empirical approach}
+
+\textbf{Data construction}
+\begin{itemize}
+  \item Cross-sectional unit: \textbf{Protocol × Blockchain}
+  \item Daily panel data:
+  \begin{itemize}
+    \item Leverage measures (utilization, borrowed vs. supplied)
+    \item Liquidation volumes (USD)
+    \item Collateral price volatility
+  \end{itemize}
+\end{itemize}
+
+\vspace{0.2cm}
+
+\textbf{Data sources}
+\begin{itemize}
+  \item On-chain smart contract data
+  \item Protocol analytics (TVL, borrowing, liquidations)
+  \item Public price oracles and aggregators
+\end{itemize}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Utilization Ratio
+% ----------------------------
+\begin{frame}{[DRAFT] Leverage Measure: Utilization Ratio}
+
+\textbf{Utilization captures aggregate leverage pressure within a lending pool.}
+
+\vspace{0.3cm}
+
+\[
+\text{Utilization}_{t} =
+\frac{\text{Total Borrowed}_{t}}{\text{Total Supplied}_{t}}
+\]
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item Measures how aggressively liquidity is being borrowed
+    \item Higher utilization implies:
+    \begin{itemize}
+        \item thinner liquidity buffers
+        \item greater sensitivity to price shocks
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+    \item Interpreted as a \textbf{protocol-level analogue of leverage}
+    \begin{itemize}
+        \item reflects borrower risk appetite
+        \item responds endogenously to prices and interest rates
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+\end{itemize}
+
+\end{frame}
+
+% ----------------------------
+% Slide — Liquidations
+% ----------------------------
+\begin{frame}{[DRAFT] Liquidations: Forced Deleveraging}
+
+\textbf{Liquidations measure realized deleveraging through collateral sales.}
+
+\vspace{0.3cm}
+
+\[
+\text{Liquidation}_{t}
+=
+\sum \big(
+\text{Collateral Liquidated}_{k,t}
+\times
+\text{Collateral Price}_{k,t}
+\big)
+\]
+
+\vspace{0.3cm}
+
+\begin{itemize}
+    \item Captures the \textbf{intensive margin} of stress
+    \begin{itemize}
+        \item not just whether liquidations occur
+        \item but how economically large they are
+    \end{itemize}
+
+    \vspace{0.2cm}
+
+    \item Liquidations are aggregated daily at the protocol level
+\end{itemize}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Volatility Measure
+% ----------------------------
+\begin{frame}{[DRAFT] Volatility: Collateral Basket Risk}
+
+\textbf{Volatility is measured at the protocol level using collateral exposure.}
+
+\vspace{0.2cm}
+
+\textbf{Step 1: Log returns for each collateral asset}
+\[
+r_{i,t} = \ln(p_{i,t}) - \ln(p_{i,t-1})
+\]
+
+\vspace{0.2cm}
+
+\textbf{Step 2: Lagged collateral weights}
+\[
+w_{i,t-1} =
+\frac{\text{Collateral}_{i,t-1}}
+{\sum_{j=1}^{N} \text{Collateral}_{j,t-1}}
+\]
+
+\vspace{0.2cm}
+
+\textbf{Step 3: Protocol-level collateral return}
+\[
+r^{\text{protocol}}_{t}
+=
+\sum_{i=1}^{N} w_{i,t-1} \cdot r_{i,t}
+\]
+
+\vspace{0.2cm}
+
+\textbf{Step 4: Rolling volatility}
+\[
+\sigma_{t}
+=
+\sqrt{\frac{1}{H}
+\sum_{\tau=t-H+1}^{t}
+\left(r^{\text{protocol}}_{\tau}
+-
+\bar{r}^{\text{protocol}}\right)^2}
+\]
+
+\end{frame}
+
+
+
+% Closing slide
+% ----------------------------
+% Slide X — Thanks
+% ----------------------------
+\begin{frame}{Thanks}
+  \begin{center}
+    {\Large Questions?}\\[0.5cm]
+    \textcolor{WilliamsPurple}{\rule{0.6\textwidth}{0.6pt}}\\[0.4cm]
+    \small Lewis Schrock \quad • \quad Williams College
+  \end{center}
+\end{frame}
+
+\end{document}

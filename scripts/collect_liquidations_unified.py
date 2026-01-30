@@ -550,9 +550,10 @@ def scan_chain_liquidations(
     contracts: Dict[str, List[str]],  # {csu: [addresses]}
     chunk_size: int = 10,  # Alchemy free tier: max 10 blocks
     max_retries: int = 5,
-    pace_seconds: float = 0.05,
+    pace_seconds: float = 0.25,  # 250ms = 4 calls/sec (safe for rate limits)
     save_interval: int = 100,  # Save checkpoint every 100 chunks
     status_interval: int = 500,  # Print status every N chunks
+    provider_rotation_interval: int = 50,  # Rotate provider every N chunks (more frequent)
 ) -> int:
     """
     Scan a chain for liquidation events and save incrementally.
@@ -560,7 +561,8 @@ def scan_chain_liquidations(
     Returns:
         Total number of events collected
     """
-    w3, _ = setup_web3_for_chain(chain)
+    w3, current_provider = setup_web3_for_chain(chain)
+    chunks_since_rotation = 0
 
     total_blocks = to_block - from_block + 1
     total_chunks = (total_blocks + chunk_size - 1) // chunk_size
@@ -599,11 +601,19 @@ def scan_chain_liquidations(
     while current <= to_block:
         chunk_end = min(current + chunk_size - 1, to_block)
 
+        # Rotate provider periodically to distribute load
+        chunks_since_rotation += 1
+        if chunks_since_rotation >= provider_rotation_interval:
+            w3, current_provider = setup_web3_for_chain(chain)
+            chunks_since_rotation = 0
+
         # Check backoff
         is_backing, remaining = is_chain_backing_off(chain)
         if is_backing:
             print(f"  Chain in backoff, waiting {remaining:.0f}s...")
             time.sleep(remaining + 1)
+            # Get fresh provider after backoff
+            w3, current_provider = setup_web3_for_chain(chain)
 
         chunk_events = []
 
@@ -673,17 +683,29 @@ def scan_chain_liquidations(
 
                 if is_rate_limit:
                     report_rpc_error(chain, str(e))
+                    # Rotate to a different provider on rate limit
+                    w3, current_provider = setup_web3_for_chain(chain)
 
                 if is_block_range:
                     print(f"  ERROR: Block range too large. Alchemy free tier limits to 10 blocks.")
                     print(f"  Reduce --chunk-size to 10 or upgrade your RPC plan.")
                     return total_events
                 elif is_rate_limit and attempt < max_retries - 1:
-                    wait_time = min(2 ** attempt, 60)
-                    print(f"  Rate limit on [{current:,}, {chunk_end:,}], waiting {wait_time}s...")
+                    wait_time = min(2 ** attempt + 1, 15)  # 2, 3, 5, 9, 15 seconds
+                    print(f"  Rate limit on [{current:,}, {chunk_end:,}], rotating provider & waiting {wait_time}s...")
                     time.sleep(wait_time)
+                elif 'connection' in error_msg or 'remote' in error_msg or 'timeout' in error_msg:
+                    # Connection error - wait briefly and rotate
+                    print(f"  Connection error on [{current:,}, {chunk_end:,}], rotating provider...")
+                    w3, current_provider = setup_web3_for_chain(chain)
+                    time.sleep(2)  # Brief cooldown
+                    if attempt >= max_retries - 1:
+                        break
                 else:
                     print(f"  Failed [{current:,}, {chunk_end:,}]: {e}")
+                    # Try rotating provider even on other errors
+                    w3, current_provider = setup_web3_for_chain(chain)
+                    time.sleep(1)
                     break
 
         # Save events from this chunk

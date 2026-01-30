@@ -1,0 +1,282 @@
+% ============================================================
+% [TEMP] SLIDES — Mid-Year Data Progress Update
+% Insert these before the closing "Thanks" frame
+% ============================================================
+
+% ----------------------------
+% Slide — Data Pipeline Overview
+% ----------------------------
+\begin{frame}{[TEMP] Data Pipeline Overview}
+
+\textbf{Three-layer architecture: Bronze → Silver → Gold}
+
+\vspace{0.3cm}
+
+\begin{columns}[T]
+
+\begin{column}{0.33\textwidth}
+\begin{block}{Bronze (Raw)}
+\begin{itemize}
+    \item On-chain smart contract calls
+    \item Block-level TVL snapshots
+    \item Raw liquidation events
+    \item 23,876 files (~124 MB)
+\end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.33\textwidth}
+\begin{block}{Silver (Processed)}
+\begin{itemize}
+    \item Daily TVL aggregation
+    \item 22,390 records
+    \item 36 CSUs across 11 chains
+    \item Standardized schema
+\end{itemize}
+\end{block}
+\end{column}
+
+\begin{column}{0.33\textwidth}
+\begin{block}{Gold (Analysis)}
+\begin{itemize}
+    \item Balanced panel data
+    \item 4,380 observations
+    \item 6 Ethereum CSUs
+    \item Panel SVAR--ready
+\end{itemize}
+\end{block}
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Pipeline Summary Table
+% ----------------------------
+\begin{frame}{[TEMP] Data Collection Summary}
+
+\begin{center}
+\includegraphics[width=0.85\textwidth]{pictures/presentation/pipeline_summary_table.png}
+\end{center}
+
+\vspace{0.2cm}
+
+\begin{itemize}
+    \item \textbf{Block cache}: Complete coverage for 17 chains (Jan 2024 -- Dec 2025)
+    \item \textbf{Price oracle}: 9,003 historical prices from Chainlink
+\end{itemize}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — TVL Coverage
+% ----------------------------
+\begin{frame}{[TEMP] TVL Data Coverage}
+
+\begin{center}
+\includegraphics[width=0.90\textwidth]{pictures/presentation/tvl_coverage_heatmap.png}
+\end{center}
+
+\begin{itemize}
+    \item 36 protocol--chain units (CSUs) tracked daily for 2 years
+    \item Covers major lending protocols: Aave V3, Compound V3, SparkLend, Fluid, Moonwell, Venus, and others
+\end{itemize}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — TVL by Chain
+% ----------------------------
+\begin{frame}{[TEMP] Total Value Locked by Chain}
+
+\begin{center}
+\includegraphics[width=0.88\textwidth]{pictures/presentation/tvl_by_chain.png}
+\end{center}
+
+\begin{itemize}
+    \item Ethereum dominates TVL; Base, Arbitrum, and Optimism show growth
+    \item Multi-chain coverage enables future cross-chain analysis
+\end{itemize}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Ethereum Liquidation Time Series
+% ----------------------------
+\begin{frame}{[TEMP] Ethereum Liquidation Volume}
+
+\begin{center}
+\includegraphics[width=0.92\textwidth]{pictures/presentation/eth_liquidation_timeseries.png}
+\end{center}
+
+\begin{itemize}
+    \item 6 CSUs $\times$ 730 days = 4,380 balanced panel observations
+    \item Liquidation activity is episodic and concentrated around price shocks
+\end{itemize}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Liquidation Distribution
+% ----------------------------
+\begin{frame}{[TEMP] Liquidation Distribution by CSU}
+
+\begin{center}
+\includegraphics[width=0.85\textwidth]{pictures/presentation/liquidation_distribution_by_csu.png}
+\end{center}
+
+\begin{itemize}
+    \item Heavy right tail: most liquidation days are small; a few are very large
+    \item Aave V3 has the most frequent and largest liquidation events
+\end{itemize}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Utilization Over Time
+% ----------------------------
+\begin{frame}{[TEMP] Utilization Ratio (Leverage Proxy)}
+
+\begin{center}
+\includegraphics[width=0.88\textwidth]{pictures/presentation/utilization_timeseries.png}
+\end{center}
+
+\vspace{0.1cm}
+
+\begin{itemize}
+    \item Utilization = Borrowed / Supplied --- proxy for aggregate leverage
+    \item Compound V3 USDC/USDT markets show persistently high utilization
+\end{itemize}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Liquidation vs Utilization
+% ----------------------------
+\begin{frame}{[TEMP] Preliminary: Liquidation vs.\ Utilization}
+
+\begin{center}
+\includegraphics[width=0.80\textwidth]{pictures/presentation/liq_vs_utilization_scatter.png}
+\end{center}
+
+\vspace{0.1cm}
+
+\begin{itemize}
+    \item Exploratory view: relationship between leverage and liquidation volume
+    \item Formal identification through Panel SVAR impulse response analysis
+\end{itemize}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Progress Roadmap
+% ----------------------------
+\begin{frame}{[TEMP] Data Pipeline Progress}
+
+\begin{center}
+\includegraphics[width=0.90\textwidth]{pictures/presentation/data_roadmap.png}
+\end{center}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Per-CSU Complexity (1 of 2)
+% ----------------------------
+\begin{frame}{[TEMP] Data Collection Complexity: One CSU, One Day}
+
+\textbf{Producing one row of the gold panel requires hundreds of smart contract calls.}
+
+\vspace{0.2cm}
+
+\renewcommand{\arraystretch}{1.15}
+\footnotesize
+\begin{tabular}{p{4.0cm} r p{5.5cm}}
+\toprule
+\textbf{Phase} & \textbf{RPC Calls} & \textbf{What it does} \\
+\midrule
+Block resolution & $\sim$24 & Binary search for block at midnight UTC \\
+Contract discovery & 3 & Resolve Pool, DataProvider, reserves list \\
+Per-reserve data (27$\times$) & 162 & symbol, decimals, aToken supply, stableDebt, variableDebt, token addresses \\
+Price oracles (22 tokens) & 44 & Chainlink \texttt{latestRoundData} + \texttt{decimals} \\
+Liquidation scan & $\sim$651 & Filter \texttt{eth\_getLogs} across $\sim$6{,}500 blocks \\
+\midrule
+\textbf{Total per CSU per day} & \textbf{$\sim$860} & \\
+\bottomrule
+\end{tabular}
+
+\vspace{0.3cm}
+
+\begin{block}{Scale}
+6 Ethereum CSUs $\times$ 730 days = 4{,}380 panel rows $\approx$ \textbf{3.8 million RPC calls} --- for one chain alone.
+\end{block}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Per-CSU Complexity (2 of 2)
+% ----------------------------
+\begin{frame}{[TEMP] Multi-Layer Pipeline Architecture}
+
+\textbf{Each observation passes through six processing layers.}
+
+\vspace{0.3cm}
+
+\begin{enumerate}
+    \item \textbf{Configuration} --- 51 CSUs defined across 14 chains; protocol, version, registry address, RPC endpoint per CSU
+    \item \textbf{Block mapping} --- Binary search maps calendar dates to block numbers; cached per chain per year
+    \item \textbf{TVL extraction} --- 166 on-chain calls per snapshot; reads 27 reserve markets $\times$ 6 fields each
+    \item \textbf{Price conversion} --- Chainlink oracle lookups for 22 non-stablecoin assets; results cached daily
+    \item \textbf{Liquidation scanning} --- Unified scanner decodes 8 protocol-specific event signatures in one pass; handles Aave, Compound V3, Fluid, SparkLend, Moonwell, Venus, Cap, Gearbox
+    \item \textbf{Bronze $\to$ Silver $\to$ Gold} --- Aggregate, merge, balance panel; produce analysis-ready output
+\end{enumerate}
+
+\vspace{0.2cm}
+
+\begin{block}{Full project scope}
+42 CSUs, 14 chains, 2 years $\rightarrow$ estimated \textbf{$\sim$15 million smart contract calls} for complete data collection.
+\end{block}
+
+\end{frame}
+
+
+% ----------------------------
+% Slide — Next Steps
+% ----------------------------
+\begin{frame}{[TEMP] Next Steps}
+
+\textbf{Remaining data work}
+\begin{itemize}
+    \item Expand liquidation collection to additional chains (Base testing underway)
+    \item Improve collateral composition USD coverage (currently $\sim$45\%)
+    \item Build silver/gold pipeline for non-Ethereum chains
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Analysis}
+\begin{itemize}
+    \item Finalize Panel SVAR data preparation (utilization, liquidation, volatility)
+    \item Run Pedroni Panel SVAR: impulse response functions and variance decomposition
+    \item Test robustness across volatility windows and variable orderings
+\end{itemize}
+
+\vspace{0.3cm}
+
+\textbf{Timeline}
+\begin{itemize}
+    \item Data completion: ongoing
+    \item Econometric analysis and writing: spring semester
+\end{itemize}
+
+\end{frame}

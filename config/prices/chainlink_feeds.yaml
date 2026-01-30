@@ -42,10 +42,25 @@ feeds:
   sUSD:
     ethereum: "0xad35Bd71b9aFE6e4bDc266B345c198eaDEf9Ad94"
 
-  # LSTs (Liquid Staking Tokens) - use ETH price as base
-  # wstETH, rETH, cbETH need exchange rate lookups
+  # LSTs (Liquid Staking Tokens)
   stETH:
     ethereum: "0xCfE54B5cD566aB89272946F602D76Ea879CAb4a8"  # stETH/USD
+  wstETH:
+    ethereum: "0x164b276057258d81941e97B0a900D4C7B358bCe0"  # wstETH/USD (Chainlink)
+  rETH:
+    ethereum: "0x536218f9E9Eb48863970252233c8F271f554C2d0"  # rETH/USD
+  cbETH:
+    ethereum: "0xF017fcB346A1885194689bA23Eff2fE6fA5C483b"  # cbETH/USD
+
+  # DeFi governance tokens
+  LDO:
+    ethereum: "0x4e844125952D32AcdF339BE976c98fe6D1f30f7a"  # LDO/USD
+  ENS:
+    ethereum: "0x5C00128d4d1c2F4f652C267d7bcdD7Ac99C16E16"  # ENS/USD
+  RPL:
+    ethereum: "0x4E155eD98aFE9034b7A5962f6C84c86d869daA9d"  # RPL/USD
+  BAL:
+    ethereum: "0xdF2917806E30300537aEB49A7663062F4d1F2b5F"  # BAL/USD
 
   # L2 tokens
   ARB:
@@ -111,3 +126,10 @@ stablecoins:
   - GHO
   - MAI
   - sDAI  # Assuming 1:1 with DAI for simplicity
+  - USDS  # Sky USD (MakerDAO rebrand)
+  - PYUSD # PayPal USD
+  - EURC  # Circle EUR (treating as $1 approximation)
+  - USDe  # Ethena USD
+  - USDtb # Unknown stablecoin
+  - crvUSD # Curve USD
+  - GUSD  # Gemini USD

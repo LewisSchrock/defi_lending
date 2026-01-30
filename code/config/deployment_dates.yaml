@@ -31,5 +31,14 @@ csus:
   aave_v3_linea: "2024-11-23"  # Verified from successful data collection (contract empty before)
   aave_v3_scroll: "2024-01-20"  # Verified: deployment block 2,618,760
 
+  # Plasma chain (launched Sept 3, 2025)
+  aave_v3_plasma: "2025-09-09"  # Verified: block 490,000
+  fluid_lending_plasma: "2025-09-15"  # Verified: block ~1,000,000 (no tokens until later)
+
+  # Newer protocol deployments (verified 2025-01-24)
+  lista_lending_binance: "2025-04-08"  # Verified: block 48,172,369
+  kinetic_flare: "2024-07-16"  # Verified: block 26,963,787
+  tydro_ink: "2025-07-25"  # Verified: block 19,954,027
+
   # Note: CSUs not listed here are assumed to have been deployed before 2024-01-01
   # and can be queried for the full year.

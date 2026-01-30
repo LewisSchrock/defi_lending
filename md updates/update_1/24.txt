@@ -1,0 +1,78 @@
+DeFi Lending Thesis - Strategic Overview
+Project Goal
+Collect historical TVL and liquidation data for DeFi lending protocols across multiple blockchains to analyze lending market dynamics. Target period: 2024-01-01 to 2025-12-31.
+
+Current Infrastructure
+RPC Provider Capacity
+Provider	Keys	Monthly Capacity	Rate Limit	Best For
+Alchemy	13	390M CU (~13 × 30M)	300 CU/sec per key	Primary workhorse
+BlockPi	12 chains	50M RU total	400 RU/sec, 20 req/sec	Chain diversity
+Ankr	1	200M credits	~30 req/sec	Backup/pooled
+Infura	1	3M credits/day	500 credits/sec	High-burst backup
+NodeReal	1	100M CU	150 CU/sec	BNB Chain specialist
+Total estimated capacity: ~830M compute units/month
+
+Chain Coverage (15 chains configured)
+High CSU count: Ethereum (30+), Base (7), Arbitrum (6), Polygon (5)
+Medium: Optimism, BSC, Avalanche, Gnosis
+Lower priority: Linea, Sonic, Ink, Meter, Scroll
+Data Collection Status
+Liquidations
+Chain	Status	Events	Last Block	Notes
+Ethereum	In Progress	17,291	23,048,246	~68% complete to 2025-12-31
+Others	Not Started	-	-	Waiting on Ethereum completion
+TVL
+Status varies by chain - check status_dashboard.py for current state
+Key Bottlenecks
+1. Sequential vs Parallel Execution
+Problem: Original collector used one RPC key at a time, cycling through when rate-limited. This meant 12 keys sat idle while 1 worked.
+
+Solution Implemented: Created collect_liquidations_parallel.py that runs 13 workers simultaneously, each with its own Alchemy key. Theoretical 13× speedup.
+
+2. Rate Limit Management
+Problem: eth_getLogs is expensive (~75 CU per call on Alchemy). At 300 CU/sec limit per key, that's only ~4 getLogs calls/second per key.
+
+Current approach:
+
+0.3 second pace per worker (conservative)
+Per-worker rate limiting (independent backoff)
+Failed chunks return to queue for other workers
+Tradeoff: More aggressive pacing = faster collection but risk of 429s and wasted capacity during backoff periods.
+
+3. Block Range Chunking
+Current: 10-block chunks for getLogs calls
+
+Smaller chunks = more calls but less risk of "response too large" errors
+Larger chunks = fewer calls but may hit response limits on active blocks
+4. Provider-Specific Quirks
+Alchemy: Most reliable, consistent CU pricing, good error messages
+BlockPi: Per-chain keys (good for isolation), but shared monthly pool
+Infura: High-credit cost for eth_getLogs, daily (not monthly) limits
+Public RPCs: Unreliable, aggressive rate limiting
+Strategic Decisions Needed
+1. Parallelism Level
+Conservative (current): 13 workers, 0.3s pace = ~43 calls/sec total
+Aggressive: 13 workers, 0.1s pace = ~130 calls/sec total
+Risk: Burning through monthly quotas faster, more 429 errors
+2. Chain Prioritization
+Option A: Complete Ethereum first (most CSUs, most data)
+Option B: Parallel multi-chain (spread risk, get partial data everywhere)
+
+3. Quota Allocation
+Current month quota consumption: Unknown (need to check provider dashboards)
+If running low, may need to throttle or wait for reset
+4. Data Completeness vs Speed
+Current end date: 2025-12-31 (fixed, not extending to present)
+Partial data acceptable? Or need 100% coverage?
+Files Reference
+scripts/collect_liquidations_parallel.py - New parallel collector
+scripts/collect_liquidations_unified.py - Original single-threaded collector
+scripts/collect_tvl_parallel.py - TVL collection
+scripts/status_dashboard.py - Progress monitoring
+scripts/check_rpc_quotas.py - Tests if endpoints are rate-limited
+config/rpc_pool_v2.py - Multi-provider RPC management
+Immediate Next Steps
+Run parallel collector to completion on Ethereum
+Monitor quota consumption across providers
+Move to next highest-CSU chains (Base, Arbitrum)
+Adjust pacing based on observed rate limit behavior

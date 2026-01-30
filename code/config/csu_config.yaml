@@ -91,13 +91,13 @@ csus:
     registry: "0x69850D0B276776781C063771b161bd8894BCdD04"
     outputs_dir: "./out/aave_v3_scroll"
 
-  aave_v3_sonic:
-    protocol: aave
-    version: v3
-    chain: sonic
-    rpc: ""
-    registry: "0x69850D0B276776781C063771b161bd8894BCdD04"
-    outputs_dir: "./out/aave_v3_sonic"
+  # aave_v3_sonic:  # EXCLUDED: Contract not deployed on Sonic (address exists on Scroll but not Sonic)
+  #   protocol: aave
+  #   version: v3
+  #   chain: sonic
+  #   rpc: ""
+  #   registry: "0x69850D0B276776781C063771b161bd8894BCdD04"
+  #   outputs_dir: "./out/aave_v3_sonic"
 
   sparklend_ethereum:
     protocol: sparklend
@@ -253,21 +253,21 @@ csus:
     registry: "0xF25212E676D1F7F89Cd72fFEe66158f541246445"
     outputs_dir: "./out/compound_v3_poly_usdc"
 
-  compound_v3_poly_usdc_e:
-    protocol: compound
-    version: v3
-    chain: polygon
-    rpc: ""
-    registry: "0xaeB0E0Ed3cE4Bf8001A38B1d2a7E8C3a27F61E4e"
-    outputs_dir: "./out/compound_v3_poly_usdc_e"
+  # compound_v3_poly_usdc_e:  # EXCLUDED: Invalid contract address (no code on Polygon)
+  #   protocol: compound
+  #   version: v3
+  #   chain: polygon
+  #   rpc: ""
+  #   registry: "0xaeB0E0Ed3cE4Bf8001A38B1d2a7E8C3a27F61E4e"
+  #   outputs_dir: "./out/compound_v3_poly_usdc_e"
 
-  compound_v3_poly_usdt:
-    protocol: compound
-    version: v3
-    chain: polygon
-    rpc: ""
-    registry: "0xaeB0E0Ed3cE4Bf8001A38B1d2a7E8C3a27F61E4e"
-    outputs_dir: "./out/compound_v3_poly_usdt"
+  # compound_v3_poly_usdt:  # EXCLUDED: Invalid contract address (no code on Polygon)
+  #   protocol: compound
+  #   version: v3
+  #   chain: polygon
+  #   rpc: ""
+  #   registry: "0xaeB0E0Ed3cE4Bf8001A38B1d2a7E8C3a27F61E4e"
+  #   outputs_dir: "./out/compound_v3_poly_usdt"
 
   fluid_lending_ethereum:
     protocol: fluid
@@ -513,32 +513,33 @@ csus:
     registry: "0xfBb21d0380beE3312B33c4353c8936a0F13EF26C"
     outputs_dir: "./out/moonwell_lending_base"
 
-  tectonic_cronos_main:
-    protocol: tectonic
-    version: main
-    chain: cronos
-    rpc: "https://evm.cronos.org/"
-    TectonicCore: "0x7de56bd8b37827c51835e162c867848fe2403a48"
-    TectonicSocket: "0xb3831584acb95ED9cCb0C11f677B5AD01DeaeEc0"
-    outputs_dir: "./out/tectonic_cronos_main"
+  # DISABLED: Cronos - no reliable RPC provider (public only)
+  # tectonic_cronos_main:
+  #   protocol: tectonic
+  #   version: main
+  #   chain: cronos
+  #   rpc: "https://evm.cronos.org/"
+  #   TectonicCore: "0x7de56bd8b37827c51835e162c867848fe2403a48"
+  #   TectonicSocket: "0xb3831584acb95ED9cCb0C11f677B5AD01DeaeEc0"
+  #   outputs_dir: "./out/tectonic_cronos_main"
 
-  tectonic_cronos_veno:
-    protocol: tectonic
-    version: veno
-    chain: cronos
-    rpc: "https://evm.cronos.org/"
-    TectonicCore: "0x7de56bd8b37827c51835e162c867848fe2403a48"
-    TectonicSocket: "0x7e0067cef1e7558dafbab3b1f8f6fa75ff64725f"
-    outputs_dir: "./out/tectonic_cronos_veno"
+  # tectonic_cronos_veno:
+  #   protocol: tectonic
+  #   version: veno
+  #   chain: cronos
+  #   rpc: "https://evm.cronos.org/"
+  #   TectonicCore: "0x7de56bd8b37827c51835e162c867848fe2403a48"
+  #   TectonicSocket: "0x7e0067cef1e7558dafbab3b1f8f6fa75ff64725f"
+  #   outputs_dir: "./out/tectonic_cronos_veno"
 
-  tectonic_cronos_defi:
-    protocol: tectonic
-    version: defi
-    chain: cronos
-    rpc: "https://evm.cronos.org/"
-    TectonicCore: "0x7de56bd8b37827c51835e162c867848fe2403a48"
-    TectonicSocket: "0x8312a8d5d1dec499d00eb28e1a2723b13aa53c1e"
-    outputs_dir: "./out/tectonic_cronos_defi"
+  # tectonic_cronos_defi:
+  #   protocol: tectonic
+  #   version: defi
+  #   chain: cronos
+  #   rpc: "https://evm.cronos.org/"
+  #   TectonicCore: "0x7de56bd8b37827c51835e162c867848fe2403a48"
+  #   TectonicSocket: "0x8312a8d5d1dec499d00eb28e1a2723b13aa53c1e"
+  #   outputs_dir: "./out/tectonic_cronos_defi"
 
   kinetic_flare:
     protocol: kinetic

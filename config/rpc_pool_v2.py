@@ -87,6 +87,9 @@ PROVIDERS = {
             'linea': 'linea-mainnet',
             'gnosis': 'gnosis-mainnet',
             'scroll': 'scroll-mainnet',
+            'sonic': 'sonic-mainnet',
+            'ink': 'ink-mainnet',
+            'plasma': 'plasma-mainnet',
         }
     ),
     'blockpi': ProviderConfig(
@@ -149,6 +152,7 @@ PROVIDERS = {
             'avalanche': 'avalanche',
             'gnosis': 'gnosis',
             'optimism': 'optimism',
+            'flare': 'flare',
         }
     ),
     'infura': ProviderConfig(
@@ -197,6 +201,15 @@ PUBLIC_RPCS = {
 # POA chains requiring middleware
 POA_CHAINS = {'binance', 'polygon', 'gnosis', 'avalanche', 'optimism',
               'linea', 'scroll', 'sonic', 'cronos', 'meter', 'flare'}
+
+# Alchemy keys that DON'T support certain chains (need to enable in dashboard)
+# Format: {chain: [list of key indices (1-based) that are NOT enabled]}
+ALCHEMY_CHAIN_EXCLUSIONS = {
+    'sonic': [1, 2, 3, 4],  # Keys 5-13 have Sonic enabled
+    'ink': [1, 2, 3, 4, 5, 6, 7, 9],  # Keys 8, 10-13 have Ink enabled
+    'scroll': [1, 2, 3, 4, 5, 6, 8],  # Keys 7, 9-13 have Scroll enabled
+    'plasma': [4, 7],  # Keys 1-3, 5-6, 8-13 have Plasma enabled
+}
 
 
 # =============================================================================
@@ -439,7 +452,15 @@ class ChainPool:
             if not keys or not isinstance(keys, list):
                 continue
 
-            for key in keys:
+            for idx, key in enumerate(keys):
+                key_num = idx + 1  # 1-based key number
+
+                # Check if this Alchemy key is excluded for this chain
+                if provider_name == 'alchemy':
+                    excluded_keys = ALCHEMY_CHAIN_EXCLUSIONS.get(self.chain, [])
+                    if key_num in excluded_keys:
+                        continue  # Skip this key for this chain
+
                 if config.url_template == 'special':
                     url = self._get_nodereal_url(chain_name, key)
                 else:
@@ -450,7 +471,7 @@ class ChainPool:
                         provider=provider_name,
                         url=url,
                         config=config,
-                        key_name=f"{provider_name}_{keys.index(key)+1}"
+                        key_name=f"{provider_name}_{key_num}"
                     ))
 
         # Add public RPCs as fallback

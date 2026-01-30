@@ -17,10 +17,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import os
 import json
+import time
 from datetime import date, datetime, timedelta, timezone
 import argparse
 import pytz
-from config.rpc_pool import get_web3, get_web3_with_key_info
+from dotenv import load_dotenv
+from web3 import Web3
+
+load_dotenv()
 
 # Import POA middleware (path changed in web3.py v6+)
 try:
@@ -35,41 +39,82 @@ except ImportError:
 NY_TZ = pytz.timezone("America/New_York")
 
 # Chains that use POA (Proof of Authority) or have non-standard extraData
-POA_CHAINS = ['binance', 'polygon', 'gnosis', 'avalanche', 'optimism', 'linea', 'scroll', 'xdai', 'cronos', 'meter', 'flare', 'sonic']
+POA_CHAINS = ['binance', 'polygon', 'gnosis', 'avalanche', 'optimism', 'linea', 'scroll', 'xdai', 'cronos', 'meter', 'flare', 'sonic', 'plasma']
 
 # Chain name aliases (config name -> RPC pool name)
 CHAIN_ALIASES = {
     'xdai': 'gnosis',  # xdai in config, but gnosis in RPC pool
 }
 
-# Track which Web3 instances have POA middleware injected
-_poa_injected = set()
+# Alchemy chain slugs
+ALCHEMY_CHAIN_SLUGS = {
+    'ethereum': 'eth-mainnet',
+    'arbitrum': 'arb-mainnet',
+    'optimism': 'opt-mainnet',
+    'base': 'base-mainnet',
+    'polygon': 'polygon-mainnet',
+    'avalanche': 'avax-mainnet',
+    'binance': 'bnb-mainnet',
+    'linea': 'linea-mainnet',
+    'gnosis': 'gnosis-mainnet',
+    'scroll': 'scroll-mainnet',
+    'sonic': 'sonic-mainnet',
+    'ink': 'ink-mainnet',
+    'plasma': 'plasma-mainnet',
+}
 
 
-def get_web3_with_poa(chain: str, rpc_chain: str = None):
-    """
-    Get a Web3 connection with POA middleware injected if needed.
+def load_alchemy_keys():
+    """Load all Alchemy API keys from environment."""
+    keys = []
+    for i in range(1, 20):
+        key = os.environ.get(f'ALCHEMY_KEY_{i}')
+        if key:
+            keys.append((i, key))
+    return keys
 
-    This ensures every connection returned has proper middleware for POA chains.
-    """
-    if rpc_chain is None:
-        rpc_chain = CHAIN_ALIASES.get(chain, chain)
 
-    w3 = get_web3(rpc_chain)
+ALCHEMY_KEYS = load_alchemy_keys()
+_current_key_index = 0
 
-    # Inject POA middleware if this chain needs it and this instance hasn't been configured
+
+def get_next_alchemy_key():
+    """Get the next Alchemy key in rotation."""
+    global _current_key_index
+    if not ALCHEMY_KEYS:
+        raise ValueError("No Alchemy keys configured")
+    key_num, key = ALCHEMY_KEYS[_current_key_index]
+    _current_key_index = (_current_key_index + 1) % len(ALCHEMY_KEYS)
+    return key_num, key
+
+
+def create_web3_for_chain(chain: str, key: str) -> Web3:
+    """Create a Web3 instance for a specific chain and key."""
+    rpc_chain = CHAIN_ALIASES.get(chain, chain)
+
+    if rpc_chain not in ALCHEMY_CHAIN_SLUGS:
+        raise ValueError(f"Chain {rpc_chain} not supported by Alchemy")
+
+    slug = ALCHEMY_CHAIN_SLUGS[rpc_chain]
+    url = f"https://{slug}.g.alchemy.com/v2/{key}"
+
+    w3 = Web3(Web3.HTTPProvider(url, request_kwargs={'timeout': 30}))
+
+    # Inject POA middleware if needed
     if chain in POA_CHAINS and geth_poa_middleware:
-        # Use id() to track which Web3 instances have been configured
-        w3_id = id(w3)
-        if w3_id not in _poa_injected:
-            try:
-                if hasattr(w3, 'middleware_onion'):
-                    w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-                    _poa_injected.add(w3_id)
-            except Exception:
-                pass  # May already be injected or not supported
+        try:
+            w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+        except Exception:
+            pass
 
     return w3
+
+
+def get_web3_with_rotation(chain: str):
+    """Get a Web3 instance using the next Alchemy key in rotation."""
+    key_num, key = get_next_alchemy_key()
+    w3 = create_web3_for_chain(chain, key)
+    return w3, key_num
 
 
 def to_dt(ts: int) -> datetime:
@@ -79,36 +124,52 @@ def to_dt(ts: int) -> datetime:
     """
     return datetime.fromtimestamp(int(ts), tz=timezone.utc)
 
-def block_for_ts(w3, ts, chain=None, rpc_chain=None, rotate_keys=True):
+def block_for_ts_with_retry(chain: str, ts: int, latest_block: int, max_retries: int = 3):
     """
-    Binary search for block at timestamp.
+    Binary search for block at timestamp with key rotation and retries.
 
     Args:
-        w3: Web3 instance (used if rotate_keys=False)
+        chain: Chain name
         ts: Target timestamp
-        chain: Chain name for POA detection (required if rotate_keys=True)
-        rpc_chain: RPC chain name if different from chain
-        rotate_keys: If True, rotate to fresh connection every few RPC calls
+        latest_block: Latest block number on chain
+        max_retries: Max retries per RPC call
+
+    Returns:
+        Block number at or after timestamp
+
+    Raises:
+        Exception if all retries fail
     """
-    lo, hi = 1, w3.eth.block_number
+    lo, hi = 1, latest_block
     ans = hi
-    call_count = 0
 
     while lo <= hi:
         mid = (lo + hi) // 2
 
-        # Rotate to fresh connection every 3 calls to distribute load across keys
-        if rotate_keys and chain and call_count > 0 and call_count % 3 == 0:
-            w3 = get_web3_with_poa(chain, rpc_chain)  # Gets connection with POA middleware
+        # Try to get block with retries and key rotation
+        block_ts = None
+        last_error = None
 
-        t = w3.eth.get_block(mid)["timestamp"]
-        call_count += 1
+        for attempt in range(max_retries):
+            try:
+                w3, key_num = get_web3_with_rotation(chain)
+                block_ts = w3.eth.get_block(mid)["timestamp"]
+                break
+            except Exception as e:
+                last_error = e
+                if '429' in str(e) or 'rate' in str(e).lower():
+                    time.sleep(0.5 * (attempt + 1))  # Backoff
+                continue
 
-        if t >= ts:
+        if block_ts is None:
+            raise Exception(f"Failed to get block {mid} after {max_retries} retries: {last_error}")
+
+        if block_ts >= ts:
             ans = mid
             hi = mid - 1
         else:
             lo = mid + 1
+
     return ans
 
 
@@ -166,7 +227,7 @@ def load_existing_cache(output_file: Path) -> dict:
     return {}
 
 
-def build_cache_for_chain(chain: str, dates: list, output_file: Path, save_interval: int = 10):
+def build_cache_for_chain(chain: str, dates: list, output_file: Path, save_interval: int = 10, max_retries: int = 5):
     """
     Build date→block cache for a specific chain with incremental support.
 
@@ -175,10 +236,24 @@ def build_cache_for_chain(chain: str, dates: list, output_file: Path, save_inter
         dates: List of date strings (YYYY-MM-DD)
         output_file: Path to save cache JSON
         save_interval: Save cache to disk every N dates (for crash recovery)
+        max_retries: Max retries per date before failing
+
+    Returns:
+        True if all dates were cached successfully, False otherwise
     """
     print(f"\n{'='*60}")
     print(f"Building block cache for {chain}")
     print(f"{'='*60}\n")
+
+    # Check chain is supported
+    rpc_chain = CHAIN_ALIASES.get(chain, chain)
+    if rpc_chain not in ALCHEMY_CHAIN_SLUGS:
+        print(f"❌ Chain {chain} not supported by Alchemy")
+        return False
+
+    print(f"[Config] Using {len(ALCHEMY_KEYS)} Alchemy keys with rotation")
+    if chain in POA_CHAINS:
+        print(f"[POA] Using POA middleware for {chain}")
 
     # Load existing cache (incremental support)
     cache = load_existing_cache(output_file)
@@ -190,119 +265,162 @@ def build_cache_for_chain(chain: str, dates: list, output_file: Path, save_inter
     missing_dates = [d for d in dates if d not in cache]
     if not missing_dates:
         print(f"[Complete] All {len(dates)} dates already cached!")
-        return
+        return True
 
     print(f"[Missing] Need to fetch {len(missing_dates)}/{len(dates)} dates\n")
 
-    # Resolve chain alias if needed
-    rpc_chain = CHAIN_ALIASES.get(chain, chain)
-    if chain != rpc_chain:
-        print(f"[Alias] Using RPC chain name '{rpc_chain}' for config chain '{chain}'\n")
-
-    # Test connection with POA middleware
-    w3 = get_web3_with_poa(chain, rpc_chain)
-    if chain in POA_CHAINS:
-        print(f"[POA] Using POA middleware for {chain}")
-
+    # Test connection and get latest block
     try:
-        latest = w3.eth.block_number
-        print(f"Connected to {chain}: latest block = {latest}\n")
+        w3, key_num = get_web3_with_rotation(chain)
+        latest_block = w3.eth.block_number
+        print(f"Connected to {chain} (key {key_num}): latest block = {latest_block:,}\n")
     except Exception as e:
         print(f"❌ Failed to connect to {chain}: {e}")
-        return
+        return False
 
     fetched_count = 0
-    error_count = 0
+    failed_dates = []
 
     for i, date_str in enumerate(missing_dates, 1):
-        try:
-            # Get fresh connection with POA middleware (rotates through API keys)
-            w3 = get_web3_with_poa(chain, rpc_chain)
+        success = False
+        last_error = None
 
-            # Get UTC window for this NY date
-            ts_start_utc, ts_end_utc = ny_date_to_utc_window(date_str)
+        # Retry loop for this date
+        for attempt in range(max_retries):
+            try:
+                # Get UTC window for this NY date
+                ts_start_utc, ts_end_utc = ny_date_to_utc_window(date_str)
 
-            # Find block at end of day (snapshot time) - rotates keys during binary search
-            block_num = block_for_ts(w3, ts_end_utc, chain=chain, rpc_chain=rpc_chain, rotate_keys=True)
+                # Find block at end of day (snapshot time) with key rotation
+                block_num = block_for_ts_with_retry(chain, ts_end_utc, latest_block, max_retries=3)
 
-            # Safety: subtract 1 to ensure block is from target day
-            block_num = max(1, block_num - 1)
+                # Safety: subtract 1 to ensure block is from target day
+                block_num = max(1, block_num - 1)
 
-            # Get block timestamp for verification (rotates to next key)
-            w3 = get_web3_with_poa(chain, rpc_chain)
-            block = w3.eth.get_block(block_num)
-            block_ts = block['timestamp']
+                # Get block timestamp for verification with retry
+                block_ts = None
+                for verify_attempt in range(3):
+                    try:
+                        w3, _ = get_web3_with_rotation(chain)
+                        block = w3.eth.get_block(block_num)
+                        block_ts = block['timestamp']
+                        break
+                    except Exception as e:
+                        if verify_attempt == 2:
+                            raise e
+                        time.sleep(0.3 * (verify_attempt + 1))
 
-            cache[date_str] = {
-                'block': block_num,
-                'timestamp': block_ts,
-                'ts_start_utc': ts_start_utc,
-                'ts_end_utc': ts_end_utc,
-            }
+                cache[date_str] = {
+                    'block': block_num,
+                    'timestamp': block_ts,
+                    'ts_start_utc': ts_start_utc,
+                    'ts_end_utc': ts_end_utc,
+                }
 
-            fetched_count += 1
-            print(f"[{i}/{len(missing_dates)}] {date_str} → block {block_num} (ts={block_ts})")
+                fetched_count += 1
+                print(f"[{i}/{len(missing_dates)}] {date_str} → block {block_num:,} (ts={block_ts})")
+                success = True
+                break
 
-            # Periodic save for crash recovery
-            if fetched_count % save_interval == 0:
-                output_file.parent.mkdir(parents=True, exist_ok=True)
-                with open(output_file, 'w') as f:
-                    json.dump(cache, f, indent=2)
-                print(f"    [Checkpoint] Saved {len(cache)} dates to cache")
+            except Exception as e:
+                last_error = e
+                if '429' in str(e) or 'rate' in str(e).lower():
+                    wait_time = 1.0 * (attempt + 1)
+                    print(f"  [Retry {attempt+1}/{max_retries}] Rate limited, waiting {wait_time}s...")
+                    time.sleep(wait_time)
+                else:
+                    print(f"  [Retry {attempt+1}/{max_retries}] Error: {str(e)[:60]}")
+                    time.sleep(0.5)
 
-        except Exception as e:
-            error_count += 1
-            print(f"❌ [{i}/{len(missing_dates)}] Failed to get block for {date_str}: {e}")
-            # Save on error too, to preserve progress
-            if fetched_count > 0:
-                output_file.parent.mkdir(parents=True, exist_ok=True)
-                with open(output_file, 'w') as f:
-                    json.dump(cache, f, indent=2)
-            continue
+        if not success:
+            failed_dates.append(date_str)
+            print(f"❌ [{i}/{len(missing_dates)}] FAILED {date_str} after {max_retries} retries: {last_error}")
+
+        # Periodic save for crash recovery
+        if fetched_count > 0 and fetched_count % save_interval == 0:
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(output_file, 'w') as f:
+                json.dump(cache, f, indent=2)
+            print(f"    [Checkpoint] Saved {len(cache)} dates to cache")
 
     # Final save
     output_file.parent.mkdir(parents=True, exist_ok=True)
     with open(output_file, 'w') as f:
         json.dump(cache, f, indent=2)
 
-    print(f"\n✅ Saved cache to {output_file}")
-    print(f"   Total cached: {len(cache)}/{len(dates)} dates")
-    print(f"   This run: +{fetched_count} fetched, {error_count} errors\n")
+    # Report results
+    print(f"\n{'='*60}")
+    if failed_dates:
+        print(f"❌ INCOMPLETE: {len(failed_dates)} dates failed")
+        print(f"   Failed dates: {', '.join(failed_dates[:10])}{'...' if len(failed_dates) > 10 else ''}")
+        print(f"   Saved cache to {output_file}")
+        print(f"   Total cached: {len(cache)}/{len(dates)} dates")
+        print(f"   This run: +{fetched_count} fetched, {len(failed_dates)} failed")
+        return False
+    else:
+        print(f"✅ SUCCESS: All {len(missing_dates)} dates fetched")
+        print(f"   Saved cache to {output_file}")
+        print(f"   Total cached: {len(cache)}/{len(dates)} dates")
+        return True
 
 
 def main():
     parser = argparse.ArgumentParser(description='Build date→block cache')
     parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
     parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
-    parser.add_argument('--chains', nargs='+', 
+    parser.add_argument('--chain', '--chains', nargs='+', dest='chains',
                        default=['ethereum', 'arbitrum', 'base', 'optimism'],
                        help='Chains to build cache for')
     parser.add_argument('--output-dir', default='data/cache',
                        help='Output directory for cache files')
-    
+    parser.add_argument('--max-retries', type=int, default=5,
+                       help='Max retries per date (default: 5)')
+
     args = parser.parse_args()
-    
+
     # Generate date list
     dates = list(iterate_dates(args.start_date, args.end_date))
-    
+
     print(f"\n{'='*60}")
     print(f"Block Cache Builder")
     print(f"{'='*60}")
     print(f"Date range: {args.start_date} → {args.end_date}")
     print(f"Total dates: {len(dates)}")
     print(f"Chains: {', '.join(args.chains)}")
+    print(f"Alchemy keys: {len(ALCHEMY_KEYS)}")
+    print(f"Max retries per date: {args.max_retries}")
     print(f"{'='*60}\n")
-    
+
     output_dir = Path(args.output_dir)
-    
-    # Build cache for each chain
+
+    # Build cache for each chain, track failures
+    results = {}
     for chain in args.chains:
         output_file = output_dir / f"{chain}_blocks_{args.start_date}_{args.end_date}.json"
-        build_cache_for_chain(chain, dates, output_file)
-    
+        success = build_cache_for_chain(chain, dates, output_file, max_retries=args.max_retries)
+        results[chain] = success
+
+    # Final summary
     print(f"\n{'='*60}")
-    print("✅ Block cache building complete!")
-    print(f"{'='*60}\n")
+    print("FINAL SUMMARY")
+    print(f"{'='*60}")
+
+    success_count = sum(1 for v in results.values() if v)
+    fail_count = len(results) - success_count
+
+    for chain, success in results.items():
+        status = "✅ Complete" if success else "❌ INCOMPLETE"
+        print(f"  {chain}: {status}")
+
+    print(f"\n  Total: {success_count}/{len(results)} chains complete")
+
+    if fail_count > 0:
+        print(f"\n❌ {fail_count} chain(s) have incomplete caches!")
+        print("   Re-run the script to retry failed dates.")
+        sys.exit(1)
+    else:
+        print(f"\n✅ All chains complete!")
+        sys.exit(0)
 
 
 if __name__ == '__main__':

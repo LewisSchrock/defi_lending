@@ -50,7 +50,6 @@ BLOCK_TIMES = {
     'avalanche': 2,
     'base': 2,
     'binance': 3,
-    'cronos': 5.5,
     'flare': 1.8,
     'gnosis': 5,
     'ink': 2,
@@ -61,6 +60,9 @@ BLOCK_TIMES = {
     'scroll': 3,
     'sonic': 0.4,
 }
+
+# Chains to exclude from dashboard (no reliable RPC)
+EXCLUDED_CHAINS = {'cronos'}
 
 
 def iterate_dates(start_str: str, end_str: str) -> List[str]:
@@ -165,6 +167,9 @@ def get_block_cache_status() -> Dict:
     for cache_file in CACHE_DIR.glob('*_blocks_*.json'):
         chain = cache_file.name.split('_blocks_')[0]
         chains.add(chain)
+
+    # Remove excluded chains
+    chains = chains - EXCLUDED_CHAINS
 
     for chain in sorted(chains):
         status[chain] = {}
@@ -475,7 +480,7 @@ def get_next_actions(block_status: Dict, bronze_status: Dict, silver_status: Dic
                 'missing_days': total_missing,
                 'csu_count': len(data['csus']),
                 'csus': data['csus'],
-                'command': f"python scripts/collect_tvl_parallel.py --start-date 2024-01-01 --end-date 2025-01-20",
+                'command': f"python scripts/collect_tvl_parallel.py --start-date 2024-01-01 --end-date 2025-12-31",
                 'description': f"Collect bronze TVL for {chain}",
                 'impact': f"Fills {total_missing} missing days across {len(data['csus'])} CSUs"
             })
@@ -512,7 +517,7 @@ def get_next_actions(block_status: Dict, bronze_status: Dict, silver_status: Dic
                 'events': 0,
                 'csu_count': data['csu_count'],
                 'csus': data['csus'],
-                'command': f"python scripts/collect_liquidations_unified.py --chain {chain} --start-date 2024-01-01 --end-date 2025-01-20",
+                'command': f"python scripts/collect_liquidations_unified.py --chain {chain} --start-date 2024-01-01 --end-date 2025-12-31",
                 'description': f"Start liquidation collection for {chain}",
                 'impact': f"Covers {data['csu_count']} CSUs: {', '.join(data['csus'][:3])}{'...' if len(data['csus']) > 3 else ''}"
             })
@@ -529,7 +534,7 @@ def get_next_actions(block_status: Dict, bronze_status: Dict, silver_status: Dic
                     'days_behind': days_behind,
                     'csu_count': data['csu_count'],
                     'csus': data['csus'],
-                    'command': f"python scripts/collect_liquidations_unified.py --chain {chain} --start-date 2024-01-01 --end-date 2025-01-20",
+                    'command': f"python scripts/collect_liquidations_unified.py --chain {chain} --start-date 2024-01-01 --end-date 2025-12-31",
                     'description': f"Continue liquidation collection for {chain}",
                     'impact': f"{days_behind} days behind, {data['csu_count']} CSUs"
                 })

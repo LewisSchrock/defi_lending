@@ -5,7 +5,7 @@ Parallel TVL Collector
 Collects TVL snapshots for all CSUs across a date range using cached blocks.
 Uses ThreadPoolExecutor for parallel collection with rate limiting.
 
-Features:
+Featur111es:
 - Puzzle-piece collection: Run any date range, fills in missing pieces
 - Global completion tracking: Scans data/bronze/tvl/ for existing data
 - Automatic key blacklisting: 401 errors permanently remove keys from rotation
@@ -89,7 +89,7 @@ BRONZE_DIR = Path('data/bronze/tvl')
 def load_block_cache(chain: str, start_date: str, end_date: str) -> Dict[str, Dict]:
     """
     Load block cache for a specific chain and date range.
-    Will try to find any cache file that covers the requested date range.
+    Will merge multiple cache files if needed to cover the requested date range.
 
     Args:
         chain: Chain name (will be aliased if needed, e.g., xdai -> gnosis)
@@ -103,36 +103,30 @@ def load_block_cache(chain: str, start_date: str, end_date: str) -> Dict[str, Di
     cache_chain = CHAIN_ALIASES.get(chain, chain)
     cache_dir = Path('data/cache')
 
-    # Try exact match with aliased name first
-    cache_file = cache_dir / f'{cache_chain}_blocks_{start_date}_{end_date}.json'
+    # Find all cache files for this chain
+    cache_pattern = f'{cache_chain}_blocks_*.json'
+    matching_caches = list(cache_dir.glob(cache_pattern))
 
-    # Also try exact match with original chain name
-    if not cache_file.exists() and chain != cache_chain:
-        cache_file = cache_dir / f'{chain}_blocks_{start_date}_{end_date}.json'
+    # Also check original chain name
+    if chain != cache_chain:
+        matching_caches.extend(cache_dir.glob(f'{chain}_blocks_*.json'))
 
-    # If not found, try to find any cache file for this chain
-    if not cache_file.exists():
-        cache_pattern = f'{cache_chain}_blocks_*.json'
-        matching_caches = list(cache_dir.glob(cache_pattern))
+    if not matching_caches:
+        raise FileNotFoundError(f"No block cache found for {chain} (looked for {cache_chain} and {chain})")
 
-        # Also check original chain name
-        if chain != cache_chain:
-            matching_caches.extend(cache_dir.glob(f'{chain}_blocks_*.json'))
+    # Merge all cache files
+    merged_cache = {}
+    for cache_file in matching_caches:
+        try:
+            with open(cache_file) as f:
+                cache_data = json.load(f)
+                merged_cache.update(cache_data)
+        except Exception:
+            continue
 
-        if matching_caches:
-            # Sort by file size (descending) to prefer larger/fuller caches
-            matching_caches.sort(key=lambda p: p.stat().st_size, reverse=True)
-            cache_file = matching_caches[0]
-        else:
-            raise FileNotFoundError(f"No block cache found for {chain} (looked for {cache_chain} and {chain})")
-
-    with open(cache_file) as f:
-        cache = json.load(f)
-
-    # Filter cache to only requested dates if needed
-    if start_date != end_date or len(cache) > len(list(iterate_dates(start_date, end_date))):
-        requested_dates = set(iterate_dates(start_date, end_date))
-        cache = {date: info for date, info in cache.items() if date in requested_dates}
+    # Filter to only requested dates
+    requested_dates = set(iterate_dates(start_date, end_date))
+    cache = {date: info for date, info in merged_cache.items() if date in requested_dates}
 
     return cache
 
@@ -496,33 +490,23 @@ def filter_csus_by_cache_availability(
             matching_caches.extend(cache_dir.glob(f'{chain}_blocks_*.json'))
 
         if matching_caches:
-            # Check each cache file to find one that covers the requested dates
-            # Sort by file size (descending) to prefer larger/fuller caches
-            matching_caches.sort(key=lambda p: p.stat().st_size, reverse=True)
-
+            # Merge all cache files to get complete coverage
             requested_dates = set(iterate_dates(start_date, end_date))
-            found_valid_cache = False
-            best_missing = 365  # Track the best (smallest) missing count
+            all_cached_dates = set()
 
             for cache_file in matching_caches:
                 try:
                     with open(cache_file) as f:
                         cache = json.load(f)
-                        cached_dates = set(cache.keys())
-
-                        if requested_dates.issubset(cached_dates):
-                            filtered[csu_name] = csu_config
-                            found_valid_cache = True
-                            break
-                        else:
-                            missing = len(requested_dates - cached_dates)
-                            if missing < best_missing:
-                                best_missing = missing
+                        all_cached_dates.update(cache.keys())
                 except Exception:
                     continue
 
-            if not found_valid_cache:
-                skipped.append(f"{csu_name} (cache missing {best_missing} dates)")
+            if requested_dates.issubset(all_cached_dates):
+                filtered[csu_name] = csu_config
+            else:
+                missing = len(requested_dates - all_cached_dates)
+                skipped.append(f"{csu_name} (cache missing {missing} dates)")
         else:
             skipped.append(f"{csu_name} (no cache for {cache_chain})")
 
