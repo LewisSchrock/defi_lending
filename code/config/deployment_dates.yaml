@@ -1,0 +1,46 @@
+# CSU Deployment Dates
+#
+# Records the deployment date for each CSU to avoid querying blocks
+# before the contract existed (which causes decode errors).
+#
+# Format:
+#   csu_name: "YYYY-MM-DD"
+#
+# These dates were found using scripts/find_contract_deployment.py
+
+csus:
+  # Compound V3 Markets
+  compound_v3_base_usdc: "2024-03-11"
+  compound_v3_op_usdc: "2024-04-06"
+  compound_v3_op_usdt: "2024-05-20"
+  compound_v3_arb_weth: "2024-06-07"
+  compound_v3_fluid_lending_arbitrum: "2024-06-11"
+  compound_v3_arb_usdt: "2024-06-20"
+  compound_v3_eth_usdt: "2024-06-28"
+  compound_v3_op_weth: "2024-07-15"
+  compound_v3_eth_wsteth: "2024-09-05"
+  compound_v3_base_aero: "2024-10-09"
+  compound_v3_eth_usds: "2024-10-17"
+
+  # Fluid Lending (uses getAllFTokens resolver - deployed mid-2024)
+  fluid_lending_arbitrum: "2024-06-11"
+  fluid_lending_base: "2025-01-01"  # FluidLendingResolver not deployed on Base in 2024
+  fluid_lending_ethereum: "2024-05-31"  # Verified from successful data collection
+
+  # Aave V3 (deployed mid-2024 on new chains)
+  aave_v3_linea: "2024-11-23"  # Verified from successful data collection (contract empty before)
+  aave_v3_scroll: "2024-01-20"  # Verified: deployment block 2,618,760
+
+  # Plasma chain (launched Sept 3, 2025)
+  aave_v3_plasma: "2025-09-09"  # Verified: block 490,000
+  fluid_lending_plasma: "2025-09-15"  # Verified: block ~1,000,000 (no tokens until later)
+
+  # Newer protocol deployments (verified 2025-01-24)
+  lista_lending_binance: "2025-04-08"  # Verified: block 48,172,369
+  kinetic_flare: "2024-07-16"  # Verified: block 26,963,787
+  tydro_ink: "2025-10-12"  # Markets active from Oct 12 (contract deployed Jul 25)
+  lista_lending_ethereum: "2025-09-26"  # Verified: block 23,445,769
+  cap_ethereum: "2025-07-08"  # Verified: cUSD + USDC vault deployed July 8 2025
+
+  # Note: CSUs not listed here are assumed to have been deployed before 2024-01-01
+  # and can be queried for the full year.

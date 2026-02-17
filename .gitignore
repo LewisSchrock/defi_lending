@@ -1,0 +1,51 @@
+# Data (too large for git, protect via read-only permissions + backups)
+data/bronze/
+data/silver/
+data/gold/
+data/analysis/
+data/cache/
+data/reference/
+
+# Notebook outputs and checkpoints
+notebooks/.ipynb_checkpoints/
+notebooks/output/
+output/
+*.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+env/
+
+# Secrets
+.env
+.env.*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Large/generated files
+*.parquet
+*.xlsx
+*.csv
+*.json
+!package.json
+
+# Archive (historical, not needed in git)
+archive/
+
+# Papers, presentations, and images
+presentation/
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+results/
