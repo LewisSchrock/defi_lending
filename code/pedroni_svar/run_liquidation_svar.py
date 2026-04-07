@@ -27,7 +27,7 @@ def run_liquidation_panel():
     plot = True
     savefig_path = "../../data/analysis/svar_figures/"
     excel_path = "../../data/analysis/panel_svar_data_qualified.xlsx"
-    excel_sheet_name = "Sheet1"
+    excel_sheet_name = "panel_data"
 
     # Variables (all stationary, no unit root)
     variables = {

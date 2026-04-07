@@ -659,7 +659,7 @@ def main():
     parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
     parser.add_argument('--workers', type=int, help='Number of parallel workers')
     parser.add_argument('--chunk-size', type=int, default=10, help='Blocks per chunk')
-    parser.add_argument('--force', action='store_true', help='Force re-collection')
+    # --force removed: previously wiped checkpoint data on accident
 
     args = parser.parse_args()
     chain = args.chain
@@ -679,13 +679,13 @@ def main():
 
     # Check checkpoint
     checkpoint = load_checkpoint(chain)
-    if checkpoint and not args.force:
+    if checkpoint:
         last_block = checkpoint.get('last_block', 0)
         if last_block >= from_block and last_block < to_block:
             print(f"Resuming from checkpoint: block {last_block:,}")
             from_block = last_block + 1
         elif last_block >= to_block:
-            print(f"Collection complete for this range. Use --force to re-collect.")
+            print(f"Collection complete for this range.")
             return
 
     # Get CSUs and resolve contracts

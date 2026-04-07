@@ -90,6 +90,27 @@ def aggregate_daily_by_csu(df: pd.DataFrame) -> pd.DataFrame:
     collateral_col = "collateral_value_usd" if "collateral_value_usd" in df.columns else "collateral_usd"
     debt_col = "debt_value_usd" if "debt_value_usd" in df.columns else "debt_usd"
 
+    # Fallback: use debt USD as proxy for collateral USD when collateral is missing
+    # (collateral seized ≈ debt repaid × liquidation bonus, typically 1.05–1.10)
+    if collateral_col in df.columns and debt_col in df.columns:
+        missing_coll = df[collateral_col].isna() | (df[collateral_col] == 0)
+        has_debt = df[debt_col].notna() & (df[debt_col] > 0)
+        n_fallback = (missing_coll & has_debt).sum()
+        if n_fallback > 0:
+            df.loc[missing_coll & has_debt, collateral_col] = df.loc[missing_coll & has_debt, debt_col]
+            print(f"  [Fallback] Used debt_usd for {n_fallback:,} events missing collateral_usd")
+
+    # Sanity filter: null out clearly mispriced events (decimal scaling bugs)
+    # The largest real single DeFi liquidation is ~$50M; $500M cap is very conservative
+    MAX_EVENT_USD = 500_000_000  # $500M
+    for col in [collateral_col, debt_col]:
+        if col in df.columns:
+            bad_mask = df[col].notna() & (df[col].abs() > MAX_EVENT_USD)
+            n_bad = bad_mask.sum()
+            if n_bad > 0:
+                print(f"  [Sanity] Nulling {n_bad:,} events with |{col}| > ${MAX_EVENT_USD/1e6:.0f}M")
+                df.loc[bad_mask, col] = np.nan
+
     agg = df.groupby(["date", "csu", "chain"]).agg(
         n_liquidations=("tx_hash", "count"),
         total_collateral_usd=(collateral_col, lambda x: x.sum() if x.notna().any() else 0),

@@ -19,11 +19,11 @@ components via Lambda matrix.
 
 ## Current State
 
-- **Sample**: 31 qualified CSUs across 10 chains, 3 protocol families (Aave, Compound, others)
-- **Period**: T=592 days (2024-07-01 to 2026-02-12)
-- **Variables**: Volatility, Liquidation, Utilization
+- **Pipeline**: 45 CSUs with liquidation data, 43 with vol/util, **31 qualified** for SVAR (>=70% coverage on all 3 vars)
+- **Period**: T=549 days (2024-07-01 to 2025-12-31)
+- **Variables**: Volatility (14-day rolling basket std), Liquidation (log-transformed), Utilization (borrowed/supplied)
 - **Identification**: Cholesky ordering vol -> liq -> util (see `context/identification_strategy_feb17.md`)
-- **Status**: Identification strategy under revision; re-estimation pending
+- **Estimation**: 28/31 CSUs estimated successfully (3 dropped for insufficient observations)
 
 ## Quick Start
 
@@ -31,8 +31,8 @@ components via Lambda matrix.
 # Rebuild vol/util panel from bronze data
 python scripts/build_volatility_panel.py --skip-fetch
 
-# Prepare trivariate SVAR panel
-python scripts/prepare_panel_svar_data.py --start-date 2024-07-01
+# Prepare trivariate SVAR panel (Strategy A: 2024-07-01 to 2025-12-31)
+python scripts/prepare_panel_svar_data.py --start-date 2024-07-01 --end-date 2025-12-31
 
 # Run Panel SVAR (via notebook)
 jupyter notebook notebooks/pedroni_panel_svar_analysis.ipynb

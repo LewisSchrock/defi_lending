@@ -8,10 +8,19 @@ Chainlink feeds return prices with 8 decimals (e.g., 200000000000 = $2000.00)
 """
 
 import json
+import signal
 from pathlib import Path
 from typing import Dict, Optional, List
 from web3 import Web3
 import yaml
+
+
+class _ChainlinkTimeout(Exception):
+    pass
+
+
+def _timeout_handler(signum, frame):
+    raise _ChainlinkTimeout("Chainlink RPC call timed out")
 
 # Chainlink Aggregator V3 ABI (minimal)
 AGGREGATOR_ABI = [
@@ -71,11 +80,19 @@ def get_chainlink_price(
 
         call_kwargs = {'block_identifier': block} if block else {}
 
-        # Get decimals
-        decimals = contract.functions.decimals().call(**call_kwargs)
+        # Set 30-second timeout to prevent hanging on unresponsive RPC nodes
+        old_handler = signal.signal(signal.SIGALRM, _timeout_handler)
+        signal.alarm(30)
+        try:
+            # Get decimals
+            decimals = contract.functions.decimals().call(**call_kwargs)
 
-        # Get latest round data
-        round_data = contract.functions.latestRoundData().call(**call_kwargs)
+            # Get latest round data
+            round_data = contract.functions.latestRoundData().call(**call_kwargs)
+        finally:
+            signal.alarm(0)
+            signal.signal(signal.SIGALRM, old_handler)
+
         answer = round_data[1]  # answer is at index 1
 
         # Convert to float with proper decimals
@@ -83,7 +100,7 @@ def get_chainlink_price(
 
         return price
 
-    except Exception as e:
+    except (_ChainlinkTimeout, Exception) as e:
         # Silently fail - will use fallback
         return None
 

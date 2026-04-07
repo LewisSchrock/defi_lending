@@ -7,7 +7,7 @@ csus:
     protocol: aave
     version: v3
     chain: ethereum
-    rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"   # <-- put your RPC here
+    rpc: ""   # <-- put your RPC here
     registry: "0x2f39D218133AFaB8F2B819B1066c7E434Ad94E9e"  # Aave V3 PoolAddressesProvider (Ethereum)
     outputs_dir: "./out/aave_v3_ethereum"
  
@@ -15,7 +15,7 @@ csus:
    protocol: aave
    version: v3
    chain: polygon
-   rpc: "https://polygon-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+   rpc: ""
    registry: "0xa97684ead0e402dC232d5A977953DF7ECBaB3CDb"
    outputs_dir: "./out/aave_v3_polygon"
 
@@ -103,7 +103,7 @@ csus:
     protocol: sparklend
     version: v1
     chain: ethereum
-    rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+    rpc: ""
     registry: "0x02C3eA4e34C0cBd694D2adFa2c690EECbC1793eE"
     outputs_dir: "./out/sparklend_ethereum"
 
@@ -273,7 +273,7 @@ csus:
     protocol: fluid
     version: v1
     chain: ethereum
-    rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+    rpc: ""
     registry: "0xC215485C572365AE87f908ad35233EC2572A3BEC"
     liq_reg: "0x129aFd8dde3b96Ea01f847CD4e5B59786A91E4d3"
     outputs_dir: "./out/fluid_lending_ethereum"
@@ -300,7 +300,7 @@ csus:
     protocol: fluid
     version: v1
     chain: base
-    rpc: ""
+    rpc: "https://lb.drpc.org/ogrpc?network=base&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
     registry: "0x264786EF916af64a1DB19F513F24a3681734ce92"
     liq_reg: "0xD0F95a6ed0112fbc6A200e5291bcDa9b55e84c9C"
     outputs_dir: "./out/fluid_lending_base"
@@ -309,7 +309,7 @@ csus:
     protocol: venus
     version: v1
     chain: binance
-    rpc: "https://bnb-mainnet.g.alchemy.com/v2/tSuWDtUlk7x6YkWXZTvOZ"
+    rpc: ""
     registry: "0xfd36e2c2a6789db23113685031d7f16329158384"
     outputs_dir: "./out/venus_core_pool_binance"
 
@@ -317,7 +317,7 @@ csus:
     protocol: lista
     version: v1
     chain: binance
-    rpc: "https://bnb-mainnet.g.alchemy.com/v2/tSuWDtUlk7x6YkWXZTvOZ"
+    rpc: ""
     registry: "0x8F73b65B4caAf64FBA2aF91cC5D4a2A1318E5D8C"
     vaults:
       - "0x834e8641d7422fe7c19a56d05516ed877b3d01e0"
@@ -408,7 +408,7 @@ csus:
   #   protocol: euler
   #   version: v2
   #   chain: ethereum
-  #   rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+  #   rpc: ""
   #   vaults:
   #   - "0x2343b4bcb96ec35d8653fb154461fc673cb20a7e"  # EVK Vault eUSDT-1
   #   - "0xb3b36220fa7d12f7055dab5c9fd18e860e9a6bf8"  # EVK Vault eWETH-1
@@ -466,7 +466,7 @@ csus:
     protocol: cap
     version: v1
     chain: ethereum
-    rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+    rpc: ""
     registry: "0x3Ed6aa32c930253fc990dE58fF882B9186cd0072"
     outputs_dir: "./out/cap_ethereum"
 
@@ -482,7 +482,7 @@ csus:
     protocol: gearbox
     version: v1
     chain: ethereum
-    rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+    rpc: ""
     registry: "0x9ea7b04da02a5373317d745c1571c84aad03321d"
     contracts_register: "0xa50d4e7d8946a7c90652339cdbd262c375d54d99"
     outputs_dir: "./out/gearbox_ethereum"
@@ -510,7 +510,7 @@ csus:
     protocol: moonwell
     version: v1
     chain: base
-    rpc: "https://base-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+    rpc: ""
     registry: "0xfBb21d0380beE3312B33c4353c8936a0F13EF26C"
     outputs_dir: "./out/moonwell_lending_base"
 
@@ -567,7 +567,7 @@ csus:
     protocol: compound
     version: v2
     chain: ethereum
-    rpc: "https://eth-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+    rpc: ""
     registry: "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"
     outputs_dir: "./out/compound_v2_ethereum"
 
@@ -599,7 +599,7 @@ csus:
     protocol: keom
     version: v1
     chain: polygon
-    rpc: ""
+    rpc: "https://lb.drpc.org/ogrpc?network=polygon&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
     registry: "0x20CA53E2395FA571798623F1cFBD11Fe2C114c24"
     outputs_dir: "./out/keom_lending_polygon"
 
@@ -626,6 +626,315 @@ csus:
   #   protocol: capyfi
   #   version: v1
   #   chain: ethereum
-  #   rpc: "https://base-mainnet.g.alchemy.com/v2/cEHzRdgL5rGydq_YIokK2"
+  #   rpc: ""
   #   registry: "0x00dc4965916e03A734190fA382633657c71f867E"
   #   outputs_dir: "./out/capyfi_ethereum"
+
+  # ========================================
+  # Category 1: Aave V3 — New Chain Deployments
+  # ========================================
+
+  aave_v3_sonic:
+    protocol: aave
+    version: v3
+    chain: sonic
+    rpc: ""
+    registry: "0x5C2e738F6E27bCE0F7558051Bf90605dD6176900"
+    outputs_dir: "./out/aave_v3_sonic"
+
+  aave_v3_celo:
+    protocol: aave
+    version: v3
+    chain: celo
+    rpc: "https://lb.drpc.org/ogrpc?network=celo&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    registry: "0x9F7Cf9417D5251C59fE94fB9147feEe1aAd9Cea5"
+    outputs_dir: "./out/aave_v3_celo"
+
+  # ========================================
+  # Category 2: Aave V3 Forks — New Protocols
+  # ========================================
+
+  # Radiant Capital V2 (Aave V2 fork — same LiquidationCall event)
+  radiant_arbitrum:
+    protocol: radiant
+    version: v2
+    chain: arbitrum
+    rpc: ""
+    registry: "0x454a8daf74b24037ee2fa073ce1be9277ed6160a"  # LendingPoolAddressesProvider → Pool 0xE23B...
+    outputs_dir: "./out/radiant_arbitrum"
+
+  radiant_binance:
+    protocol: radiant
+    version: v2
+    chain: binance
+    rpc: ""
+    registry: "0x64A59e3a3A2D15D03E868618261aF12c3deee27c"  # LendingPoolAddressesProvider → Pool 0xCcf3...
+    outputs_dir: "./out/radiant_binance"
+
+  radiant_ethereum:
+    protocol: radiant
+    version: v2
+    chain: ethereum
+    rpc: ""
+    registry: "0x70e507f1d20AeC229F435cd1EcaC6A7200119B9F"  # LendingPoolAddressesProvider → Pool 0xA950...
+    outputs_dir: "./out/radiant_ethereum"
+
+  radiant_base:
+    protocol: radiant
+    version: v2
+    chain: base
+    rpc: ""
+    registry: "0xe7f252D19AB96254144Fbb0D94ebC0ff7EA0C541"  # LendingPoolAddressesProvider → Pool 0x3079...
+    outputs_dir: "./out/radiant_base"
+
+  # ZeroLend (Aave V3 fork)
+  zerolend_zksync:
+    protocol: zerolend
+    version: v3
+    chain: zksync
+    rpc: "https://mainnet.era.zksync.io"  # Direct RPC - Alchemy/dRPC 403/400 on zkSync archive
+    registry: "0x4f285Ea117eF0067B59853D6d16a5dE8088bA259"  # PoolAddressesProvider
+    outputs_dir: "./out/zerolend_zksync"
+
+  zerolend_linea:
+    protocol: zerolend
+    version: v3
+    chain: linea
+    rpc: ""
+    registry: "0xC44827C51d00381ed4C52646aeAB45b455d200eB"  # PoolAddressesProvider
+    outputs_dir: "./out/zerolend_linea"
+
+  zerolend_blast:
+    protocol: zerolend
+    version: v3
+    chain: blast
+    rpc: "https://rpc.blast.io"  # Direct RPC - Alchemy 403 on Blast archive
+    registry: "0xb0811a1FC9Fb9972ee683Ba04c32Cb828Bcf587B"  # PoolAddressesProvider
+    outputs_dir: "./out/zerolend_blast"
+
+  zerolend_ethereum:
+    protocol: zerolend
+    version: v3
+    chain: ethereum
+    rpc: "https://lb.drpc.org/ogrpc?network=ethereum&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    registry: "0xFD856E1a33225B86f70D686f9280435E3fF75FCF"  # PoolAddressesProvider (was Pool Proxy 0x3BC3D34C32cc98bf098D832364Df8A222bBaB4c0)
+    outputs_dir: "./out/zerolend_ethereum"
+
+  zerolend_base:
+    protocol: zerolend
+    version: v3
+    chain: base
+    rpc: "https://lb.drpc.org/ogrpc?network=base&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    registry: "0x5213ab3997a596c75Ac6ebF81f8aEb9cf9A31007"  # PoolAddressesProvider (was Pool Proxy 0x766f21277087E18967c1b10bF602d8Fe56d0c671)
+    outputs_dir: "./out/zerolend_base"
+
+  # Seamless Protocol (Aave V3 fork on Base)
+  # Verified via SeamlessAddressBook.sol: Pool = 0x8F44Fd754285aa6A2b8B9B97739B79746e0475a7
+  seamless_base:
+    protocol: seamless
+    version: v3
+    chain: base
+    rpc: ""
+    registry: "0x0E02EB705be325407707662C6f6d3466E939f3a0"  # PoolAddressesProvider (confirmed correct)
+    outputs_dir: "./out/seamless_base"
+
+  # PAC Finance (Aave V3 fork on Blast)
+  pac_blast:
+    protocol: pac
+    version: v3
+    chain: blast
+    rpc: "https://rpc.blast.io"  # Direct RPC - Alchemy 403 on Blast archive
+    registry: "0x688B5fd3C3E3724b4De08C4BCB3A755F9b579c9a"  # PoolAddressesProvider
+    outputs_dir: "./out/pac_blast"
+
+  # SparkLend on Gnosis
+  sparklend_gnosis:
+    protocol: sparklend
+    version: v1
+    chain: xdai
+    rpc: ""
+    registry: "0xA98DaCB3fC964A6A0d2ce3B77294241585EAbA6d"
+    outputs_dir: "./out/sparklend_gnosis"
+
+  # ========================================
+  # Category 2: Compound V2 Forks — New Protocols
+  # ========================================
+
+  # Cream Finance (Compound V2 fork)
+  cream_ethereum:
+    protocol: cream
+    version: v2
+    chain: ethereum
+    rpc: ""
+    registry: "0x3d5BC3c8d13dcB8bF317092d84783c2697AE9258"
+    outputs_dir: "./out/cream_ethereum"
+
+  cream_binance:
+    protocol: cream
+    version: v2
+    chain: binance
+    rpc: ""
+    registry: "0x589de0f0Ccf905477646599bb3E5C622C84cC0ba"
+    outputs_dir: "./out/cream_binance"
+
+  # Iron Bank (Yearn ecosystem, Compound V2 fork)
+  ironbank_ethereum:
+    protocol: ironbank
+    version: v2
+    chain: ethereum
+    rpc: "https://lb.drpc.org/ogrpc?network=ethereum&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    registry: "0xAB1c342C7bf5Ec5F02ADEA1c2270670bCa144CbB"
+    outputs_dir: "./out/ironbank_ethereum"
+
+  ironbank_fantom:
+    protocol: ironbank
+    version: v2
+    chain: fantom
+    rpc: "https://lb.drpc.org/ogrpc?network=fantom&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    registry: "0x4250A6D3BD57455d7C6821eECb6206F507576cD2"
+    outputs_dir: "./out/ironbank_fantom"
+
+  # ========================================
+  # Category 3: New Protocol Architectures
+  # ========================================
+
+  # Morpho Blue — singleton contract (same address on all chains)
+  morpho_ethereum:
+    protocol: morpho
+    version: blue
+    chain: ethereum
+    rpc: ""
+    registry: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+    outputs_dir: "./out/morpho_ethereum"
+
+  morpho_base:
+    protocol: morpho
+    version: blue
+    chain: base
+    rpc: ""
+    registry: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+    outputs_dir: "./out/morpho_base"
+
+  morpho_arbitrum:
+    protocol: morpho
+    version: blue
+    chain: arbitrum
+    rpc: ""
+    registry: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+    outputs_dir: "./out/morpho_arbitrum"
+
+  # Euler V2 — factory-based vault discovery
+  euler_v2_ethereum:
+    protocol: euler
+    version: v2
+    chain: ethereum
+    rpc: ""
+    factory: "0x29a56a1b8214D9Cf7c5561811750D5cBDb45CC8e"
+    outputs_dir: "./out/euler_v2_ethereum"
+
+  euler_v2_base:
+    protocol: euler
+    version: v2
+    chain: base
+    rpc: ""
+    factory: "0x7F321498A801A191a93C840750ed637149dDf8D0"
+    outputs_dir: "./out/euler_v2_base"
+
+  euler_v2_arbitrum:
+    protocol: euler
+    version: v2
+    chain: arbitrum
+    rpc: "https://lb.drpc.org/ogrpc?network=arbitrum&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    factory: "0x78Df1CF5bf06a7f27f2ACc580B934238C1b80D50"
+    outputs_dir: "./out/euler_v2_arbitrum"
+
+  euler_v2_sonic:
+    protocol: euler
+    version: v2
+    chain: sonic
+    rpc: "https://lb.drpc.org/ogrpc?network=sonic&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    factory: "0xF075cC8660B51D0b8a4474e3f47eDAC5fA034cFB"
+    outputs_dir: "./out/euler_v2_sonic"
+
+  # Silo V2 — factory-based silo discovery
+  silo_v2_ethereum:
+    protocol: silo
+    version: v2
+    chain: ethereum
+    rpc: ""
+    factory: "0xa42001d6d2237d2c74108fe360403c4b796b7170"
+    outputs_dir: "./out/silo_v2_ethereum"
+
+  silo_v2_arbitrum:
+    protocol: silo
+    version: v2
+    chain: arbitrum
+    rpc: ""
+    factory: "0xf7dc975C96B434D436b9bF45E7a45c95F0521442"
+    outputs_dir: "./out/silo_v2_arbitrum"
+
+  # Fraxlend — deployer-based pair discovery
+  fraxlend_ethereum:
+    protocol: fraxlend
+    version: v1
+    chain: ethereum
+    rpc: ""
+    deployer: "0x38488de975b77dc1b0d4b8569f596f6fd6ca0b92"
+    outputs_dir: "./out/fraxlend_ethereum"
+
+  # ========================================
+  # Aave V2 — Legacy Deployments
+  # Uses LendingPoolAddressesProvider (getLendingPool, getAddress)
+  # ========================================
+
+  aave_v2_ethereum:
+    protocol: aave
+    version: v2
+    chain: ethereum
+    rpc: ""
+    registry: "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5"  # LendingPoolAddressesProvider -> LendingPool 0x7d2768de...
+    outputs_dir: "./out/aave_v2_ethereum"
+
+  aave_v2_polygon:
+    protocol: aave
+    version: v2
+    chain: polygon
+    rpc: "https://lb.drpc.org/ogrpc?network=polygon&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    registry: "0xd05e3E715d945B59290df0ae8eF85c1BdB684744"  # LendingPoolAddressesProvider -> LendingPool 0x8dff5e27...
+    outputs_dir: "./out/aave_v2_polygon"
+
+  # ========================================
+  # Cap Finance — Arbitrum Deployment
+  # Uses Yearn V3-style vault architecture
+  # ========================================
+
+  cap_arbitrum:
+    protocol: cap
+    version: v1
+    chain: arbitrum
+    rpc: ""
+    registry: "0x7e38a9d2c99caef533e5d692ed8a2ce4b478e585"  # Top vault by liquidation volume
+    outputs_dir: "./out/cap_arbitrum"
+
+  # ========================================
+  # Lista Lending — Additional Chain Deployments
+  # Uses Morpho Blue-style architecture (Moolah fork)
+  # ========================================
+
+  lista_lending_base:
+    protocol: lista
+    version: v1
+    chain: base
+    rpc: ""
+    registry: "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"  # Uses Morpho Blue singleton on Base
+    vaults: []  # Market discovery via CreateMarket events (morpho-style)
+    outputs_dir: "./out/lista_lending_base"
+
+  lista_lending_arbitrum:
+    protocol: lista
+    version: v1
+    chain: arbitrum
+    rpc: ""
+    registry: "0x6c247b1f6182318877311737bac0844baa518f5e"  # Moolah core contract on Arbitrum
+    vaults: []  # Market discovery via CreateMarket events (morpho-style)
+    outputs_dir: "./out/lista_lending_arbitrum"

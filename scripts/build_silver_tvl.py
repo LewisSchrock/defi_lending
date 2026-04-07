@@ -293,7 +293,7 @@ def main():
     parser.add_argument('--date', help='Process only this date (YYYY-MM-DD)')
     parser.add_argument('--verbose', '-v', action='store_true', help='Verbose output')
     parser.add_argument('--dry-run', action='store_true', help='Show what would be processed')
-    parser.add_argument('--force', action='store_true', help='Reprocess all files (ignore existing silver)')
+    # --force removed: previously wiped silver data on accident
     parser.add_argument('--clear-not-found', action='store_true',
                         help='Clear not-found cache before running (retry failed lookups)')
     parser.add_argument('--show-not-found', action='store_true',
@@ -357,11 +357,7 @@ def main():
     print("\n[Stage 5/5] Processing bronze files to silver...")
 
     # Load existing silver data for incremental updates
-    if args.force:
-        existing_silver = {}
-        print("  --force: Reprocessing all files")
-    else:
-        existing_silver = load_existing_silver()
+    existing_silver = load_existing_silver()
         print(f"  Existing silver records: {len(existing_silver)}")
 
     silver_data = list(existing_silver.values())  # Start with existing data
@@ -376,17 +372,15 @@ def main():
         if args.date:
             bronze_files = [f for f in bronze_files if f.stem == args.date]
 
-        # Filter out files we already have in silver (unless --force)
-        # FIX: Initialize skipped_count before the conditional to avoid NameError
+        # Filter out files we already have in silver (incremental)
         skipped_count = 0
-        if not args.force:
-            new_files = []
-            for f in bronze_files:
-                date_str = f.stem  # filename is YYYY-MM-DD.json
-                key = (csu_name, date_str)
-                if key not in existing_silver:
-                    new_files.append(f)
-            skipped_count = len(bronze_files) - len(new_files)
+        new_files = []
+        for f in bronze_files:
+            date_str = f.stem  # filename is YYYY-MM-DD.json
+            key = (csu_name, date_str)
+            if key not in existing_silver:
+                new_files.append(f)
+        skipped_count = len(bronze_files) - len(new_files)
             skipped += skipped_count
             bronze_files = new_files
 

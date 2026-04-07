@@ -60,9 +60,8 @@ BASE_CSUS = [
 
 
 def load_panel():
-    path = PROJECT_ROOT / 'data' / 'gold' / 'panel_base_eth' / 'gold_panel_base_eth.parquet'
+    path = PROJECT_ROOT / 'data' / 'analysis' / 'panel_svar_data_qualified.parquet'
     df = pd.read_parquet(path)
-    df['liquidation'] = df['log_collateral_usd']
     return df
 
 

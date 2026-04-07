@@ -73,6 +73,7 @@ def _get_symbol(market: dict, chain: str = '') -> str:
         market.get('token_symbol') or
         market.get('symbol') or
         market.get('asset_symbol') or
+        market.get('loan_symbol') or        # Morpho Blue
         'UNKNOWN'
     )
     if sym == 'NATIVE':
@@ -89,6 +90,7 @@ def _get_decimals(market: dict) -> int:
         market.get('underlying_decimals') or
         market.get('token_decimals') or
         market.get('decimals') or
+        market.get('loan_decimals') or        # Morpho Blue
         18
     )
 
@@ -108,6 +110,9 @@ def _get_supply_raw(market: dict) -> int:
     # Fluid / Gearbox
     if 'total_assets_raw' in market:
         return market['total_assets_raw']
+    # Morpho Blue
+    if 'total_supply_assets_raw' in market:
+        return market['total_supply_assets_raw']
     return market.get('total_supply_raw') or 0
 
 
@@ -125,7 +130,10 @@ def _get_borrow_raw(market: dict) -> int:
     if 'total_borrows_raw' in market:
         return market['total_borrows_raw']
     # Fluid / Gearbox
-    return market.get('total_borrow_raw') or 0
+    if 'total_borrow_raw' in market:
+        return market['total_borrow_raw']
+    # Morpho Blue
+    return market.get('total_borrow_assets_raw') or 0
 
 
 def load_price_cache() -> dict:
@@ -151,14 +159,23 @@ def load_oracle_price_cache() -> dict:
     return {}
 
 
+CHAIN_ALIASES = {'xdai': 'gnosis', 'bsc': 'binance'}
+
+
+def _normalize_chain(chain: str) -> str:
+    """Normalize chain names (xdai->gnosis, bsc->binance)."""
+    return CHAIN_ALIASES.get(chain.lower(), chain.lower())
+
+
 def _get_chain_from_csu(csu: str) -> str:
     """Parse chain from CSU name."""
     for chain in ['ethereum', 'arbitrum', 'optimism', 'polygon', 'avalanche',
-                  'binance', 'gnosis', 'linea', 'scroll', 'ink', 'base']:
+                  'binance', 'gnosis', 'linea', 'scroll', 'ink', 'base',
+                  'sonic', 'celo', 'fantom', 'zksync', 'meter', 'blast']:
         if chain in csu.lower():
             return chain
     aliases = {'eth': 'ethereum', 'arb': 'arbitrum', 'op': 'optimism',
-               'bsc': 'binance'}
+               'bsc': 'binance', 'xdai': 'gnosis'}
     for part in csu.lower().split('_'):
         if part in aliases:
             return aliases[part]
@@ -343,7 +360,7 @@ def build_composition_and_volatility(all_snapshots: dict, cache: dict,
 
         for snap in snapshots:
             date = snap['date']
-            snap_chain = snap.get('chain', chain)
+            snap_chain = _normalize_chain(snap.get('chain', chain))
             markets = snap.get('data', [])
 
             token_usd = {}
@@ -361,8 +378,11 @@ def build_composition_and_volatility(all_snapshots: dict, cache: dict,
                     continue
 
                 # Get token address for oracle lookup
-                addr = (m.get('underlying_address') or
+                addr = (m.get('underlying') or
+                        m.get('underlying_address') or
                         m.get('token_address') or
+                        m.get('loan_token') or
+                        m.get('collateral_token') or
                         m.get('address') or '')
 
                 # Get price using oracle cache first, then symbol cache
@@ -425,6 +445,10 @@ def build_composition_and_volatility(all_snapshots: dict, cache: dict,
 
                 if p_today and p_prev and p_today > 0 and p_prev > 0:
                     log_ret = np.log(p_today) - np.log(p_prev)
+                    # Skip token if return implies bad oracle price
+                    # (|log_ret| > 2.0 ≈ >7x move, catches exchange-rate oracle errors)
+                    if abs(log_ret) > 2.0:
+                        continue
                     basket_ret += w * log_ret
                     total_w += w
 

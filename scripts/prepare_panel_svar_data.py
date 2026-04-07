@@ -11,14 +11,17 @@ Utilization and volatility are sourced from the vol_util_panel (computed
 from bronze TVL data in build_volatility_panel.py). Liquidation comes from
 the gold liquidation panel. CSU names are normalized across data sources.
 
+The panel is UNBALANCED: each CSU is trimmed to its own effective date range
+(first to last date with vol/util data). The Pedroni (2013) framework estimates
+separate VARs per CSU, so different members can have different T.
+
 See data/analysis/README.md for economic definitions.
 
 Output: Excel + Parquet files ready for Panel SVAR analysis
 
 Usage:
     python scripts/prepare_panel_svar_data.py
-    python scripts/prepare_panel_svar_data.py --start-date 2024-07-01
-    python scripts/prepare_panel_svar_data.py --min-coverage 0.70
+    python scripts/prepare_panel_svar_data.py --min-obs 200
 """
 
 import sys
@@ -26,6 +29,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import argparse
+import json
 import pandas as pd
 import numpy as np
 
@@ -49,6 +53,17 @@ CSU_ALIASES = {
     'aave_v3_xdai': 'aave_v3_gnosis',
 }
 
+# === CSU Exclusions ===
+# CSUs excluded from the qualified SVAR panel due to degenerate variable behavior.
+# These units produce constant or near-constant series that prevent SVAR estimation.
+CSU_EXCLUSIONS = {
+    'sonne_lending_optimism',   # Post-exploit: utilization=1.0, liquidation=0 throughout
+    'gearbox_ethereum',         # Credit Account architecture: utilization=0, liquidation=0 throughout
+    'compound_v3_base_weth',    # Zero liquidation events across entire sample (degenerate)
+    'ironbank_ethereum',        # Zero liquidation events across entire sample (degenerate)
+    'ironbank_fantom',          # Zero liquidation events across entire sample (degenerate)
+}
+
 
 def normalize_csu(name: str) -> str:
     """Map a CSU name to its canonical form."""
@@ -57,12 +72,111 @@ def normalize_csu(name: str) -> str:
 
 # === Data Loading ===
 
+GOLD_LIQUIDATION_PANEL = Path('data/gold/liquidations/all_chains/daily_panel.parquet')
+
+
 def load_liquidation_panel() -> pd.DataFrame:
-    """Load gold liquidation panel with normalized CSU names."""
-    path = Path('data/gold/liquidations/all_chains/daily_panel.parquet')
-    df = pd.read_parquet(path)
+    """Load the canonical gold liquidation panel with normalized CSU names."""
+    df = pd.read_parquet(GOLD_LIQUIDATION_PANEL)
     df['csu'] = df['csu'].map(normalize_csu)
+
+    # Deduplicate within panel (name normalization can merge CSUs)
+    df = df.groupby(['date', 'csu'], as_index=False).agg({
+        col: 'sum' for col in ['n_liquidations', 'total_collateral_usd', 'total_debt_usd']
+        if col in df.columns
+    })
+
+    # Supplement with bronze CV3 data for CSUs not already in gold
+    bronze_supplement = _load_bronze_cv3_supplement(existing_csus=set(df['csu'].unique()))
+    if not bronze_supplement.empty:
+        df = pd.concat([df, bronze_supplement], ignore_index=True)
+        print(f"  After bronze supplement: {df['csu'].nunique()} CSUs")
+
     return df
+
+
+def _load_bronze_cv3_supplement(existing_csus: set) -> pd.DataFrame:
+    """Load Compound V3 events from bronze _cv3 directories not in gold.
+
+    Converts usd_value_raw / 1e8 to USD for AbsorbCollateral and AbsorbDebt
+    events, then aggregates to daily panels matching gold schema.
+    """
+    bronze_root = Path('data/bronze/liquidations')
+    cv3_dirs = sorted(bronze_root.glob('*_cv3'))
+
+    if not cv3_dirs:
+        return pd.DataFrame()
+
+    all_events = []
+    for cv3_dir in cv3_dirs:
+        events_file = cv3_dir / 'events.jsonl'
+        if not events_file.exists():
+            continue
+        with open(events_file) as f:
+            for line in f:
+                try:
+                    all_events.append(json.loads(line.strip()))
+                except json.JSONDecodeError:
+                    continue
+
+    if not all_events:
+        return pd.DataFrame()
+
+    df = pd.DataFrame(all_events)
+    df['csu'] = df['csu'].map(normalize_csu)
+
+    # Only keep CSUs not already in gold
+    new_csus = set(df['csu'].unique()) - existing_csus
+    if not new_csus:
+        return pd.DataFrame()
+
+    df = df[df['csu'].isin(new_csus)].copy()
+
+    # Convert usd_value_raw to USD (Compound V3 uses 1e8 scaling)
+    df['usd_value'] = pd.to_numeric(df.get('usd_value_raw', 0), errors='coerce').fillna(0) / 1e8
+
+    # Separate collateral and debt events
+    coll = df[df['event_name'] == 'AbsorbCollateral'].copy()
+    debt = df[df['event_name'] == 'AbsorbDebt'].copy()
+
+    # Aggregate collateral USD by (date, csu)
+    coll_daily = coll.groupby(['date', 'csu']).agg(
+        total_collateral_usd=('usd_value', 'sum'),
+    ).reset_index() if not coll.empty else pd.DataFrame(columns=['date', 'csu', 'total_collateral_usd'])
+
+    # Aggregate debt USD by (date, csu)
+    debt_daily = debt.groupby(['date', 'csu']).agg(
+        total_debt_usd=('usd_value', 'sum'),
+    ).reset_index() if not debt.empty else pd.DataFrame(columns=['date', 'csu', 'total_debt_usd'])
+
+    # Count unique liquidations by (tx_hash, borrower) pairs per (date, csu)
+    liq_counts = df.drop_duplicates(subset=['tx_hash', 'borrower', 'date', 'csu']).groupby(
+        ['date', 'csu']
+    ).size().reset_index(name='n_liquidations')
+
+    # Merge all aggregates
+    daily = liq_counts.merge(coll_daily, on=['date', 'csu'], how='left')
+    daily = daily.merge(debt_daily, on=['date', 'csu'], how='left')
+    daily['total_collateral_usd'] = daily['total_collateral_usd'].fillna(0)
+    daily['total_debt_usd'] = daily['total_debt_usd'].fillna(0)
+
+    # Create balanced panel with continuous date range (fill missing dates with 0)
+    min_date = df['date'].min()
+    max_date = df['date'].max()
+    all_dates = [d.strftime('%Y-%m-%d') for d in pd.date_range(min_date, max_date, freq='D')]
+    all_new_csus = sorted(new_csus)
+    full_idx = pd.MultiIndex.from_product([all_dates, all_new_csus], names=['date', 'csu'])
+    balanced = pd.DataFrame(index=full_idx).reset_index()
+    balanced = balanced.merge(daily, on=['date', 'csu'], how='left')
+    balanced['n_liquidations'] = balanced['n_liquidations'].fillna(0).astype(int)
+    balanced['total_collateral_usd'] = balanced['total_collateral_usd'].fillna(0)
+    balanced['total_debt_usd'] = balanced['total_debt_usd'].fillna(0)
+
+    print(f"  Bronze CV3 supplement: {len(new_csus)} new CSUs "
+          f"({', '.join(all_new_csus)}), "
+          f"{int(daily['n_liquidations'].sum()):,} total events")
+
+    return balanced
 
 
 def load_vol_util_panel() -> pd.DataFrame:
@@ -75,13 +189,19 @@ def load_vol_util_panel() -> pd.DataFrame:
 
 # === Main Pipeline ===
 
-def prepare_panel_data(start_date: str = '2024-07-01',
-                       min_coverage: float = 0.70) -> pd.DataFrame:
+def prepare_panel_data(min_obs: int = 200) -> pd.DataFrame:
     """
-    Prepare balanced panel with:
+    Prepare unbalanced panel with:
     - liquidation: log(1 + total_collateral_usd)
     - utilization: Leverage proxy (borrowed/supplied) from bronze TVL
     - volatility: Rolling std of collateral basket returns from bronze TVL
+
+    Each CSU is trimmed to its own effective date range (first to last date
+    with vol/util data). The Pedroni framework estimates separate VARs per
+    member, so different CSUs can have different T.
+
+    CSUs are qualified based on minimum complete observations (all 3 vars
+    non-null), not coverage percentage of a fixed window.
     """
     print("Loading data...")
     liq_df = load_liquidation_panel()
@@ -89,13 +209,17 @@ def prepare_panel_data(start_date: str = '2024-07-01',
 
     liq_csus = set(liq_df['csu'].unique())
     vu_csus = set(vu_df['csu'].unique())
-    matched_csus = sorted(liq_csus & vu_csus)
+    matched_csus = sorted((liq_csus & vu_csus) - CSU_EXCLUSIONS)
+
+    excluded_present = sorted((liq_csus | vu_csus) & CSU_EXCLUSIONS)
+    if excluded_present:
+        print(f"  Excluded CSUs:     {excluded_present}")
 
     print(f"  Liquidation panel: {len(liq_csus)} CSUs, {len(liq_df):,} rows")
     print(f"  Vol/util panel:    {len(vu_csus)} CSUs, {len(vu_df):,} rows")
     print(f"  Matched CSUs:      {len(matched_csus)}")
 
-    unmatched_liq = sorted(liq_csus - vu_csus)
+    unmatched_liq = sorted(liq_csus - vu_csus - CSU_EXCLUSIONS)
     if unmatched_liq:
         print(f"  No vol/util data:  {unmatched_liq}")
 
@@ -109,38 +233,51 @@ def prepare_panel_data(start_date: str = '2024-07-01',
 
     # Merge utilization + volatility from vol_util panel
     panel = panel.merge(
-        vu_df[['date', 'csu', 'utilization', 'volatility', 'basket_return']],
+        vu_df[['date', 'csu', 'utilization', 'volatility', 'basket_return', 'log_price']],
         on=['date', 'csu'],
         how='left'
     )
 
-    # Apply T-trimming
-    if start_date:
-        before = len(panel)
-        panel = panel[panel['date'] >= start_date].copy()
-        print(f"\n  T-trimming: start={start_date}, dropped {before - len(panel):,} rows")
-
     panel = panel.sort_values(['csu', 'date']).reset_index(drop=True)
 
-    # Filter CSUs by coverage
-    print(f"\nFiltering CSUs (min coverage={min_coverage:.0%} for all 3 vars)...")
+    # Per-CSU trimming: trim each CSU to its effective date range
+    # (first to last date where vol/util data exists)
+    print("\nPer-CSU effective range trimming...")
+    trimmed_parts = []
+    before_total = len(panel)
+    for csu in sorted(panel['csu'].unique()):
+        cd = panel[panel['csu'] == csu]
+        has_vu = cd['utilization'].notna() | cd['volatility'].notna()
+        if not has_vu.any():
+            continue
+        first_vu = cd.loc[has_vu, 'date'].min()
+        last_vu = cd.loc[has_vu, 'date'].max()
+        trimmed = cd[(cd['date'] >= first_vu) & (cd['date'] <= last_vu)]
+        trimmed_parts.append(trimmed)
+
+    panel = pd.concat(trimmed_parts, ignore_index=True)
+    dropped = before_total - len(panel)
+    if dropped > 0:
+        print(f"  Dropped {dropped:,} rows outside per-CSU effective ranges")
+
+    # Filter CSUs by minimum complete observations
+    print(f"\nFiltering CSUs (min {min_obs} complete observations)...")
     qualified = []
     for csu in sorted(panel['csu'].unique()):
         cd = panel[panel['csu'] == csu]
-        liq_pct = cd['liquidation'].notna().mean()
-        util_pct = cd['utilization'].notna().mean()
-        vol_pct = cd['volatility'].notna().mean()
-        all3_pct = ((cd['liquidation'].notna()) &
+        complete = ((cd['liquidation'].notna()) &
                     (cd['utilization'].notna()) &
-                    (cd['volatility'].notna())).mean()
+                    (cd['volatility'].notna())).sum()
+        total = len(cd)
+        date_range = f"{cd['date'].min()} to {cd['date'].max()}"
 
-        if all3_pct >= min_coverage:
+        if complete >= min_obs:
             qualified.append(csu)
-            print(f"  QUALIFIED {csu}: all3={all3_pct:.0%} "
-                  f"(liq={liq_pct:.0%}, util={util_pct:.0%}, vol={vol_pct:.0%})")
+            print(f"  QUALIFIED {csu}: T={total}, complete={complete}, "
+                  f"range={date_range}")
         else:
-            print(f"  DROPPED   {csu}: all3={all3_pct:.0%} "
-                  f"(liq={liq_pct:.0%}, util={util_pct:.0%}, vol={vol_pct:.0%})")
+            print(f"  DROPPED   {csu}: T={total}, complete={complete}, "
+                  f"range={date_range}")
 
     qualified_panel = panel[panel['csu'].isin(qualified)].copy()
 
@@ -149,20 +286,15 @@ def prepare_panel_data(start_date: str = '2024-07-01',
 
 def main():
     parser = argparse.ArgumentParser(description='Prepare Panel SVAR data')
-    parser.add_argument('--start-date', type=str, default='2024-07-01',
-                        help='Start date for T-trimming (default: 2024-07-01)')
-    parser.add_argument('--min-coverage', type=float, default=0.70,
-                        help='Min coverage for all 3 vars to qualify (default: 0.70)')
+    parser.add_argument('--min-obs', type=int, default=200,
+                        help='Min complete observations (all 3 vars) to qualify (default: 200)')
     args = parser.parse_args()
 
     print("=" * 70)
-    print("Preparing Panel SVAR Data")
+    print("Preparing Panel SVAR Data (unbalanced panel)")
     print("=" * 70)
 
-    panel, qualified = prepare_panel_data(
-        start_date=args.start_date,
-        min_coverage=args.min_coverage,
-    )
+    panel, qualified = prepare_panel_data(min_obs=args.min_obs)
 
     # Summary
     print("\n" + "=" * 70)
@@ -197,13 +329,16 @@ def main():
     print(f"\n  By CSU:")
     for csu in sorted(qualified['csu'].unique()):
         cd = qualified[qualified['csu'] == csu]
+        complete = ((cd['liquidation'].notna()) &
+                    (cd['utilization'].notna()) &
+                    (cd['volatility'].notna())).sum()
         liq_days = (cd['total_collateral_usd'] > 0).sum()
         util_mean = cd['utilization'].mean()
         vol_mean = cd['volatility'].mean()
-        print(f"    {csu}: T={len(cd)}, "
+        print(f"    {csu}: T={len(cd)}, complete={complete}, "
+              f"range={cd['date'].min()} to {cd['date'].max()}, "
               f"liq_events={liq_days}, "
-              f"util={util_mean:.3f}, "
-              f"vol={vol_mean:.4f}")
+              f"util={util_mean:.3f}, vol={vol_mean:.4f}")
 
     # Save
     output_dir = Path('data/analysis')

@@ -34,6 +34,102 @@ except ImportError:
     print("[error] pip install web3")
     sys.exit(1)
 
+# DefiLlama price fallback
+sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from adapters.prices.defillama import get_token_price_defillama, STABLECOINS as DL_STABLECOINS
+    HAS_DEFILLAMA = True
+except ImportError:
+    HAS_DEFILLAMA = False
+    def get_token_price_defillama(*a, **kw): return None
+
+# DefiLlama chain name mapping for address-based lookups
+DEFILLAMA_CHAINS = {
+    "ethereum": "ethereum",
+    "polygon": "polygon",
+    "avalanche": "avax",
+    "arbitrum": "arbitrum",
+    "optimism": "optimism",
+    "base": "base",
+    "gnosis": "gnosis",
+    "linea": "linea",
+    "scroll": "scroll",
+    "bsc": "bsc",
+    "ink": "ink",
+    "sonic": "sonic",
+    "celo": "celo",
+    "fantom": "fantom",
+    "blast": "blast",
+    "zksync": "era",
+}
+
+# Native token wrapped addresses by chain (for cETH/cAVAX/etc that have no underlying())
+NATIVE_WRAPPED = {
+    "ethereum": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",  # WETH
+    "linea": "0xe5d7c2a44ffddf6b295a15c148167daaaf5cf34f",      # WETH on Linea
+    "scroll": "0x5300000000000000000000000000000000000004",        # WETH on Scroll
+    "avalanche": "0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7",   # WAVAX
+    "arbitrum": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",    # WETH on Arbitrum
+    "base": "0x4200000000000000000000000000000000000006",          # WETH on Base
+    "optimism": "0x4200000000000000000000000000000000000006",      # WETH on Optimism
+    "bsc": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",         # WBNB
+    "polygon": "0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270",     # WMATIC
+    "sonic": "0x039e2fb66102314ce7b64ce5ce3e5183bc94ad38",        # wS (Wrapped Sonic)
+    "blast": "0x4300000000000000000000000000000000000004",         # WETH on Blast
+    "fantom": "0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83",      # WFTM
+}
+
+import requests as _requests
+from threading import Lock as _DLLock
+
+_dl_rate_lock = _DLLock()
+_dl_last_call = 0.0
+_dl_cache: Dict[str, Optional[float]] = {}  # "chain|addr|date" -> price
+_dl_cache_lock = _DLLock()
+
+def _defillama_price_by_address(chain: str, token_addr: str, date_str: str) -> Optional[float]:
+    """Get historical price from DefiLlama using chain:address format.
+    Thread-safe with rate limiting and date-based caching."""
+    global _dl_last_call
+    dl_chain = DEFILLAMA_CHAINS.get(chain)
+    if not dl_chain or not token_addr:
+        return None
+
+    # Check date-based cache first (same token + date = same price)
+    cache_key = f"{dl_chain}|{token_addr}|{date_str}"
+    with _dl_cache_lock:
+        if cache_key in _dl_cache:
+            return _dl_cache[cache_key]
+
+    try:
+        # Rate limit: max 4 req/sec
+        with _dl_rate_lock:
+            now = time.time()
+            elapsed = now - _dl_last_call
+            if elapsed < 0.25:
+                time.sleep(0.25 - elapsed)
+            _dl_last_call = time.time()
+
+        dt = datetime.strptime(date_str, '%Y-%m-%d')
+        ts = int(dt.replace(tzinfo=timezone.utc).timestamp())
+        coin_id = f"{dl_chain}:{token_addr}"
+        url = f"https://coins.llama.fi/prices/historical/{ts}/{coin_id}"
+        resp = _requests.get(url, timeout=15)
+        price = None
+        if resp.status_code == 200:
+            data = resp.json()
+            coin_data = data.get("coins", {}).get(coin_id)
+            if coin_data:
+                price = coin_data.get("price")
+        # Cache result (including None to avoid retrying)
+        with _dl_cache_lock:
+            _dl_cache[cache_key] = price
+        return price
+    except Exception:
+        with _dl_cache_lock:
+            _dl_cache[cache_key] = None
+        return None
+
 # ============================================================================
 # Rate Limiter
 # ============================================================================
@@ -144,6 +240,22 @@ PROTOCOL_ORACLES = {
     "ink": {
         "aave_v3": {"provider": "0x4172E6aAEC070ACB31aaCE343A58c93E4C70f44D"},  # Tydro (Aave V3 fork)
     },
+    "sonic": {
+        "aave_v3": {"provider": "0x5C2e738F6E27bCE0F7558051Bf90605dD6176900"},
+    },
+    "celo": {
+        "aave_v3": {"provider": "0x9F7Cf9417D5251C59fE94fB9147feEe1aAd9Cea5"},
+    },
+    "fantom": {
+        "compound_v2": {"comptroller": "0x4250A6D3BD57455d7C6821eECb6206F507576cD2"},  # Iron Bank
+    },
+    "blast": {
+        "aave_v3": {"provider": "0xb0811a1FC9Fb9972ee683Ba04c32Cb828Bcf587B"},  # ZeroLend
+        "aave_v3_pac": {"provider": "0x688B5fd3C3E3724b4De08C4BCB3A755F9b579c9a"},  # PAC Finance
+    },
+    "zksync": {
+        "aave_v3": {"provider": "0x4f285Ea117eF0067B59853D6d16a5dE8088bA259"},  # ZeroLend
+    },
 }
 
 # dRPC network slugs
@@ -159,6 +271,11 @@ DRPC_NETWORKS = {
     "scroll": "scroll",
     "bsc": "bsc",
     "ink": "ink",
+    "sonic": "sonic",
+    "celo": "celo",
+    "fantom": "fantom",
+    "blast": "blast",
+    "zksync": "zksync-mainnet",
 }
 
 # Known stablecoins (assume $1.00)
@@ -466,6 +583,13 @@ def process_single_event_wrapper(
     coll_addr = event.get("collateral_asset")
     debt_addr = event.get("debt_asset")
 
+    # Compound V2 forks: derive token addresses from cToken fields
+    if protocol == "compound_v2" and not coll_addr:
+        # market_token_collateral = collateral cToken, contract = debt cToken
+        coll_addr = event.get("market_token_collateral")
+        if not debt_addr:
+            debt_addr = contract  # The contract IS the debt cToken
+
     # For Compound V3: use protocol-native usd_value_raw directly (8 decimals)
     # Compound V3's AbsorbDebt events don't emit individual asset addresses,
     # but provide the USD value calculated by the protocol itself
@@ -490,31 +614,109 @@ def process_single_event_wrapper(
         }
         return enriched
 
+    # Morpho: resolve market_id → (loanToken, collateralToken)
+    if protocol == "morpho" and not coll_addr and event.get("market_id"):
+        try:
+            morpho = w3.eth.contract(
+                address=Web3.to_checksum_address(contract),
+                abi=[{"inputs": [{"type": "bytes32"}], "name": "idToMarketParams",
+                      "outputs": [{"components": [
+                          {"name": "loanToken", "type": "address"},
+                          {"name": "collateralToken", "type": "address"},
+                          {"name": "oracle", "type": "address"},
+                          {"name": "irm", "type": "address"},
+                          {"name": "lltv", "type": "uint256"}
+                      ], "type": "tuple"}], "stateMutability": "view", "type": "function"}]
+            )
+            market_id = bytes.fromhex(event["market_id"].replace("0x", ""))
+            params = morpho.functions.idToMarketParams(market_id).call()
+            debt_addr = params[0].lower()   # loanToken
+            coll_addr = params[1].lower()   # collateralToken
+        except Exception:
+            pass
+
+    # Euler V2: fix data misalignment — collector puts 'collateral' vault addr in repay_assets
+    # repay_assets = collateral vault address (uint256), yield_balance = actual repay_assets
+    if protocol == "euler_v2" and contract:
+        raw_repay = event.get("repay_assets", 0)
+        raw_yield = event.get("yield_balance", 0)
+        # Extract collateral vault address from repay_assets (it's an address as uint256)
+        coll_vault_hex = hex(raw_repay) if raw_repay else ""
+        if len(coll_vault_hex) >= 42:  # Valid address
+            coll_vault_addr = "0x" + coll_vault_hex[-40:]
+            try:
+                # Get collateral underlying token from the collateral vault
+                coll_vault = w3.eth.contract(
+                    address=Web3.to_checksum_address(coll_vault_addr),
+                    abi=[{"inputs": [], "name": "asset", "outputs": [{"type": "address"}],
+                          "stateMutability": "view", "type": "function"}]
+                )
+                coll_addr = coll_vault.functions.asset().call().lower()
+            except Exception:
+                pass
+        # Resolve debt token from the debt vault (contract field)
+        try:
+            debt_vault = w3.eth.contract(
+                address=Web3.to_checksum_address(contract),
+                abi=[{"inputs": [], "name": "asset", "outputs": [{"type": "address"}],
+                      "stateMutability": "view", "type": "function"}]
+            )
+            debt_addr = debt_vault.functions.asset().call().lower()
+        except Exception:
+            pass
+
     # Get token info (thread-safe)
     coll_decimals, coll_symbol = None, None
     debt_decimals, debt_symbol = None, None
-    
+
     if coll_addr:
         with token_lock:
             if coll_addr not in token_cache:
                 token_cache[coll_addr] = get_token_info(w3, coll_addr)
             coll_decimals, coll_symbol = token_cache[coll_addr]
-    
+
     if debt_addr:
         with token_lock:
             if debt_addr not in token_cache:
                 token_cache[debt_addr] = get_token_info(w3, debt_addr)
             debt_decimals, debt_symbol = token_cache[debt_addr]
+
+    # Compound V2 forks: debt_repaid_raw is in UNDERLYING units, not cToken units.
+    # Resolve underlying token to get correct decimals for USD calculation.
+    # collateral_seized_raw IS in cToken units (8 dec) — use cToken decimals for that.
+    if protocol == "compound_v2":
+        # Resolve debt underlying decimals (repayAmount is in underlying units)
+        if debt_addr:
+            underlying_key = f"_underlying_{debt_addr}"
+            with token_lock:
+                if underlying_key not in token_cache:
+                    try:
+                        ct = w3.eth.contract(
+                            address=Web3.to_checksum_address(debt_addr),
+                            abi=CTOKEN_ABI)
+                        u_addr = ct.functions.underlying().call().lower()
+                        token_cache[underlying_key] = get_token_info(w3, u_addr)
+                    except Exception:
+                        # Could be cETH (no underlying()), use 18 decimals
+                        if debt_symbol and "eth" in debt_symbol.lower():
+                            token_cache[underlying_key] = (18, "ETH")
+                        else:
+                            token_cache[underlying_key] = (debt_decimals, debt_symbol)
+                u_dec, u_sym = token_cache[underlying_key]
+                if u_dec is not None:
+                    debt_decimals = u_dec
+                    debt_symbol = u_sym or debt_symbol
     
     # Get prices with rate limiting and caching
+    # IMPORTANT: Normalize all cache keys to lowercase addresses to prevent duplicates
     coll_price = None
     debt_price = None
-    
+
     if coll_addr:
-        cache_key = f"{protocol}|{coll_addr}|{block_num}"
+        cache_key = f"{protocol}|{coll_addr.lower()}|{block_num}"
         with cache_lock:
             cached_price = price_cache.get(cache_key)
-        
+
         if cached_price is not None:
             coll_price = cached_price
         else:
@@ -523,15 +725,15 @@ def process_single_event_wrapper(
             else:
                 rate_limiter.acquire()
                 coll_price = oracle.get_price(protocol, coll_addr, block_num, contract)
-            
+
             with cache_lock:
                 price_cache[cache_key] = coll_price
-    
+
     if debt_addr:
-        cache_key = f"{protocol}|{debt_addr}|{block_num}"
+        cache_key = f"{protocol}|{debt_addr.lower()}|{block_num}"
         with cache_lock:
             cached_price = price_cache.get(cache_key)
-        
+
         if cached_price is not None:
             debt_price = cached_price
         else:
@@ -540,23 +742,116 @@ def process_single_event_wrapper(
             else:
                 rate_limiter.acquire()
                 debt_price = oracle.get_price(protocol, debt_addr, block_num, contract)
-            
+
             with cache_lock:
                 price_cache[cache_key] = debt_price
-    
-    # Calculate USD
-    coll_amount_raw = event.get("collateral_seized_raw", 0)
-    debt_amount_raw = event.get("debt_repaid_raw", 0)
-    
+
+    # For Compound V2 forks: resolve cToken -> underlying for DefiLlama pricing
+    # Use chain-specific native wrapped token addresses (not hardcoded Ethereum WETH)
+    coll_underlying = None
+    debt_underlying = None
+    if protocol == "compound_v2":
+        native_wrapped = NATIVE_WRAPPED.get(oracle.chain)
+        if coll_addr and coll_price is None:
+            underlying_cache_key = f"_ctoken_underlying_{coll_addr.lower()}"
+            with token_lock:
+                if underlying_cache_key not in token_cache:
+                    try:
+                        ct = w3.eth.contract(address=Web3.to_checksum_address(coll_addr), abi=CTOKEN_ABI)
+                        token_cache[underlying_cache_key] = ct.functions.underlying().call().lower()
+                    except Exception:
+                        # Native token cToken (cETH, qiAVAX, etc.) — use chain wrapped native
+                        sym_lower = (coll_symbol or "").lower()
+                        if native_wrapped and any(h in sym_lower for h in ["eth", "avax", "bnb", "matic", "ftm"]):
+                            token_cache[underlying_cache_key] = native_wrapped
+                        else:
+                            token_cache[underlying_cache_key] = None
+                coll_underlying = token_cache[underlying_cache_key]
+        if debt_addr and debt_price is None:
+            underlying_cache_key = f"_ctoken_underlying_{debt_addr.lower()}"
+            with token_lock:
+                if underlying_cache_key not in token_cache:
+                    try:
+                        ct = w3.eth.contract(address=Web3.to_checksum_address(debt_addr), abi=CTOKEN_ABI)
+                        token_cache[underlying_cache_key] = ct.functions.underlying().call().lower()
+                    except Exception:
+                        sym_lower = (debt_symbol or "").lower()
+                        if native_wrapped and any(h in sym_lower for h in ["eth", "avax", "bnb", "matic", "ftm"]):
+                            token_cache[underlying_cache_key] = native_wrapped
+                        else:
+                            token_cache[underlying_cache_key] = None
+                debt_underlying = token_cache[underlying_cache_key]
+
+    # DefiLlama fallback: try symbol-based, then address-based
+    event_date = event.get("date")
+    if event_date:
+        if coll_price is None and coll_addr:
+            # Try underlying symbol for cTokens first (strip prefix)
+            dl_price = None
+            if HAS_DEFILLAMA:
+                # For cTokens, try underlying symbol (e.g. "qiAVAX" -> "AVAX", "lETH" -> "ETH")
+                if protocol == "compound_v2" and coll_symbol and coll_underlying:
+                    u_info = token_cache.get(coll_underlying)
+                    u_sym = None
+                    if isinstance(u_info, tuple) and len(u_info) == 2:
+                        u_sym = u_info[1]
+                    if u_sym:
+                        dl_price = get_token_price_defillama(u_sym, event_date)
+                if dl_price is None and coll_symbol:
+                    dl_price = get_token_price_defillama(coll_symbol, event_date)
+            # Fall back to address-based lookup (try underlying for cTokens first)
+            if dl_price is None and coll_underlying:
+                dl_price = _defillama_price_by_address(oracle.chain, coll_underlying, event_date)
+            if dl_price is None:
+                dl_price = _defillama_price_by_address(oracle.chain, coll_addr, event_date)
+            if dl_price is not None:
+                coll_price = int(dl_price * 10**8)
+                with cache_lock:
+                    price_cache[f"{protocol}|{coll_addr.lower()}|{block_num}"] = coll_price
+        if debt_price is None and debt_addr:
+            dl_price = None
+            if HAS_DEFILLAMA:
+                if protocol == "compound_v2" and debt_symbol and debt_underlying:
+                    u_info = token_cache.get(debt_underlying)
+                    u_sym = None
+                    if isinstance(u_info, tuple) and len(u_info) == 2:
+                        u_sym = u_info[1]
+                    if u_sym:
+                        dl_price = get_token_price_defillama(u_sym, event_date)
+                if dl_price is None and debt_symbol:
+                    dl_price = get_token_price_defillama(debt_symbol, event_date)
+            if dl_price is None and debt_underlying:
+                dl_price = _defillama_price_by_address(oracle.chain, debt_underlying, event_date)
+            if dl_price is None:
+                dl_price = _defillama_price_by_address(oracle.chain, debt_addr, event_date)
+            if dl_price is not None:
+                debt_price = int(dl_price * 10**8)
+                with cache_lock:
+                    price_cache[f"{protocol}|{debt_addr.lower()}|{block_num}"] = debt_price
+
+    # Calculate USD — handle different amount field names per protocol
+    coll_amount_raw = event.get("collateral_seized_raw") or event.get("seized_assets") or 0
+    debt_amount_raw = event.get("debt_repaid_raw") or event.get("repaid_assets") or event.get("repay_amount_raw") or 0
+    # Euler V2: due to collector data misalignment, yield_balance = actual debt repaid
+    # Actual collateral seized amount was lost (3rd data field not read by collector)
+    # We approximate collateral_usd from debt_usd * 1.05 (typical liquidation bonus)
+    if protocol == "euler_v2":
+        debt_amount_raw = event.get("yield_balance") or 0  # yield_balance is actually repay_assets
+        coll_amount_raw = 0  # Not available due to data misalignment
+
     coll_usd = None
     debt_usd = None
-    
+
     if coll_price and coll_decimals is not None and coll_amount_raw:
         coll_usd = (coll_amount_raw * coll_price) / (10 ** (coll_decimals + 8))
-    
+
     if debt_price and debt_decimals is not None and debt_amount_raw:
         debt_usd = (debt_amount_raw * debt_price) / (10 ** (debt_decimals + 8))
-    
+
+    # Euler V2: approximate collateral from debt (collateral amount was lost in collector)
+    if protocol == "euler_v2" and debt_usd and not coll_usd:
+        coll_usd = debt_usd * 1.05  # ~5% liquidation bonus approximation
+
     enriched = {
         **event,
         "collateral_symbol": coll_symbol,
@@ -608,13 +903,24 @@ def process_chain(chain: str, dry_run: bool = False, workers: int = 50) -> Dict:
     token_cache: Dict[str, Tuple[int, str]] = {}
 
     # Load persistent price cache
-    price_cache: Dict[str, Optional[int]] = {}  # "protocol|addr|block" -> price
+    price_cache: Dict[str, Optional[int]] = {}  # "protocol|addr_lower|block" -> price
     price_cache_file.parent.mkdir(parents=True, exist_ok=True)
     if price_cache_file.exists():
         try:
             with open(price_cache_file) as f:
-                price_cache = json.load(f)
-            print(f"  Loaded {len(price_cache):,} prices from cache")
+                raw_cache = json.load(f)
+            # Normalize all cache keys to lowercase addresses.
+            # If both mixed-case and lowercase keys exist, prefer the one with a non-None value.
+            for k, v in raw_cache.items():
+                parts = k.split("|")
+                if len(parts) == 3:
+                    normalized = f"{parts[0]}|{parts[1].lower()}|{parts[2]}"
+                else:
+                    normalized = k
+                # Keep non-None values over None values
+                if normalized not in price_cache or price_cache[normalized] is None:
+                    price_cache[normalized] = v
+            print(f"  Loaded {len(raw_cache):,} prices from cache -> {len(price_cache):,} after normalization")
         except:
             print(f"  Warning: Could not load price cache, starting fresh")
             price_cache = {}
@@ -835,20 +1141,30 @@ def main():
     parser.add_argument("--chain", required=True)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--workers", type=int, default=50, help="Number of concurrent workers (default: 50)")
+    parser.add_argument("--force", action="store_true",
+                        help="Clear checkpoint and reprocess all events from scratch (use after backfilling prices)")
     args = parser.parse_args()
 
     print("=" * 60)
     print("MULTI-PROTOCOL LIQUIDATION ENRICHMENT")
     print(f"Started: {datetime.now().isoformat()}")
+    if args.force:
+        print("MODE: FORCE REPROCESS (ignoring checkpoint)")
     print("=" * 60)
 
     if args.chain == "all":
         chains = [d.name for d in INPUT_DIR.iterdir() if d.is_dir() and (d / "events.jsonl").exists()]
     else:
-        chains = [args.chain]
+        chains = [c.strip() for c in args.chain.split(",")]
 
     results = []
     for chain in chains:
+        if args.force:
+            # Clear checkpoint so all events are reprocessed
+            checkpoint_file = OUTPUT_DIR / chain / ".checkpoint"
+            if checkpoint_file.exists():
+                checkpoint_file.unlink()
+                print(f"  Cleared checkpoint for {chain}")
         result = process_chain(chain, args.dry_run, workers=args.workers)
         results.append(result)
 

@@ -70,7 +70,7 @@ def panelSVAR(input):
     if common_output.lag_order == 0:
         raise Exception("No lags selected for common shock. Panel SVAR ends.")
     
-    common_rotation_mat = True  # Use common structural identification (Pedroni 2013 standard)
+    common_rotation_mat = False  # Per-member BQ identification (each member gets own M)
     # Composite shock
     for member, member_df in input.df.groupby(input.member_col):
         member_input = copy.deepcopy(input)

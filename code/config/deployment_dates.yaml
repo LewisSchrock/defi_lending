@@ -24,7 +24,7 @@ csus:
 
   # Fluid Lending (uses getAllFTokens resolver - deployed mid-2024)
   fluid_lending_arbitrum: "2024-06-11"
-  fluid_lending_base: "2025-01-01"  # FluidLendingResolver not deployed on Base in 2024
+  fluid_lending_base: "2024-08-01"   # Fluid deployed on Base ~Aug 2024
   fluid_lending_ethereum: "2024-05-31"  # Verified from successful data collection
 
   # Aave V3 (deployed mid-2024 on new chains)
@@ -41,6 +41,41 @@ csus:
   tydro_ink: "2025-10-12"  # Markets active from Oct 12 (contract deployed Jul 25)
   lista_lending_ethereum: "2025-09-26"  # Verified: block 23,445,769
   cap_ethereum: "2025-07-08"  # Verified: cUSD + USDC vault deployed July 8 2025
+
+  # Euler V2 (GenericFactory deployment dates)
+  euler_v2_ethereum: "2024-08-15"  # Factory deployed 2024-08-14 (block 20,529,225)
+  euler_v2_base: "2024-11-12"     # Factory deployed 2024-11-11 (block 22,282,408)
+
+  # Morpho Blue (singleton deployed Jan 2024 on Ethereum)
+  morpho_ethereum: "2024-01-11"   # CreateMarket events start Jan 2024
+
+  # ZeroLend (deployed at various dates)
+  zerolend_ethereum: "2024-03-03"  # Verified: getPool() set at block 19,356,922
+  zerolend_base: "2024-09-24"     # Verified: getPool() set at block 20,143,163 (Sep 23 07:14 UTC)
+  zerolend_blast: "2024-03-01"    # First TVL per DeFiLlama
+  zerolend_linea: "2024-03-11"    # First TVL per DeFiLlama
+
+  # Aave V3 Sonic (Sonic mainnet Dec 2024, Aave V3 deployed ~Feb 2025)
+  aave_v3_sonic: "2025-02-15"     # First successful data collection date
+
+  # PAC Finance on Blast
+  pac_blast: "2024-03-01"         # Blast mainnet launch
+
+  # SparkLend Gnosis (already collecting from 2024-01-01 - deployed 2023)
+
+  # Lista Lending
+  lista_lending_base: "2025-01-01"    # Approximate
+  lista_lending_arbitrum: "2025-01-01"  # Approximate
+
+  # Aave V3 Celo (deployed March 2025)
+  aave_v3_celo: "2025-03-17"        # Aave V3 went live on Celo March 17 2025
+
+  # Euler V2 additional chains
+  euler_v2_arbitrum: "2025-01-30"   # Factory deployed block ~300,781,250
+  euler_v2_sonic: "2025-01-25"      # Verified: factory deployed block 5,324,454
+
+  # IronBank (deployed 2021, active throughout our range)
+  # ironbank_fantom: no date needed — deployed Oct 2021
 
   # Note: CSUs not listed here are assumed to have been deployed before 2024-01-01
   # and can be queried for the full year.

@@ -94,33 +94,14 @@ PROVIDERS = {
             'plasma': 'plasma',
             'meter': 'meter',
             'flare': 'flare',
+            'celo': 'celo',
+            'blast': 'blast',
+            'zksync': 'zksync-era',
+            'manta': 'manta-pacific',
+            'fantom': 'fantom',
         }
     ),
-    'alchemy': ProviderConfig(
-        name='alchemy',
-        monthly_limit=30_000_000,
-        burst_limit=300,
-        get_logs_cost=60,
-        call_cost=26,
-        block_cost=20,
-        priority=1,
-        url_template='https://{chain}.g.alchemy.com/v2/{key}',
-        chain_map={
-            'ethereum': 'eth-mainnet',
-            'arbitrum': 'arb-mainnet',
-            'optimism': 'opt-mainnet',
-            'base': 'base-mainnet',
-            'polygon': 'polygon-mainnet',
-            'avalanche': 'avax-mainnet',
-            'binance': 'bnb-mainnet',
-            'linea': 'linea-mainnet',
-            'gnosis': 'gnosis-mainnet',
-            'scroll': 'scroll-mainnet',
-            'sonic': 'sonic-mainnet',
-            'ink': 'ink-mainnet',
-            'plasma': 'plasma-mainnet',
-        }
-    ),
+    # 'alchemy' removed — user directive: only use dRPC, not Alchemy
     'blockpi': ProviderConfig(
         name='blockpi',
         monthly_limit=50_000_000,  # 50M RU per 31 days
@@ -225,11 +206,17 @@ PUBLIC_RPCS = {
     'ink': ['https://rpc-qnd.inkonchain.com'],
     'cronos': ['https://evm.cronos.org'],
     'flare': ['https://flare-api.flare.network/ext/C/rpc'],
+    'celo': ['https://forno.celo.org'],
+    'blast': ['https://rpc.blast.io'],
+    'zksync': ['https://mainnet.era.zksync.io'],
+    'manta': ['https://pacific-rpc.manta.network/http'],
+    'fantom': ['https://rpc.ftm.tools'],
 }
 
 # POA chains requiring middleware
 POA_CHAINS = {'binance', 'polygon', 'gnosis', 'avalanche', 'optimism',
-              'linea', 'scroll', 'sonic', 'cronos', 'meter', 'flare'}
+              'linea', 'scroll', 'sonic', 'cronos', 'meter', 'flare',
+              'celo', 'blast', 'manta', 'fantom'}
 
 # Alchemy keys that DON'T support certain chains (need to enable in dashboard)
 # Format: {chain: [list of key indices (1-based) that are NOT enabled]}

@@ -29,6 +29,11 @@ PUBLIC_RPCS = {
     'meter': 'https://rpc.meter.io',
     'scroll': 'https://rpc.scroll.io',
     'sonic': 'https://rpc.soniclabs.com',
+    'celo': 'https://forno.celo.org',
+    'blast': 'https://rpc.blast.io',
+    'zksync': 'https://mainnet.era.zksync.io',
+    'manta': 'https://pacific-rpc.manta.network/http',
+    'fantom': 'https://rpc.ftm.tools',
 }
 
 

@@ -2,13 +2,22 @@
 """
 Run Pedroni Panel SVAR for Thesis Analyses
 
-Three comparisons using heterogeneous member-specific SVARs:
-  1. Architecture: Pooled (Aave-style) vs Isolated (Compound V3)
-  2. Mechanism: Aave-Style (Instant) vs Compound V3 (Absorb)
-  3. Chain: Ethereum (L1) vs Base (L2)
+Comparisons using heterogeneous member-specific SVARs:
+  0. Full Panel (all 45 qualified CSUs)
+  1. Architecture: Pooled (N=30) vs Isolated/Compound V3 (N=15)
+  2. Chain Layer: L1 (N=14) vs L2 Rollup (N=22), sidechains dropped
+  3. Aave V3 across chains (N=12) — same protocol, isolate chain effects
 
-Variables (all stationary):
-  utilization → liquidation → volatility  (Cholesky ordering)
+Market Type (Stablecoin vs Volatile base within CV3) is in run_market_type_analysis.py.
+
+Variables:
+  utilization (I(0)), liquidation (I(0)), log_price (I(1))
+
+Identification: Pure Long-Run (Blanchard-Quah)
+  LR1: Liquidation shocks have no permanent effect on utilization
+  LR2: Price shocks have no permanent effect on utilization
+  LR3: Price shocks have no permanent effect on liquidation
+  F1*M is lower triangular: util_shock most permanent, price_shock most transitory
 
 Based on: Pedroni (2013), Econometrics 1(2), 180-206
 """
@@ -40,21 +49,27 @@ from identification import findM
 
 # === Configuration ===
 
-VARIABLE_ORDER = ['utilization', 'liquidation', 'volatility']
+VARIABLE_ORDER = ['utilization', 'liquidation', 'log_price']
 VARIABLES = {
-    'utilization': [0, 0],   # stationary in, stationary out
-    'liquidation': [0, 0],
-    'volatility':  [0, 0],
+    'utilization': [0, 0],   # I(0) in, I(0) out
+    'liquidation': [0, 0],   # I(0) in, I(0) out
+    'log_price':   [1, 0],   # I(1) in, differenced to I(0) for estimation
 }
-SHOCKS = ['Utilization', 'Liquidation', 'Volatility']
+SHOCKS = ['Utilization', 'Liquidation', 'Price']
 
-# Cholesky: lower-triangular M → zeros in upper triangle of sr_constraint
-SR_CONSTRAINT = np.array([
+# Pure Long-Run (Blanchard-Quah) identification:
+#   LR1: Liquidation shocks have no permanent effect on utilization
+#   LR2: Price shocks have no permanent effect on utilization
+#   LR3: Price shocks have no permanent effect on liquidation
+# F1*M is lower triangular: util_shock most permanent, price_shock most transitory
+SR_CONSTRAINT = np.array([])
+LR_CONSTRAINT = np.array([
     ['.', '0', '0'],
     ['.', '.', '0'],
     ['.', '.', '.'],
 ])
-SR_SIGN = np.array([
+SR_SIGN = np.array([])
+LR_SIGN = np.array([
     ['+', '.', '.'],
     ['.', '+', '.'],
     ['.', '.', '+'],
@@ -64,31 +79,75 @@ MAXLAGS = 10
 NSTEPS = 20
 LAGMETHOD = 'bic'
 
-# Subsample definitions
-AAVE_STYLE_CSUS = ['aave_v3_ethereum', 'aave_v3_base', 'moonwell_lending_base', 'sparklend_ethereum']
-COMPOUND_V3_CSUS = [
-    'compound_v3_eth_usdc', 'compound_v3_eth_usdt', 'compound_v3_eth_usds',
-    'compound_v3_eth_weth', 'compound_v3_eth_wsteth',
-    'compound_v3_base_usdc', 'compound_v3_base_weth', 'compound_v3_base_aero',
+# === Subsample definitions ===
+
+# Comparison 1: Architecture — Pooled (N=30) vs Isolated/CV3 (N=15)
+# Pooled: shared liquidity pool, competitive instant liquidation (Aave-style)
+POOLED_CSUS = [
+    'aave_v2_polygon',
+    'aave_v3_arbitrum', 'aave_v3_avalanche', 'aave_v3_base', 'aave_v3_binance',
+    'aave_v3_celo', 'aave_v3_ethereum', 'aave_v3_gnosis', 'aave_v3_linea',
+    'aave_v3_optimism', 'aave_v3_polygon', 'aave_v3_scroll', 'aave_v3_sonic',
+    'benqi_lending_avalanche', 'compound_v2_ethereum',
+    'euler_v2_sonic',
+    'fluid_lending_arbitrum', 'fluid_lending_ethereum',
+    'keom_lending_polygon', 'layerbank_lending_scroll', 'lodestar_lending_arbitrum',
+    'mendi_lending_linea', 'moonwell_lending_base', 'morpho_ethereum',
+    'sparklend_ethereum', 'sparklend_gnosis',
+    'venus_core_pool_binance',
+    'zerolend_ethereum', 'zerolend_linea', 'zerolend_zksync',
 ]
-ETHEREUM_CSUS = [
-    'aave_v3_ethereum', 'compound_v3_eth_usdc', 'compound_v3_eth_usdt',
-    'compound_v3_eth_usds', 'compound_v3_eth_weth', 'compound_v3_eth_wsteth',
-    'sparklend_ethereum',
+# Isolated: single-asset markets, protocol-absorb liquidation (Compound V3)
+ISOLATED_CSUS = [
+    'compound_v3_arb_usdc', 'compound_v3_arb_usdc_e', 'compound_v3_arb_usdt',
+    'compound_v3_arb_weth',
+    'compound_v3_base_aero', 'compound_v3_base_usdbc', 'compound_v3_base_usdc',
+    'compound_v3_eth_usdc', 'compound_v3_eth_usds', 'compound_v3_eth_usdt',
+    'compound_v3_eth_weth',
+    'compound_v3_op_usdc', 'compound_v3_op_usdt', 'compound_v3_op_weth',
+    'compound_v3_poly_usdc',
 ]
-BASE_CSUS = [
-    'aave_v3_base', 'compound_v3_base_usdc', 'compound_v3_base_weth',
-    'compound_v3_base_aero', 'moonwell_lending_base',
+
+# Comparison 2: Chain Layer — L1 (N=14) vs L2 Rollup (N=22), sidechains dropped
+# L1: Ethereum, Avalanche, Binance
+L1_CSUS = [
+    'aave_v3_avalanche', 'aave_v3_binance', 'aave_v3_ethereum',
+    'benqi_lending_avalanche', 'compound_v2_ethereum',
+    'compound_v3_eth_usdc', 'compound_v3_eth_usds', 'compound_v3_eth_usdt',
+    'compound_v3_eth_weth',
+    'fluid_lending_ethereum', 'morpho_ethereum', 'sparklend_ethereum',
+    'venus_core_pool_binance', 'zerolend_ethereum',
+]
+# L2 Rollup: Arbitrum, Base, Optimism, Scroll, Linea, zkSync
+L2_CSUS = [
+    'aave_v3_arbitrum', 'aave_v3_base', 'aave_v3_linea',
+    'aave_v3_optimism', 'aave_v3_scroll',
+    'compound_v3_arb_usdc', 'compound_v3_arb_usdc_e', 'compound_v3_arb_usdt',
+    'compound_v3_arb_weth',
+    'compound_v3_base_aero', 'compound_v3_base_usdbc', 'compound_v3_base_usdc',
+    'compound_v3_op_usdc', 'compound_v3_op_usdt', 'compound_v3_op_weth',
+    'fluid_lending_arbitrum', 'layerbank_lending_scroll', 'lodestar_lending_arbitrum',
+    'mendi_lending_linea', 'moonwell_lending_base',
+    'zerolend_linea', 'zerolend_zksync',
+]
+# Dropped sidechains (N=9): polygon (3), gnosis (2), celo (1), sonic (2)
+
+# Comparison 3: Aave V3 across chains (N=12) — same protocol, isolate chain effects
+AAVE_V3_CSUS = [
+    'aave_v3_arbitrum', 'aave_v3_avalanche', 'aave_v3_base', 'aave_v3_binance',
+    'aave_v3_celo', 'aave_v3_ethereum', 'aave_v3_gnosis', 'aave_v3_linea',
+    'aave_v3_optimism', 'aave_v3_polygon', 'aave_v3_scroll', 'aave_v3_sonic',
 ]
 
 
 def load_panel() -> pd.DataFrame:
-    """Load gold panel data and prepare for Pedroni SVAR."""
-    path = PROJECT_ROOT / 'data' / 'gold' / 'panel_base_eth' / 'gold_panel_base_eth.parquet'
+    """Load qualified panel data prepared by prepare_panel_svar_data.py."""
+    path = PROJECT_ROOT / 'data' / 'analysis' / 'panel_svar_data_qualified.parquet'
     df = pd.read_parquet(path)
 
-    # Use log1p(collateral) as liquidation variable
-    df['liquidation'] = df['log_collateral_usd']
+    # Convert log_price (cumulative log return) to price level so SVAR's
+    # log_diff() recovers basket returns. This avoids log(negative) NaN.
+    df['log_price'] = np.exp(df['log_price'])
 
     # Keep only needed columns
     cols = ['date', 'csu'] + VARIABLE_ORDER
@@ -109,10 +168,10 @@ def make_var_input(df: pd.DataFrame) -> VAR_input:
         td_col=['date'],
         member_col='csu',
         M=None,
-        sr_constraint=SR_CONSTRAINT.copy(),
-        lr_constraint=np.array([]),
-        sr_sign=SR_SIGN.copy(),
-        lr_sign=np.array([]),
+        sr_constraint=SR_CONSTRAINT.copy() if SR_CONSTRAINT.size > 0 else SR_CONSTRAINT,
+        lr_constraint=LR_CONSTRAINT.copy(),
+        sr_sign=SR_SIGN.copy() if SR_SIGN.size > 0 else SR_SIGN,
+        lr_sign=LR_SIGN.copy(),
         maxlags=MAXLAGS,
         nsteps=NSTEPS,
         lagmethod=LAGMETHOD,
@@ -386,11 +445,152 @@ def run_comparison(name: str, df: pd.DataFrame, csus_a: list, label_a: str,
     return results
 
 
+def run_full_panel(df: pd.DataFrame, output_dir: Path):
+    """Run Pedroni Panel SVAR on all qualified CSUs."""
+    print(f"\n{'='*70}")
+    print(f"Full Panel SVAR: {df['csu'].nunique()} CSUs")
+    print(f"{'='*70}")
+
+    var_input = make_var_input(df)
+    panel_out = panelSVAR(var_input)
+
+    member_irfs = parse_panel_output(panel_out, NSTEPS, len(VARIABLE_ORDER), VARIABLE_ORDER, SHOCKS)
+    print(f"  Successfully estimated {len(member_irfs)}/{df['csu'].nunique()} members")
+
+    # Plot all member IRFs
+    plot_member_irfs(
+        member_irfs, VARIABLE_ORDER, SHOCKS,
+        f'Full Panel: Member Composite IRFs (N={len(member_irfs)})',
+        output_dir / 'pedroni_full_panel_members.png',
+    )
+
+    # Save IRF data
+    irfs_df = irf_to_dataframe(member_irfs, VARIABLE_ORDER, SHOCKS, 'composite')
+    irfs_df.to_csv(output_dir / 'pedroni_full_panel_irfs.csv', index=False)
+
+    # Save Lambda
+    lam_df = lambda_to_dataframe(member_irfs, VARIABLE_ORDER)
+    lam_df.to_csv(output_dir / 'pedroni_full_panel_lambda.csv', index=False)
+
+    # Summary table
+    median_ir = compute_median_irf(member_irfs, 'composite')
+    mean_ir = compute_mean_irf(member_irfs, 'composite')
+    if median_ir is not None:
+        summary_rows = []
+        for horizon in [1, 5, 10, 20]:
+            cum_median = median_ir[:horizon+1].sum(axis=0)
+            cum_mean = mean_ir[:horizon+1].sum(axis=0)
+            for i, var in enumerate(VARIABLE_ORDER):
+                for j, shock in enumerate(SHOCKS):
+                    summary_rows.append({
+                        'horizon': horizon,
+                        'response': var,
+                        'shock': shock,
+                        'cumulative_median': cum_median[i, j],
+                        'cumulative_mean': cum_mean[i, j],
+                    })
+        summary_df = pd.DataFrame(summary_rows)
+        summary_df.to_csv(output_dir / 'pedroni_full_panel_summary.csv', index=False)
+
+        print(f"\n  Full Panel - Median Cumulative IRF at h=10:")
+        cum10 = median_ir[:11].sum(axis=0)
+        for i, var in enumerate(VARIABLE_ORDER):
+            for j, shock in enumerate(SHOCKS):
+                print(f"    {var} <- {shock}: {cum10[i,j]:.6f}")
+
+        # LR restriction checks: all three should approach 0
+        print(f"\n  LR Restriction Checks (cumulative, should -> 0):")
+        for label, ri, si in [("Liq -> Util", 0, 1), ("Price -> Util", 0, 2), ("Price -> Liq", 1, 2)]:
+            for h in [5, 10, 15, 20]:
+                cum = median_ir[:h+1, ri, si].sum()
+                print(f"    {label} h={h:2d}: {cum:.6f}")
+
+    # Lambda decomposition
+    print(f"\n  Lambda Decomposition (diagonal elements):")
+    for var in VARIABLE_ORDER:
+        vals = lam_df[lam_df['variable'] == var]['lambda']
+        print(f"    {var}: mean lambda = {vals.mean():.4f}, median = {vals.median():.4f}")
+
+    return member_irfs, panel_out
+
+
+def run_subsample_panel(name: str, df: pd.DataFrame, csus: list, output_dir: Path):
+    """Run Pedroni Panel SVAR on a single subsample (no comparison)."""
+    print(f"\n{'='*70}")
+    print(f"Subsample Panel: {name} (N={len(csus)})")
+    print(f"{'='*70}")
+
+    os.makedirs('output', exist_ok=True)
+
+    sub_df = df[df['csu'].isin(csus)].copy()
+    actual_csus = sorted(sub_df['csu'].unique())
+    print(f"  Requested: {len(csus)}, Available in panel: {len(actual_csus)}")
+    print(f"  Observations: {len(sub_df)}")
+
+    var_input = make_var_input(sub_df)
+    panel_out = panelSVAR(var_input)
+
+    member_irfs = parse_panel_output(panel_out, NSTEPS, len(VARIABLE_ORDER), VARIABLE_ORDER, SHOCKS)
+    print(f"  Successfully estimated {len(member_irfs)}/{len(actual_csus)} members")
+
+    tag = name.lower().replace(' ', '_')
+
+    # Plot member IRFs
+    plot_member_irfs(
+        member_irfs, VARIABLE_ORDER, SHOCKS,
+        f'{name}: Member Composite IRFs (N={len(member_irfs)})',
+        output_dir / f'pedroni_{tag}_members.png',
+    )
+
+    # Save IRF data
+    irfs_df = irf_to_dataframe(member_irfs, VARIABLE_ORDER, SHOCKS, 'composite')
+    irfs_df.to_csv(output_dir / f'pedroni_{tag}_irfs.csv', index=False)
+
+    # Save Lambda
+    lam_df = lambda_to_dataframe(member_irfs, VARIABLE_ORDER)
+    lam_df.to_csv(output_dir / f'pedroni_{tag}_lambda.csv', index=False)
+
+    # Summary
+    median_ir = compute_median_irf(member_irfs, 'composite')
+    if median_ir is not None:
+        summary_rows = []
+        for horizon in [1, 5, 10, 20]:
+            cum = median_ir[:horizon+1].sum(axis=0)
+            for i, var in enumerate(VARIABLE_ORDER):
+                for j, shock in enumerate(SHOCKS):
+                    summary_rows.append({
+                        'horizon': horizon, 'response': var, 'shock': shock,
+                        'cumulative_median': cum[i, j],
+                    })
+        pd.DataFrame(summary_rows).to_csv(output_dir / f'pedroni_{tag}_summary.csv', index=False)
+
+        print(f"\n  {name} - Median Cumulative IRF at h=10:")
+        cum10 = median_ir[:11].sum(axis=0)
+        for i, var in enumerate(VARIABLE_ORDER):
+            for j, shock in enumerate(SHOCKS):
+                print(f"    {var} <- {shock}: {cum10[i,j]:.6f}")
+
+        print(f"\n  LR Restriction Checks (cumulative, should -> 0):")
+        for label, ri, si in [("Liq -> Util", 0, 1), ("Price -> Util", 0, 2), ("Price -> Liq", 1, 2)]:
+            for h in [5, 10, 15, 20]:
+                cum = median_ir[:h+1, ri, si].sum()
+                print(f"    {label} h={h:2d}: {cum:.6f}")
+
+    # Lambda decomposition
+    print(f"\n  Lambda Decomposition (diagonal elements):")
+    for var in VARIABLE_ORDER:
+        vals = lam_df[lam_df['variable'] == var]['lambda']
+        print(f"    {var}: mean lambda = {vals.mean():.4f}, median = {vals.median():.4f}")
+
+    return member_irfs, panel_out
+
+
 def main():
     print("=" * 70)
     print("Pedroni Panel SVAR - Thesis Analysis")
     print("Methodology: Pedroni (2013)")
-    print("Variables: utilization → liquidation → volatility (Cholesky)")
+    print("Identification: Pure LR (BQ): liq !-> util, price !-> util, price !-> liq permanently")
+    print(f"Variables: utilization, liquidation, log_price")
     print(f"Lags: BIC (max {MAXLAGS}), IRF steps: {NSTEPS}")
     print("=" * 70)
 
@@ -398,6 +598,7 @@ def main():
     df = load_panel()
     print(f"\nLoaded panel: {len(df)} obs, {df['csu'].nunique()} CSUs")
     print(f"Date range: {df['date'].min()} to {df['date'].max()}")
+    print(f"CSUs: {sorted(df['csu'].unique())}")
 
     # Output directory
     output_dir = PROJECT_ROOT / 'results' / 'pedroni'
@@ -409,29 +610,28 @@ def main():
     os.makedirs('output', exist_ok=True)
 
     try:
-        # 1. Mechanism comparison
-        mech_results = run_comparison(
-            'Mechanism', df,
-            AAVE_STYLE_CSUS, 'Aave-Style',
-            COMPOUND_V3_CSUS, 'Compound V3',
-            output_dir,
-        )
+        # 0. Full panel analysis (all 45 CSUs)
+        full_irfs, full_out = run_full_panel(df, output_dir)
 
-        # 2. Chain comparison
-        chain_results = run_comparison(
-            'Chain', df,
-            ETHEREUM_CSUS, 'Ethereum L1',
-            BASE_CSUS, 'Base L2',
-            output_dir,
-        )
-
-        # 3. Architecture comparison
+        # 1. Architecture: Pooled (N=30) vs Isolated/CV3 (N=15)
         arch_results = run_comparison(
             'Architecture', df,
-            AAVE_STYLE_CSUS, 'Pooled',
-            COMPOUND_V3_CSUS, 'Isolated',
+            POOLED_CSUS, 'Pooled',
+            ISOLATED_CSUS, 'Isolated',
             output_dir,
         )
+
+        # 2. Chain Layer: L1 (N=14) vs L2 Rollup (N=22)
+        chain_results = run_comparison(
+            'Chain Layer', df,
+            L1_CSUS, 'L1',
+            L2_CSUS, 'L2 Rollup',
+            output_dir,
+        )
+
+        # 3. Aave V3 across chains (N=12)
+        aave_irfs, aave_out = run_subsample_panel('Aave V3', df, AAVE_V3_CSUS, output_dir)
+
     finally:
         os.chdir(original_cwd)
 

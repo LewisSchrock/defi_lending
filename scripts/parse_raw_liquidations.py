@@ -66,13 +66,38 @@ COMPOUND_V3_COMET_TO_CSU = {
     ("0xf25212e676d1f7f89cd72ffee66158f541246445", "polygon"): "compound_v3_poly_usdc",
 }
 
-# Aave V3: special Pool addresses for SparkLend and Tydro
-AAVE_SPECIAL_POOLS = {
-    # SparkLend on Ethereum
-    "0xc13e21b648a5ee794902342038ff3adab66be987": "sparklend_ethereum",
-    # Tydro on Ink
-    "0x2816cf15f6d2a220e789aa011d5ee4eb6c47feba": "tydro_ink",
+# All protocols sharing the LiquidationCall topic0 (0xe413a321...)
+# Maps (contract_address_lowercase, chain) → (csu_name, protocol_override)
+# protocol_override replaces the default "aave_v3" assigned by topic0
+LIQUIDATION_CALL_POOL_TO_CSU = {
+    # --- Aave V2 Pools (same LiquidationCall event as V3) ---
+    ("0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9", "ethereum"): ("aave_v2_ethereum", "aave_v2"),
+    ("0x8dff5e27ea6b7ac08ebfdf9eb090f32ee9a30fcf", "polygon"):  ("aave_v2_polygon", "aave_v2"),
+    ("0x4f01aed16d97e3ab5ab2b501154dc9bb0f1a5a2c", "avalanche"): ("aave_v2_avalanche", "aave_v2"),
+
+    # --- SparkLend (Aave V3 fork) ---
+    ("0xc13e21b648a5ee794902342038ff3adab66be987", "ethereum"): ("sparklend_ethereum", "sparklend"),
+    ("0x2dae5307c5e3fd1cf5a72cb6f698f915860607e0", "gnosis"):   ("sparklend_gnosis", "sparklend"),
+
+    # --- Tydro (Aave V3 fork on Ink) ---
+    ("0x2816cf15f6d2a220e789aa011d5ee4eb6c47feba", "ink"): ("tydro_ink", "tydro"),
+
+    # --- ZeroLend (Aave V3 fork) ---
+    ("0x3bc3d34c32cc98bf098d832364df8a222bbab4c0", "ethereum"): ("zerolend_ethereum", "zerolend"),
+    ("0x2f9bb73a8e98793e26cb2f6c4ad037bdf1c6b269", "linea"):    ("zerolend_linea", "zerolend"),
+    ("0xa70b0f3c2470abbe104bdb3f3aaa9c7c54bea7a8", "blast"):    ("zerolend_blast", "zerolend"),
+    ("0x4d9429246ea989c9cee203b43f6d1c7d83e3b8f8", "zksync"):   ("zerolend_zksync", "zerolend"),
+    ("0x766f21277087e18967c1b10bf602d8fe56d0c671", "base"):     ("zerolend_base", "zerolend"),
+
+    # --- Seamless Protocol (Aave V3 fork on Base) ---
+    ("0x8f44fd754285aa6a2b8b9b97739b79746e0475a7", "base"): ("seamless_base", "seamless"),
+
+    # --- PAC Finance (Aave V3 fork on Blast) ---
+    ("0xd2499b3c8611e36ca89a70fda2a72c49ee19eaa8", "blast"): ("pac_blast", "pac"),
 }
+
+# Legacy alias (kept for backward compat references)
+AAVE_SPECIAL_POOLS = {k: v[0] for (k, chain), v in LIQUIDATION_CALL_POOL_TO_CSU.items()}
 
 # Compound V2-style: chain → CSU name (primary fork per chain)
 COMPOUND_V2_CHAIN_MAP = {
@@ -102,8 +127,9 @@ def resolve_csu(protocol: str, chain: str, contract: str) -> str:
         return f"compound_v3_{chain}"
 
     if protocol == "aave_v3":
-        if contract in AAVE_SPECIAL_POOLS:
-            return AAVE_SPECIAL_POOLS[contract]
+        key = (contract, chain)
+        if key in LIQUIDATION_CALL_POOL_TO_CSU:
+            return LIQUIDATION_CALL_POOL_TO_CSU[key][0]
         # Normalize chain names to match vol_util convention
         chain_name = {"bsc": "binance", "gnosis": "xdai"}.get(chain, chain)
         return f"aave_v3_{chain_name}"
@@ -526,13 +552,19 @@ def parse_event(event: Dict, chain: str) -> Optional[Dict]:
     contract = event.get("address", "").lower()
     csu = resolve_csu(parsed["protocol"], chain, contract)
 
+    # Override protocol if the contract belongs to a different protocol family
+    resolved_protocol = parsed["protocol"]
+    pool_key = (contract, chain)
+    if pool_key in LIQUIDATION_CALL_POOL_TO_CSU:
+        resolved_protocol = LIQUIDATION_CALL_POOL_TO_CSU[pool_key][1]
+
     result = {
         "tx_hash": tx_hash,
         "log_index": log_index,
         "block_number": block_num,
         "timestamp": timestamp,
         "date": datetime.fromtimestamp(timestamp, tz=timezone.utc).strftime("%Y-%m-%d") if timestamp else None,
-        "protocol": parsed["protocol"],
+        "protocol": resolved_protocol,
         "csu": csu,
         "event_name": parsed["event_name"],
         "contract": event.get("address", "").lower(),

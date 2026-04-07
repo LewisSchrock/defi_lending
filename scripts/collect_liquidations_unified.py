@@ -24,7 +24,7 @@ Usage:
     python scripts/collect_liquidations_unified.py --chain ethereum --start-date 2024-01-01 --end-date 2024-12-31
 
     # Force restart (ignore checkpoint)
-    python scripts/collect_liquidations_unified.py --chain ethereum --start-date 2024-01-01 --end-date 2024-12-31 --force
+    python scripts/collect_liquidations_unified.py --chain ethereum --start-date 2024-01-01 --end-date 2024-12-31
 
     # Dry run to see what would be scanned
     python scripts/collect_liquidations_unified.py --chain ethereum --start-date 2024-01-01 --end-date 2024-12-31 --dry-run
@@ -46,7 +46,7 @@ from dataclasses import dataclass, asdict
 from eth_utils import keccak
 from web3 import Web3
 
-from config.rpc_pool_v2 import get_web3_with_info, report_rpc_error, is_chain_backing_off
+from config.rpc_pool_v2 import get_web3_with_info, report_rpc_error, is_chain_backing_off, get_pool
 
 # Import POA middleware
 try:
@@ -65,6 +65,35 @@ except ImportError:
 CSU_CONFIG_PATH = Path('code/config/csu_config.yaml')
 BRONZE_LIQUIDATIONS_DIR = Path('data/bronze/liquidations')
 BLOCK_CACHE_DIR = Path('data/cache')
+
+
+# =============================================================================
+# PER-CHAIN eth_getLogs BLOCK RANGE LIMITS
+# =============================================================================
+# Maximum blocks per eth_getLogs call, sourced from blockchain node defaults
+# and provider documentation (Chainstack, dRPC). Using these instead of a
+# flat default ensures we maximize throughput per chain.
+
+CHAIN_BLOCK_LIMITS = {
+    'ethereum':   10_000,   # Geth default
+    'arbitrum':   10_000,   # Nitro
+    'base':       10_000,   # OP Stack
+    'optimism':   10_000,   # OP Stack
+    'binance':     5_000,   # BSC node limit
+    'polygon':     3_500,   # Bor client
+    'avalanche':   2_048,   # C-Chain
+    'fantom':      5_000,   # Opera
+    'gnosis':     10_000,   # xDai
+    'linea':       5_000,   # Linea
+    'celo':       10_000,   # Celo
+    'blast':      10_000,   # OP Stack-based
+    'zksync':     10_000,   # zkSync Era
+    'sonic':      10_000,   # Sonic (Fantom successor)
+    'manta':      10_000,   # Manta
+    'scroll':     10_000,   # Scroll
+}
+
+DEFAULT_BLOCK_LIMIT = 2_000  # Conservative fallback for unknown chains
 
 
 # =============================================================================
@@ -122,13 +151,21 @@ LIQUIDATION_EVENTS = [
         indexed_params=['liquidator', 'borrower', 'debt_token'],
         data_params=['collateral_token', 'debt_repaid_raw', 'collateral_seized_raw']
     ),
-    # Compound V2-style (Venus, Benqi, Moonwell, Kinetic, Tectonic, Sumer)
+    # Compound V2-style (Benqi, Moonwell, Kinetic, Tectonic, Sumer) — indexed liquidator+borrower
     EventSignature.from_signature(
         protocol='compound_v2',
         event_name='LiquidateBorrow',
         signature='LiquidateBorrow(address,address,uint256,address,uint256)',
         indexed_params=['liquidator', 'borrower'],
         data_params=['repay_amount_raw', 'market_token_collateral', 'seize_tokens_raw']
+    ),
+    # Venus on BSC — NO indexed params beyond event sig (all 5 params in data)
+    EventSignature.from_signature(
+        protocol='compound_v2_no_index',
+        event_name='LiquidateBorrow',
+        signature='LiquidateBorrow(address,address,uint256,address,uint256)',
+        indexed_params=[],
+        data_params=['liquidator', 'borrower', 'repay_amount_raw', 'market_token_collateral', 'seize_tokens_raw']
     ),
     # Gearbox
     EventSignature.from_signature(
@@ -154,10 +191,48 @@ LIQUIDATION_EVENTS = [
         indexed_params=['market_id', 'caller', 'borrower'],
         data_params=['repaid_assets', 'repaid_shares', 'seized_assets', 'bad_debt_assets', 'bad_debt_shares']
     ),
+    # Morpho Blue — singleton contract on all chains
+    EventSignature.from_signature(
+        protocol='morpho',
+        event_name='Liquidate',
+        signature='Liquidate(bytes32,address,address,uint256,uint256,uint256,uint256,uint256)',
+        indexed_params=['market_id', 'caller', 'borrower'],
+        data_params=['repaid_assets', 'repaid_shares', 'seized_assets', 'bad_debt_assets', 'bad_debt_shares']
+    ),
+    # Euler V2 — emitted from individual EVault contracts
+    # Note: 'collateral' is NOT indexed in the actual Solidity event, it's in the data
+    EventSignature.from_signature(
+        protocol='euler_v2',
+        event_name='Liquidate',
+        signature='Liquidate(address,address,address,uint256,uint256)',
+        indexed_params=['liquidator', 'violator'],
+        data_params=['collateral', 'repay_assets', 'yield_balance']
+    ),
+    # Silo V2 — emitted from PartialLiquidation hook
+    EventSignature.from_signature(
+        protocol='silo_v2',
+        event_name='LiquidationCall',
+        signature='LiquidationCall(address,address,address,uint256,uint256,bool)',
+        indexed_params=['liquidator', 'silo', 'borrower'],
+        data_params=['repay_debt_assets', 'withdraw_collateral', 'receive_s_token']
+    ),
+    # Fraxlend — emitted from individual FraxlendPair contracts
+    EventSignature.from_signature(
+        protocol='fraxlend',
+        event_name='Liquidate',
+        signature='Liquidate(address,uint256,uint256,uint256,uint256,uint256)',
+        indexed_params=['borrower'],
+        data_params=['collateral_for_liquidator', 'shares_to_liquidate',
+                     'amount_liquidator_to_repay', 'shares_to_adjust', 'amount_to_adjust']
+    ),
 ]
 
-# Build lookup by topic0
-TOPIC0_TO_EVENT: Dict[str, EventSignature] = {e.topic0: e for e in LIQUIDATION_EVENTS}
+# Build lookup by topic0 — group by topic0 for signatures that share the same hash
+_TOPIC0_GROUPS: Dict[str, List[EventSignature]] = {}
+for _e in LIQUIDATION_EVENTS:
+    _TOPIC0_GROUPS.setdefault(_e.topic0, []).append(_e)
+# Primary lookup picks the first (most common) variant; decode_liquidation_event handles ambiguity
+TOPIC0_TO_EVENT: Dict[str, EventSignature] = {t: es[0] for t, es in _TOPIC0_GROUPS.items()}
 ALL_TOPIC0S: List[str] = list(TOPIC0_TO_EVENT.keys())
 
 
@@ -165,22 +240,42 @@ ALL_TOPIC0S: List[str] = list(TOPIC0_TO_EVENT.keys())
 # CHAIN CONFIGURATION
 # =============================================================================
 
-POA_CHAINS = ['binance', 'polygon', 'gnosis', 'avalanche', 'optimism', 'linea', 'scroll', 'xdai', 'plasma', 'sonic', 'cronos', 'meter', 'flare']
+POA_CHAINS = ['binance', 'polygon', 'gnosis', 'avalanche', 'optimism', 'linea', 'scroll', 'xdai', 'plasma', 'sonic', 'cronos', 'meter', 'flare', 'celo', 'blast', 'manta', 'fantom']
 CHAIN_ALIASES = {'xdai': 'gnosis'}
 
 # Protocol to adapter type mapping
 PROTOCOL_TYPES = {
+    # Aave V3 and forks (all emit LiquidationCall)
     'aave': 'aave_v3',
     'sparklend': 'aave_v3',
     'tydro': 'aave_v3',
+    'radiant': 'aave_v3',      # Aave V2 fork — same LiquidationCall event
+    'zerolend': 'aave_v3',     # Aave V3 fork
+    'seamless': 'aave_v3',     # Aave V3 fork on Base
+    'pac': 'aave_v3',          # Aave V3 fork on Blast
+    # Compound V3
     'compound': 'compound_v3',
-    'fluid': 'fluid',
+    # Compound V2 and forks (all emit LiquidateBorrow)
     'venus': 'compound_v2',
     'benqi': 'compound_v2',
     'moonwell': 'compound_v2',
     'kinetic': 'compound_v2',
     'tectonic': 'compound_v2',
     'sumer': 'compound_v2',
+    'cream': 'compound_v2',    # Cream Finance
+    'ironbank': 'compound_v2', # Iron Bank (Yearn ecosystem)
+    'layerbank': 'compound_v2',
+    'mendi': 'compound_v2',
+    'lodestar': 'compound_v2',
+    'sonne': 'compound_v2',
+    'keom': 'compound_v2',
+    # New protocol architectures
+    'morpho': 'morpho',
+    'euler': 'euler_v2',
+    'silo': 'silo_v2',
+    'fraxlend': 'fraxlend',
+    # Other
+    'fluid': 'fluid',
     'gearbox': 'gearbox',
     'cap': 'cap',
     'lista': 'lista',
@@ -275,8 +370,42 @@ def get_csus_for_chain(chain: str, csu_config: Dict) -> List[Dict]:
                     csu_info['address'] = registry
                     csu_info['contract_type'] = 'single'
 
+            elif adapter_type == 'morpho':
+                # Morpho Blue uses singleton contract
+                registry = cfg.get('registry')
+                if registry and registry.startswith('0x'):
+                    csu_info['address'] = registry
+                    csu_info['contract_type'] = 'single'
+
+            elif adapter_type == 'euler_v2':
+                # Euler V2 uses factory for dynamic vault discovery
+                factory = cfg.get('factory') or cfg.get('registry')
+                vaults = cfg.get('vaults')
+                if vaults:
+                    # Static vault list provided
+                    csu_info['addresses'] = [v for v in vaults if v.startswith('0x')]
+                    csu_info['contract_type'] = 'multi'
+                elif factory and factory.startswith('0x'):
+                    # Dynamic discovery from factory
+                    csu_info['registry'] = factory
+                    csu_info['contract_type'] = 'euler_factory'
+
+            elif adapter_type == 'silo_v2':
+                # Silo V2 uses factory + hook-based liquidation
+                factory = cfg.get('factory') or cfg.get('registry')
+                if factory and factory.startswith('0x'):
+                    csu_info['registry'] = factory
+                    csu_info['contract_type'] = 'silo_factory'
+
+            elif adapter_type == 'fraxlend':
+                # Fraxlend uses deployer for pair discovery
+                deployer = cfg.get('deployer') or cfg.get('registry')
+                if deployer and deployer.startswith('0x'):
+                    csu_info['registry'] = deployer
+                    csu_info['contract_type'] = 'fraxlend_deployer'
+
             # Only add if we have a valid address/registry
-            if 'address' in csu_info or 'registry' in csu_info:
+            if 'address' in csu_info or 'registry' in csu_info or 'addresses' in csu_info:
                 csus.append(csu_info)
 
     return csus
@@ -287,11 +416,21 @@ def get_csus_for_chain(chain: str, csu_config: Dict) -> List[Dict]:
 # =============================================================================
 
 def resolve_aave_pool(web3: Web3, registry: str) -> str:
-    """Get Pool address from PoolAddressesProvider."""
-    abi = [{"inputs": [], "name": "getPool", "outputs": [{"type": "address"}], "stateMutability": "view", "type": "function"}]
+    """Get Pool address from PoolAddressesProvider (V2 or V3)."""
     registry = Web3.to_checksum_address(registry)
-    provider = web3.eth.contract(address=registry, abi=abi)
-    return Web3.to_checksum_address(provider.functions.getPool().call())
+
+    # Try Aave V3 getPool() first
+    abi_v3 = [{"inputs": [], "name": "getPool", "outputs": [{"type": "address"}], "stateMutability": "view", "type": "function"}]
+    try:
+        provider = web3.eth.contract(address=registry, abi=abi_v3)
+        return Web3.to_checksum_address(provider.functions.getPool().call())
+    except Exception:
+        pass
+
+    # Fall back to Aave V2 getLendingPool()
+    abi_v2 = [{"inputs": [], "name": "getLendingPool", "outputs": [{"type": "address"}], "stateMutability": "view", "type": "function"}]
+    provider = web3.eth.contract(address=registry, abi=abi_v2)
+    return Web3.to_checksum_address(provider.functions.getLendingPool().call())
 
 
 def resolve_compound_v2_markets(web3: Web3, comptroller: str) -> List[str]:
@@ -329,6 +468,47 @@ def resolve_gearbox_facades(web3: Web3, address_provider: str) -> List[str]:
     return facades
 
 
+def resolve_euler_v2_vaults(web3: Web3, factory: str) -> List[str]:
+    """Discover all EVault proxy addresses from Euler V2 GenericFactory."""
+    len_abi = [{"inputs": [], "name": "getProxyListLength", "outputs": [{"type": "uint256"}], "stateMutability": "view", "type": "function"}]
+    slice_abi = [{"inputs": [{"type": "uint256"}, {"type": "uint256"}], "name": "getProxyListSlice", "outputs": [{"type": "address[]"}], "stateMutability": "view", "type": "function"}]
+
+    factory = Web3.to_checksum_address(factory)
+    factory_contract = web3.eth.contract(address=factory, abi=len_abi + slice_abi)
+
+    total = factory_contract.functions.getProxyListLength().call()
+    print(f"    Euler V2 factory: {total} vaults deployed")
+
+    # Fetch in batches of 100
+    vaults = []
+    batch_size = 100
+    for start in range(0, total, batch_size):
+        end = min(start + batch_size, total)
+        batch = factory_contract.functions.getProxyListSlice(start, end).call()
+        vaults.extend([Web3.to_checksum_address(v) for v in batch])
+
+    return vaults
+
+
+def resolve_fraxlend_pairs(web3: Web3, deployer: str) -> List[str]:
+    """Discover all FraxlendPair addresses from FraxlendPairDeployer."""
+    abi = [{"inputs": [], "name": "getAllPairAddresses", "outputs": [{"type": "address[]"}], "stateMutability": "view", "type": "function"}]
+    deployer = Web3.to_checksum_address(deployer)
+    contract = web3.eth.contract(address=deployer, abi=abi)
+    pairs = contract.functions.getAllPairAddresses().call()
+    print(f"    Fraxlend deployer: {len(pairs)} pairs")
+    return [Web3.to_checksum_address(p) for p in pairs]
+
+
+def resolve_silo_v2_silos(web3: Web3, factory: str) -> List[str]:
+    """Discover Silo V2 silo addresses from SiloFactory."""
+    # Silo V2 uses a hook-based liquidation via PartialLiquidation contract
+    # The factory can enumerate silos, but the liquidation events come from
+    # the PartialLiquidation hook contract, not the silos themselves.
+    # For now, return the factory as a catch-all (events will be filtered by topic0)
+    return [Web3.to_checksum_address(factory)]
+
+
 def resolve_contracts(web3: Web3, csu_info: Dict) -> List[str]:
     """Resolve contract addresses for a CSU."""
     contract_type = csu_info.get('contract_type')
@@ -337,6 +517,11 @@ def resolve_contracts(web3: Web3, csu_info: Dict) -> List[str]:
         if contract_type == 'single':
             addr = csu_info.get('address')
             return [Web3.to_checksum_address(addr)] if addr else []
+
+        elif contract_type == 'multi':
+            # Multiple known addresses (e.g., static vault list)
+            addresses = csu_info.get('addresses', [])
+            return [Web3.to_checksum_address(a) for a in addresses]
 
         elif contract_type == 'pool_provider':
             pool = resolve_aave_pool(web3, csu_info['registry'])
@@ -349,6 +534,17 @@ def resolve_contracts(web3: Web3, csu_info: Dict) -> List[str]:
         elif contract_type == 'gearbox_provider':
             facades = resolve_gearbox_facades(web3, csu_info['registry'])
             return facades
+
+        elif contract_type == 'euler_factory':
+            vaults = resolve_euler_v2_vaults(web3, csu_info['registry'])
+            return vaults
+
+        elif contract_type == 'fraxlend_deployer':
+            pairs = resolve_fraxlend_pairs(web3, csu_info['registry'])
+            return pairs
+
+        elif contract_type == 'silo_factory':
+            return resolve_silo_v2_silos(web3, csu_info['registry'])
 
     except Exception as e:
         print(f"  Warning: Failed to resolve contracts for {csu_info['csu']}: {e}")
@@ -365,6 +561,16 @@ def decode_liquidation_event(web3: Web3, log: Dict, event_sig: EventSignature, c
     topics = log['topics']
     data = log['data']
     data_bytes = bytes.fromhex(data[2:]) if isinstance(data, str) else data
+
+    # Resolve ambiguous signatures: if topic count doesn't match expected indexed params,
+    # try alternate signatures with same topic0 (e.g., Venus has 0 indexed params)
+    n_topics = len(topics) - 1  # subtract topic[0] (event sig hash)
+    if n_topics != len(event_sig.indexed_params):
+        topic0 = topics[0].hex() if isinstance(topics[0], bytes) else topics[0]
+        for alt_sig in _TOPIC0_GROUPS.get(topic0, []):
+            if len(alt_sig.indexed_params) == n_topics:
+                event_sig = alt_sig
+                break
 
     result = {
         'tx_hash': log['transactionHash'].hex() if isinstance(log['transactionHash'], bytes) else log['transactionHash'],
@@ -398,11 +604,11 @@ def decode_liquidation_event(web3: Web3, log: Dict, event_sig: EventSignature, c
 
         chunk = data_bytes[offset:offset + 32]
 
-        # Check for boolean first (receive_a_token)
-        if 'receive_a_token' in param_name:
+        # Check for boolean first (receive_a_token, receive_s_token)
+        if param_name.startswith('receive_') and param_name.endswith('_token'):
             result[param_name] = bool(int.from_bytes(chunk, 'big'))
         # Then check for addresses
-        elif param_name in ['liquidator', 'to', 'absorber'] or (
+        elif param_name in ['liquidator', 'borrower', 'to', 'absorber', 'collateral'] or (
             'token' in param_name.lower() and 'receive' not in param_name.lower()
         ):
             result[param_name] = web3.to_checksum_address('0x' + chunk.hex()[-40:])
@@ -528,19 +734,33 @@ def load_block_cache(chain: str, start_date: str, end_date: str) -> Dict[str, Di
 # UNIFIED SCANNER
 # =============================================================================
 
-def setup_web3_for_chain(chain: str) -> Tuple[Web3, Optional[str]]:
-    """Setup Web3 instance with appropriate middleware."""
+def setup_web3_for_chain(chain: str, max_attempts: int = 20) -> Tuple[Web3, Optional[str]]:
+    """Setup Web3 instance with appropriate middleware. Retries across providers."""
     rpc_chain = CHAIN_ALIASES.get(chain, chain)
-    w3, key_name, _ = get_web3_with_info(rpc_chain)
 
-    if chain in POA_CHAINS and geth_poa_middleware:
+    key_name = "unknown"
+    for attempt in range(max_attempts):
         try:
-            if hasattr(w3, 'middleware_onion'):
-                w3.middleware_onion.inject(geth_poa_middleware, layer=0)
-        except Exception:
-            pass
+            w3, key_name, _ = get_web3_with_info(rpc_chain)
 
-    return w3, key_name
+            if chain in POA_CHAINS and geth_poa_middleware:
+                try:
+                    if hasattr(w3, 'middleware_onion'):
+                        w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+                except Exception:
+                    pass
+
+            # Verify connection works
+            _ = w3.eth.block_number
+            return w3, key_name
+        except Exception as e:
+            if attempt < max_attempts - 1:
+                print(f"  Provider attempt {attempt+1} failed ({key_name}): {e}")
+                time.sleep(1)
+            else:
+                raise RuntimeError(f"All {max_attempts} provider attempts failed for {chain}: {e}")
+
+    raise RuntimeError(f"Could not connect to {chain}")
 
 
 def scan_chain_liquidations(
@@ -554,6 +774,7 @@ def scan_chain_liquidations(
     save_interval: int = 100,  # Save checkpoint every 100 chunks
     status_interval: int = 500,  # Print status every N chunks
     provider_rotation_interval: int = 50,  # Rotate provider every N chunks (more frequent)
+    rpc_chain: str = None,  # Real chain name for RPC (if different from output chain)
 ) -> int:
     """
     Scan a chain for liquidation events and save incrementally.
@@ -561,7 +782,8 @@ def scan_chain_liquidations(
     Returns:
         Total number of events collected
     """
-    w3, current_provider = setup_web3_for_chain(chain)
+    rpc_chain = rpc_chain or chain
+    w3, current_provider = setup_web3_for_chain(rpc_chain)
     chunks_since_rotation = 0
 
     total_blocks = to_block - from_block + 1
@@ -604,16 +826,16 @@ def scan_chain_liquidations(
         # Rotate provider periodically to distribute load
         chunks_since_rotation += 1
         if chunks_since_rotation >= provider_rotation_interval:
-            w3, current_provider = setup_web3_for_chain(chain)
+            w3, current_provider = setup_web3_for_chain(rpc_chain)
             chunks_since_rotation = 0
 
         # Check backoff
-        is_backing, remaining = is_chain_backing_off(chain)
+        is_backing, remaining = is_chain_backing_off(rpc_chain)
         if is_backing:
             print(f"  Chain in backoff, waiting {remaining:.0f}s...")
             time.sleep(remaining + 1)
             # Get fresh provider after backoff
-            w3, current_provider = setup_web3_for_chain(chain)
+            w3, current_provider = setup_web3_for_chain(rpc_chain)
 
         chunk_events = []
 
@@ -682,14 +904,17 @@ def scan_chain_liquidations(
                 is_block_range = 'block range' in error_msg or '10 block range' in error_msg
 
                 if is_rate_limit:
-                    report_rpc_error(chain, str(e))
+                    report_rpc_error(rpc_chain, str(e))
                     # Rotate to a different provider on rate limit
-                    w3, current_provider = setup_web3_for_chain(chain)
+                    w3, current_provider = setup_web3_for_chain(rpc_chain)
 
                 if is_block_range:
-                    print(f"  ERROR: Block range too large. Alchemy free tier limits to 10 blocks.")
-                    print(f"  Reduce --chunk-size to 10 or upgrade your RPC plan.")
-                    return total_events
+                    # Auto-reduce chunk size
+                    chunk_size = max(chunk_size // 2, 1)
+                    print(f"  Block range too large, reducing chunk_size to {chunk_size}")
+                    chunk_end = min(current + chunk_size - 1, to_block)
+                    total_chunks = (to_block - current + chunk_size) // chunk_size
+                    continue
                 elif is_rate_limit and attempt < max_retries - 1:
                     wait_time = min(2 ** attempt + 1, 15)  # 2, 3, 5, 9, 15 seconds
                     print(f"  Rate limit on [{current:,}, {chunk_end:,}], rotating provider & waiting {wait_time}s...")
@@ -697,14 +922,14 @@ def scan_chain_liquidations(
                 elif 'connection' in error_msg or 'remote' in error_msg or 'timeout' in error_msg:
                     # Connection error - wait briefly and rotate
                     print(f"  Connection error on [{current:,}, {chunk_end:,}], rotating provider...")
-                    w3, current_provider = setup_web3_for_chain(chain)
+                    w3, current_provider = setup_web3_for_chain(rpc_chain)
                     time.sleep(2)  # Brief cooldown
                     if attempt >= max_retries - 1:
                         break
                 else:
                     print(f"  Failed [{current:,}, {chunk_end:,}]: {e}")
                     # Try rotating provider even on other errors
-                    w3, current_provider = setup_web3_for_chain(chain)
+                    w3, current_provider = setup_web3_for_chain(rpc_chain)
                     time.sleep(1)
                     break
 
@@ -790,19 +1015,55 @@ def main():
     parser.add_argument('--chain', required=True, help='Chain to scan')
     parser.add_argument('--start-date', required=True, help='Start date (YYYY-MM-DD)')
     parser.add_argument('--end-date', required=True, help='End date (YYYY-MM-DD)')
-    parser.add_argument('--chunk-size', type=int, default=10, help='Blocks per API call (Alchemy free tier: max 10)')
+    parser.add_argument('--chunk-size', type=int, default=None,
+                       help='Blocks per API call (auto-set from CHAIN_BLOCK_LIMITS if omitted)')
+    parser.add_argument('--pace', type=float, default=0.0, help='Seconds between API calls (0 for dRPC paid, 0.25 for rate-limited)')
+    parser.add_argument('--provider', type=str, default=None,
+                       help='Restrict RPC pool to a single provider (e.g. drpc, alchemy, blockpi)')
     parser.add_argument('--status-interval', type=int, default=500, help='Print status every N chunks (default: 500)')
-    parser.add_argument('--force', action='store_true', help='Force restart (ignore checkpoint)')
+    # --force removed: previously wiped checkpoint data on accident
     parser.add_argument('--dry-run', action='store_true', help='Show what would be scanned')
+    parser.add_argument('--csu-filter', nargs='+', default=None,
+                       help='Only collect for specific CSU names (uses separate checkpoint/output)')
+    parser.add_argument('--output-suffix', default=None,
+                       help='Suffix for output dir (e.g. "new" → data/bronze/liquidations/ethereum_new/)')
 
     args = parser.parse_args()
     chain = args.chain
+
+    # Auto-set chunk_size from per-chain limits if not explicitly provided
+    if args.chunk_size is None:
+        args.chunk_size = CHAIN_BLOCK_LIMITS.get(chain, DEFAULT_BLOCK_LIMIT)
+
+    # Filter RPC pool to a single provider if requested
+    if args.provider:
+        pool = get_pool(chain)
+        before = len(pool.endpoints)
+        pool.endpoints = [e for e in pool.endpoints if e.provider == args.provider]
+        pool.current_idx = 0
+        print(f"[Provider filter] Restricted {chain} pool to '{args.provider}': {before} → {len(pool.endpoints)} endpoints")
+        if not pool.endpoints:
+            print(f"ERROR: No endpoints for provider '{args.provider}' on chain '{chain}'")
+            return
+
+    # Determine output chain name (for separate output when using --csu-filter)
+    output_chain = chain
+    if args.output_suffix:
+        output_chain = f"{chain}_{args.output_suffix}"
+    elif args.csu_filter:
+        output_chain = f"{chain}_new"
 
     print("=" * 80)
     print("Unified Multi-Protocol Liquidation Collector")
     print("=" * 80)
     print(f"Chain: {chain}")
     print(f"Date range: {args.start_date} to {args.end_date}")
+    print(f"Chunk size: {args.chunk_size:,} blocks (limit for {chain})")
+    if args.provider:
+        print(f"Provider: {args.provider} only")
+    if args.csu_filter:
+        print(f"CSU filter: {', '.join(args.csu_filter)}")
+        print(f"Output dir: data/bronze/liquidations/{output_chain}/")
 
     # Load CSU config (single source of truth)
     print("\nLoading CSU configuration...")
@@ -813,6 +1074,14 @@ def main():
     if not csus:
         print(f"No configured CSUs for chain: {chain}")
         return
+
+    # Apply CSU filter if specified
+    if args.csu_filter:
+        filter_set = set(args.csu_filter)
+        csus = [c for c in csus if c['csu'] in filter_set]
+        if not csus:
+            print(f"No matching CSUs for filter: {args.csu_filter}")
+            return
 
     print(f"Found {len(csus)} CSUs for {chain}:")
     for csu in csus:
@@ -842,9 +1111,9 @@ def main():
     from_block = block_cache[args.start_date]['block']
     to_block = block_cache[args.end_date]['block']
 
-    # Check checkpoint for resume
-    checkpoint = load_checkpoint(chain)
-    if checkpoint and not args.force:
+    # Check checkpoint for resume (uses output_chain for isolation)
+    checkpoint = load_checkpoint(output_chain)
+    if checkpoint:
         last_block = checkpoint.get('last_block', 0)
         if last_block >= from_block and last_block < to_block:
             print(f"\nResuming from checkpoint: block {last_block:,}")
@@ -853,7 +1122,6 @@ def main():
         elif last_block >= to_block:
             print(f"\nCheckpoint shows collection complete for this range")
             print(f"  Total events: {checkpoint.get('total_events', 0)}")
-            print("Use --force to re-collect")
             return
 
     print(f"\nBlock range: [{from_block:,}, {to_block:,}] ({to_block - from_block + 1:,} blocks)")
@@ -888,22 +1156,24 @@ def main():
             print(f"  {csu}: {len(addrs)} contract(s)")
         return
 
-    # Scan for liquidations
+    # Scan for liquidations (uses output_chain for isolated output)
     print("\n" + "=" * 80)
     print("Starting scan...")
     print("=" * 80)
 
     total_events = scan_chain_liquidations(
-        chain=chain,
+        chain=output_chain,
         from_block=from_block,
         to_block=to_block,
         contracts=contracts,
         chunk_size=args.chunk_size,
+        pace_seconds=args.pace,
         status_interval=args.status_interval,
+        rpc_chain=chain,
     )
 
     # Final output location reminder
-    print(f"📁 Output saved to: {get_chain_output_dir(chain)}/events.jsonl")
+    print(f"📁 Output saved to: {get_chain_output_dir(output_chain)}/events.jsonl")
 
 
 if __name__ == '__main__':

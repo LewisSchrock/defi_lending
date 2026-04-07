@@ -29,10 +29,12 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 from typing import Dict, List, Tuple, Optional, Set
 import yaml
+from web3 import Web3
 from config.rpc_pool_v2 import get_web3_with_info, blacklist_key, report_rpc_error, is_chain_backing_off
 
 # Import TVL adapters
 from adapters.tvl.aave_v3 import get_aave_v3_tvl
+from adapters.tvl.aave_v2 import get_aave_v2_tvl
 from adapters.tvl.compound_v3 import get_compound_v3_tvl
 from adapters.tvl.compound_v2_style import (
     get_compound_style_tvl,
@@ -49,6 +51,8 @@ from adapters.tvl.cap import get_cap_tvl
 from adapters.tvl.lista import get_lista_tvl
 from adapters.tvl.venus import get_venus_tvl
 from adapters.tvl.layerbank import get_layerbank_tvl
+from adapters.tvl.morpho import get_morpho_tvl
+from adapters.tvl.euler_v2 import get_euler_v2_tvl
 
 # Import POA middleware
 try:
@@ -60,22 +64,30 @@ except ImportError:
         geth_poa_middleware = None
 
 # Chain configurations
-POA_CHAINS = ['binance', 'polygon', 'gnosis', 'avalanche', 'optimism', 'linea', 'scroll', 'xdai']
+POA_CHAINS = ['binance', 'polygon', 'gnosis', 'avalanche', 'optimism', 'linea', 'scroll', 'xdai',
+              'sonic', 'cronos', 'meter', 'flare', 'celo', 'blast', 'manta', 'fantom']
 CHAIN_ALIASES = {
     'xdai': 'gnosis',
 }
 
 # Adapter mapping
+# Key format: protocol name (from csu_config.yaml) -> adapter function
+# For protocols with version-specific adapters, use "protocol_version" key
 ADAPTER_MAP = {
-    'aave': get_aave_v3_tvl,
+    # Aave V3 and forks
+    'aave': get_aave_v3_tvl,           # Default for Aave (V3)
+    'aave_v2': get_aave_v2_tvl,        # Aave V2 (getLendingPool pattern)
+    'sparklend': get_aave_v3_tvl,      # SparkLend is an Aave V3 fork
+    'tydro': get_aave_v3_tvl,          # Tydro is an Aave V3 fork
+    'zerolend': get_aave_v3_tvl,       # ZeroLend is an Aave V3 fork
+    'pac': get_aave_v3_tvl,            # PAC Finance is an Aave V3 fork
+    'seamless': get_aave_v3_tvl,       # Seamless is an Aave V3 fork
+    'radiant': get_aave_v2_tvl,        # Radiant V2 is an Aave V2 fork (getLendingPool pattern)
+    # Compound V3
     'compound': get_compound_v3_tvl,
+    # Compound V2 and forks
     'compound_v2': get_compound_style_tvl,
-    'fluid': get_fluid_tvl,
-    'gearbox': get_gearbox_tvl,
-    'cap': get_cap_tvl,
-    'lista': get_lista_tvl,
     'venus': get_venus_tvl,
-    'sparklend': get_aave_v3_tvl,  # SparkLend is an Aave V3 fork
     'benqi': get_benqi_tvl,
     'moonwell': get_moonwell_tvl,
     'kinetic': get_kinetic_tvl,
@@ -85,8 +97,17 @@ ADAPTER_MAP = {
     'lodestar': get_compound_style_tvl,
     'sonne': get_compound_style_tvl,
     'keom': get_compound_style_tvl,
+    'cream': get_compound_style_tvl,   # Cream Finance is a Compound V2 fork
+    'ironbank': get_compound_style_tvl, # Iron Bank is a Compound V2 fork
     'layerbank': get_layerbank_tvl,
-    'tydro': get_aave_v3_tvl,
+    # Other protocols
+    'fluid': get_fluid_tvl,
+    'gearbox': get_gearbox_tvl,
+    'cap': get_cap_tvl,
+    'lista': get_lista_tvl,
+    # New protocol architectures
+    'morpho': get_morpho_tvl,           # Morpho Blue singleton
+    'euler': get_euler_v2_tvl,          # Euler V2 factory-based
 }
 
 # Bronze data directory
@@ -296,14 +317,15 @@ def is_retryable_error(error_str: str) -> bool:
         'Service Unavailable',
         'timeout',
         'timed out',
+        "return data: b''",  # Empty RPC response - retry with different endpoint
     ]
     error_lower = error_str.lower()
     return any(pattern.lower() in error_lower for pattern in retryable_patterns)
 
 
 def is_auth_error(error_str: str) -> bool:
-    """Check if error is an authentication/authorization error (401)."""
-    return '401' in error_str or 'Unauthorized' in error_str
+    """Check if error is an authentication/authorization error (401/403)."""
+    return '401' in error_str or '403' in error_str or 'Unauthorized' in error_str or 'Forbidden' in error_str
 
 
 def collect_tvl_snapshot_with_retry(
@@ -348,12 +370,13 @@ def collect_tvl_snapshot_with_retry(
         if data is not None:
             return result
 
-        # Check for 401 Unauthorized - blacklist the key
+        # Check for 401/403 auth errors - blacklist the provider and RETRY with next endpoint
         if error and is_auth_error(error):
-            # We need to figure out which key was used
-            # The error message from requests often contains the URL
-            # For now, just log and don't retry 401s
-            print(f"  ⚠️  Auth error detected for {chain}. Check your API keys.")
+            # Report error to trigger backoff on the failing endpoint
+            report_rpc_error(chain, error)
+            if attempt < max_retries:
+                time.sleep(0.5)
+                continue
             return result
 
         # Check if error is retryable
@@ -395,12 +418,24 @@ def collect_tvl_snapshot(
     """
     try:
         chain = csu_config['chain']
-        registry = csu_config['registry']
+        # Support both 'registry' and 'factory' config keys
+        registry = csu_config.get('registry') or csu_config.get('factory', '')
         block_number = block_info['block']
         protocol = csu_config.get('protocol', '')
 
-        # Get a fresh Web3 instance with key info
-        w3, key_name = setup_web3_for_chain(chain)
+        # Get a fresh Web3 instance - prefer direct RPC if specified in config
+        direct_rpc = csu_config.get('rpc', '')
+        if direct_rpc:
+            w3 = Web3(Web3.HTTPProvider(direct_rpc))
+            if chain in POA_CHAINS and geth_poa_middleware:
+                try:
+                    if hasattr(w3, 'middleware_onion'):
+                        w3.middleware_onion.inject(geth_poa_middleware, layer=0)
+                except Exception:
+                    pass
+            key_name = None
+        else:
+            w3, key_name = setup_web3_for_chain(chain)
 
         # Get appropriate adapter
         adapter = get_adapter_for_csu(csu_config)
@@ -411,7 +446,17 @@ def collect_tvl_snapshot(
         try:
             if protocol.lower() == 'lista':
                 vault_addresses = csu_config.get('vaults', [])
-                tvl_data = adapter(w3, registry, vault_addresses, block_number)
+                if vault_addresses:
+                    # Standard Lista: vault-based market discovery
+                    tvl_data = adapter(w3, registry, vault_addresses, block_number)
+                else:
+                    # Lista on chains without vault lists: use Morpho-style
+                    # event-based discovery (same singleton contract pattern)
+                    tvl_data = get_morpho_tvl(w3, registry, block_number)
+            elif protocol.lower() == 'euler':
+                # Euler V2: pass factory address for vault discovery
+                factory = csu_config.get('factory') or registry
+                tvl_data = adapter(w3, factory, block_number)
             else:
                 tvl_data = adapter(w3, registry, block_number)
         except Exception as e:

@@ -57,10 +57,67 @@ REFERENCE_DIR = DATA_DIR / "reference"
 # Protocols to exclude from silver pipeline
 EXCLUDED_PROTOCOLS = {'gearbox'}
 
+# --- Contract-address filtering for LiquidationCall emitters ---
+# All protocols sharing the LiquidationCall topic0 (0xe413a321...)
+# Maps (contract_address_lowercase, chain) → (csu_name, protocol_override)
+# Imported from parse_raw_liquidations for consistency
+try:
+    from scripts.parse_raw_liquidations import LIQUIDATION_CALL_POOL_TO_CSU
+except ImportError:
+    # Inline copy if import fails (standalone execution)
+    LIQUIDATION_CALL_POOL_TO_CSU = {
+        # Aave V2 Pools
+        ("0x7d2768de32b0b80b7a3454c06bdac94a69ddc7a9", "ethereum"): ("aave_v2_ethereum", "aave_v2"),
+        ("0x8dff5e27ea6b7ac08ebfdf9eb090f32ee9a30fcf", "polygon"):  ("aave_v2_polygon", "aave_v2"),
+        ("0x4f01aed16d97e3ab5ab2b501154dc9bb0f1a5a2c", "avalanche"): ("aave_v2_avalanche", "aave_v2"),
+        # SparkLend
+        ("0xc13e21b648a5ee794902342038ff3adab66be987", "ethereum"): ("sparklend_ethereum", "sparklend"),
+        ("0x2dae5307c5e3fd1cf5a72cb6f698f915860607e0", "gnosis"):   ("sparklend_gnosis", "sparklend"),
+        # Tydro
+        ("0x2816cf15f6d2a220e789aa011d5ee4eb6c47feba", "ink"): ("tydro_ink", "tydro"),
+        # ZeroLend
+        ("0x3bc3d34c32cc98bf098d832364df8a222bbab4c0", "ethereum"): ("zerolend_ethereum", "zerolend"),
+        ("0x2f9bb73a8e98793e26cb2f6c4ad037bdf1c6b269", "linea"):    ("zerolend_linea", "zerolend"),
+        ("0xa70b0f3c2470abbe104bdb3f3aaa9c7c54bea7a8", "blast"):    ("zerolend_blast", "zerolend"),
+        ("0x4d9429246ea989c9cee203b43f6d1c7d83e3b8f8", "zksync"):   ("zerolend_zksync", "zerolend"),
+        ("0x766f21277087e18967c1b10bf602d8fe56d0c671", "base"):     ("zerolend_base", "zerolend"),
+        # Seamless
+        ("0x8f44fd754285aa6a2b8b9b97739b79746e0475a7", "base"): ("seamless_base", "seamless"),
+        # PAC Finance
+        ("0xd2499b3c8611e36ca89a70fda2a72c49ee19eaa8", "blast"): ("pac_blast", "pac"),
+    }
+
 # Chain name aliases (bronze dir name → RPC pool name)
 CHAIN_ALIASES = {
     'bsc': 'binance',
     'xdai': 'gnosis',
+}
+
+# Compound V3 base token addresses (CSU name → base token address)
+# Base token is the borrowable asset in each Comet market
+COMPOUND_V3_BASE_TOKENS = {
+    # Ethereum
+    'compound_v3_eth_usdc':   '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',  # USDC
+    'compound_v3_eth_weth':   '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',  # WETH
+    'compound_v3_eth_usdt':   '0xdAC17F958D2ee523a2206206994597C13D831ec7',  # USDT
+    'compound_v3_eth_wsteth': '0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0',  # wstETH
+    'compound_v3_eth_usds':   '0xdC035D45d973E3EC169d2276DDab16f1e407384F',  # USDS
+    # Arbitrum
+    'compound_v3_arb_usdc':   '0xaf88d065e77c8cC2239327C5EDb3A432268e5831',  # USDC
+    'compound_v3_arb_usdc_e': '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',  # USDC.e (bridged)
+    'compound_v3_arb_weth':   '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',  # WETH
+    'compound_v3_arb_usdt':   '0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9',  # USDT
+    # Base
+    'compound_v3_base_usdc':  '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',  # USDC
+    'compound_v3_base_usdbc': '0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA',  # USDbC (bridged)
+    'compound_v3_base_weth':  '0x4200000000000000000000000000000000000006',  # WETH
+    'compound_v3_base_aero':  '0x940181a94A35A4569E4529A3CDfB74e38FD98631',  # AERO
+    # Optimism
+    'compound_v3_op_usdc':    '0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85',  # USDC
+    'compound_v3_op_usdt':    '0x94b008aA00579c1307B0EF2c499aD98a8ce58e58',  # USDT
+    'compound_v3_op_weth':    '0x4200000000000000000000000000000000000006',  # WETH
+    # Polygon
+    'compound_v3_poly_usdc':  '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359',  # USDC (native)
 }
 
 # ERC20 ABI for token metadata
@@ -90,6 +147,51 @@ def load_bronze_events(chain: str) -> List[dict]:
     return events
 
 
+def re_resolve_csu(events: List[dict], chain: str) -> List[dict]:
+    """
+    Re-resolve CSU and protocol fields based on contract address.
+
+    Bronze data may have incorrect CSU assignments because all LiquidationCall
+    events (Aave V2, V3, SparkLend, ZeroLend, etc.) share the same topic0.
+    This step overrides the CSU using the known contract-to-CSU mapping.
+    """
+    corrected = 0
+    for e in events:
+        contract = (e.get('contract') or e.get('contract_address', '')).lower()
+        key = (contract, chain)
+        if key in LIQUIDATION_CALL_POOL_TO_CSU:
+            new_csu, new_protocol = LIQUIDATION_CALL_POOL_TO_CSU[key]
+            if e.get('csu') != new_csu:
+                corrected += 1
+            e['csu'] = new_csu
+            e['protocol'] = new_protocol
+    if corrected:
+        print(f"  Re-resolved {corrected} events to correct CSU via contract-address filtering")
+    return events
+
+
+def deduplicate_events(events: List[dict]) -> List[dict]:
+    """
+    Remove exact duplicate rows (same-CSU duplicates from overlapping fetches).
+
+    Uses (tx_hash, log_index, csu) as the dedup key. Cross-CSU duplicates
+    (same tx_hash + log_index but different CSU) are expected and kept.
+    """
+    seen = set()
+    deduped = []
+    dups = 0
+    for e in events:
+        key = (e.get('tx_hash'), e.get('log_index'), e.get('csu'))
+        if key in seen:
+            dups += 1
+            continue
+        seen.add(key)
+        deduped.append(e)
+    if dups:
+        print(f"  Removed {dups} same-CSU duplicate events")
+    return deduped
+
+
 def join_compound_events(events: List[dict]) -> List[dict]:
     """
     Join Compound v3 AbsorbDebt and AbsorbCollateral events.
@@ -117,9 +219,11 @@ def join_compound_events(events: List[dict]) -> List[dict]:
             other_events.append(e)
 
     # Index collateral events by (tx_hash, borrower)
+    # Normalize borrower to lowercase for case-insensitive matching
     collateral_by_key = defaultdict(list)
     for e in compound_collateral:
-        key = (e.get('tx_hash'), e.get('borrower'))
+        borrower = e.get('borrower', '').lower() if e.get('borrower') else None
+        key = (e.get('tx_hash'), borrower)
         collateral_by_key[key].append(e)
 
     # Join debt events with their collateral events
@@ -127,7 +231,8 @@ def join_compound_events(events: List[dict]) -> List[dict]:
     unmatched_debt = 0
 
     for debt_event in compound_debt:
-        key = (debt_event.get('tx_hash'), debt_event.get('borrower'))
+        borrower = debt_event.get('borrower', '').lower() if debt_event.get('borrower') else None
+        key = (debt_event.get('tx_hash'), borrower)
         collateral_matches = collateral_by_key.get(key, [])
 
         if collateral_matches:
@@ -148,7 +253,7 @@ def join_compound_events(events: List[dict]) -> List[dict]:
                     # not 'collateral_asset' and 'collateral_absorbed_raw'. Check both field names.
                     'collateral_asset': coll_event.get('collateral_asset') or coll_event.get('asset'),
                     'collateral_seized_raw': coll_event.get('collateral_absorbed_raw') or coll_event.get('collateral_raw'),
-                    'debt_asset': None,  # Compound v3 base asset determined by market
+                    'debt_asset': COMPOUND_V3_BASE_TOKENS.get(debt_event.get('csu')),  # Base token from market CSU
                     'debt_repaid_raw': debt_event.get('base_paid_out_raw'),
                     # Keep USD values if present
                     'collateral_usd_raw': coll_event.get('usd_value_raw'),
@@ -171,7 +276,7 @@ def join_compound_events(events: List[dict]) -> List[dict]:
                 'liquidator': debt_event.get('absorber'),
                 'collateral_asset': None,
                 'collateral_seized_raw': None,
-                'debt_asset': None,
+                'debt_asset': COMPOUND_V3_BASE_TOKENS.get(debt_event.get('csu')),  # Base token from market CSU
                 'debt_repaid_raw': debt_event.get('base_paid_out_raw'),
                 'debt_usd_raw': debt_event.get('usd_value_raw'),
             }
@@ -194,7 +299,7 @@ def normalize_event(event: dict, chain: str) -> dict:
         'tx_hash': event.get('tx_hash'),
         'log_index': event.get('log_index'),
         'block_number': event.get('block_number'),
-        'block_timestamp': event.get('block_timestamp'),
+        'block_timestamp': event.get('block_timestamp') or event.get('timestamp'),
         'chain': chain,
         'protocol': protocol,
         'csu': event.get('csu'),
@@ -203,7 +308,9 @@ def normalize_event(event: dict, chain: str) -> dict:
     }
 
     # Protocol-specific field mapping
-    if 'aave' in protocol or 'spark' in protocol:
+    # All Aave-family protocols (V2, V3, and forks) share the same LiquidationCall event
+    AAVE_FAMILY = ('aave', 'spark', 'zerolend', 'seamless', 'pac', 'tydro', 'radiant')
+    if any(p in protocol for p in AAVE_FAMILY):
         normalized['collateral_asset'] = event.get('collateral_asset')
         normalized['collateral_seized_raw'] = event.get('collateral_seized_raw')
         normalized['debt_asset'] = event.get('debt_asset')
@@ -218,20 +325,61 @@ def normalize_event(event: dict, chain: str) -> dict:
         normalized['collateral_usd_raw'] = event.get('collateral_usd_raw')
         normalized['debt_usd_raw'] = event.get('debt_usd_raw')
     elif 'compound_v2' in protocol or 'venus' in protocol or 'benqi' in protocol or 'moonwell' in protocol:
-        # FIX: Compound V2-style forks emit LiquidateBorrow with different field names
+        # Compound V2-style forks emit LiquidateBorrow with different field names
         # The parallel collector outputs: ctoken_collateral, repay_amount_raw, seize_tokens_raw
-        # The cToken that emitted the event is the debt market (contract_address)
+        # Also handles: cream, ironbank, layerbank, mendi, lodestar, sonne, keom
         normalized['collateral_asset'] = event.get('collateral_asset') or event.get('ctoken_collateral')
         normalized['collateral_seized_raw'] = event.get('collateral_seized_raw') or event.get('seize_tokens_raw')
         normalized['debt_asset'] = event.get('debt_asset') or event.get('contract_address')
         normalized['debt_repaid_raw'] = event.get('debt_repaid_raw') or event.get('repay_amount_raw')
     elif 'fluid' in protocol:
-        # FIX: Fluid events use 'debt_token' and 'collateral_token' (not 'debt_asset'/'collateral_asset')
-        # Map to unified schema
+        # Fluid events use 'debt_token' and 'collateral_token'
         normalized['collateral_asset'] = event.get('collateral_asset') or event.get('collateral_token')
         normalized['collateral_seized_raw'] = event.get('collateral_seized_raw')
         normalized['debt_asset'] = event.get('debt_asset') or event.get('debt_token')
         normalized['debt_repaid_raw'] = event.get('debt_repaid_raw')
+    elif 'morpho' in protocol or 'lista' in protocol:
+        # Morpho Blue / Lista: singleton contract, market-based
+        # Event: Liquidate(bytes32 market_id, address caller, address borrower,
+        #                   uint256 repaid_assets, uint256 repaid_shares,
+        #                   uint256 seized_assets, uint256 bad_debt_assets, uint256 bad_debt_shares)
+        # Caller = liquidator, no direct token addresses in event
+        normalized['liquidator'] = event.get('caller') or event.get('liquidator')
+        normalized['collateral_seized_raw'] = event.get('seized_assets')
+        normalized['debt_repaid_raw'] = event.get('repaid_assets')
+        # Token addresses resolved later by enrichment (from market_id)
+        normalized['collateral_asset'] = None
+        normalized['debt_asset'] = None
+    elif 'euler' in protocol:
+        # Euler V2: event emitted from individual EVault contracts
+        # Event: Liquidate(address liquidator, address violator, address collateral,
+        #                   uint256 repay_assets, uint256 yield_balance)
+        # violator = borrower, collateral = collateral vault address
+        normalized['borrower'] = event.get('violator') or event.get('borrower')
+        normalized['collateral_asset'] = event.get('collateral')  # Collateral vault address
+        normalized['collateral_seized_raw'] = event.get('yield_balance')
+        normalized['debt_asset'] = event.get('contract')  # The emitting EVault is the debt market
+        normalized['debt_repaid_raw'] = event.get('repay_assets')
+    elif 'silo' in protocol:
+        # Silo V2: event emitted from PartialLiquidation hook
+        # Event: LiquidationCall(address liquidator, address silo, address borrower,
+        #                         uint256 repay_debt_assets, uint256 withdraw_collateral, bool receive_s_token)
+        normalized['collateral_seized_raw'] = event.get('withdraw_collateral')
+        normalized['debt_repaid_raw'] = event.get('repay_debt_assets')
+        # Token addresses resolved later by enrichment (from silo contract)
+        normalized['collateral_asset'] = None
+        normalized['debt_asset'] = event.get('silo')  # Silo address
+    elif 'fraxlend' in protocol:
+        # Fraxlend: event emitted from individual FraxlendPair contracts
+        # Event: Liquidate(address borrower, uint256 collateral_for_liquidator,
+        #                   uint256 shares_to_liquidate, uint256 amount_liquidator_to_repay,
+        #                   uint256 shares_to_adjust, uint256 amount_to_adjust)
+        # No liquidator address in event (msg.sender)
+        normalized['collateral_seized_raw'] = event.get('collateral_for_liquidator')
+        normalized['debt_repaid_raw'] = event.get('amount_liquidator_to_repay')
+        # Token addresses resolved later (from FraxlendPair contract)
+        normalized['collateral_asset'] = None
+        normalized['debt_asset'] = event.get('contract')  # The FraxlendPair contract
     else:
         # Generic mapping
         normalized['collateral_asset'] = event.get('collateral_asset')
@@ -506,14 +654,21 @@ def save_price_cache(chain: str, cache: Dict[str, float]):
         json.dump(cache, f, indent=2)
 
 
-# Import Chainlink adapter
+# Import unified price service (Chainlink → DefiLlama → CoinGecko → Stablecoin)
 try:
-    from adapters.prices.chainlink import get_token_price_chainlink, get_stablecoins
-    HAS_CHAINLINK = True
+    from adapters.prices.price_service import get_token_price, save_all as save_price_service_cache
+    HAS_CHAINLINK = True  # price_service includes Chainlink internally
 except ImportError:
     HAS_CHAINLINK = False
-    def get_token_price_chainlink(*args, **kwargs):
+    def get_token_price(*args, **kwargs):
         return None
+    def save_price_service_cache():
+        pass
+
+# Keep stablecoin list for backward compat
+try:
+    from adapters.prices.chainlink import get_stablecoins
+except ImportError:
     def get_stablecoins():
         return ['USDC', 'USDT', 'DAI', 'FRAX', 'LUSD', 'GHO', 'sUSD', 'PYUSD', 'USDS', 'crvUSD']
 
@@ -521,32 +676,29 @@ except ImportError:
 def get_price_for_date(w3, symbol: str, date: str, representative_block: int,
                        price_cache: Dict[str, float], chain: str = 'ethereum') -> Optional[float]:
     """
-    Get token price for a specific date using Chainlink oracle.
+    Get token price for a specific date using unified price service.
 
+    Priority: Cache → Chainlink → DefiLlama → CoinGecko → Stablecoin.
     Uses one representative block per date to minimize RPC calls.
-
-    Args:
-        chain: Chain name — used to select the correct Chainlink feed address.
     """
     if not symbol:
         return None
 
     cache_key = f"{date}_{symbol}"
 
-    # Check cache first
+    # Check local cache first
     if cache_key in price_cache:
         return price_cache[cache_key]
 
-    # Check stablecoins (assume $1.00) and cache the result
-    stablecoins = get_stablecoins()
-    if symbol in stablecoins or symbol.upper() in stablecoins:
-        price_cache[cache_key] = 1.0
-        return 1.0
-
-    # Fetch from Chainlink at representative block
-    # FIX: Was hardcoded chain='ethereum' — now uses the actual chain parameter
-    # so that Chainlink lookups use the correct feed address for each chain
-    price = get_token_price_chainlink(w3, symbol, chain=chain, block=representative_block)
+    # Use unified price service (handles stablecoins, Chainlink, DefiLlama, CoinGecko)
+    price = get_token_price(
+        token_symbol=symbol,
+        date_str=date,
+        web3=w3,
+        chain=chain,
+        block=representative_block,
+        use_api_fallback=True,
+    )
 
     if price is not None:
         price_cache[cache_key] = price
@@ -589,7 +741,7 @@ def calculate_usd_values(events: List[dict], chain: str, skip_prices: bool = Fal
     print(f"  Loaded {len(price_cache)} cached prices", flush=True)
 
     # Get web3 connection
-    w3 = get_web3(chain)
+    w3 = get_web3(CHAIN_ALIASES.get(chain, chain))
 
     # Build date -> representative_block mapping (use first block of each date)
     date_to_block = {}
@@ -636,11 +788,13 @@ def calculate_usd_values(events: List[dict], chain: str, skip_prices: bool = Fal
 
             # Progress update
             if (i + 1) % 50 == 0:
-                print(f"    Progress: {i + 1}/{len(uncached)} pairs ({fetched} Chainlink lookups)", flush=True)
+                print(f"    Progress: {i + 1}/{len(uncached)} pairs ({fetched} price lookups)", flush=True)
                 save_price_cache(chain, price_cache)
+                save_price_service_cache()
 
         save_price_cache(chain, price_cache)
-        print(f"  Fetched {fetched} prices from Chainlink ({stablecoin_count} stablecoins assumed $1)", flush=True)
+        save_price_service_cache()
+        print(f"  Fetched {fetched} prices via unified service ({stablecoin_count} stablecoins assumed $1)", flush=True)
 
     # Apply prices to events
     applied_collateral = 0
@@ -832,38 +986,46 @@ def main():
     print("="*70)
 
     # Step 1: Load bronze data
-    print("\n[1/8] Loading bronze data...")
+    print("\n[1/10] Loading bronze data...")
     events = load_bronze_events(chain)
     print(f"  Loaded {len(events):,} events (excluding Gearbox)")
 
+    # Step 1b: Re-resolve CSU via contract-address filtering
+    print("\n[2/10] Re-resolving CSU assignments via contract address...")
+    events = re_resolve_csu(events, chain)
+
+    # Step 1c: Deduplicate same-CSU duplicates
+    print("\n[3/10] Deduplicating events...")
+    events = deduplicate_events(events)
+
     # Step 2: Join Compound events
-    print("\n[2/8] Joining Compound events...")
+    print("\n[4/10] Joining Compound events...")
     events = join_compound_events(events)
 
-    # Step 3: Normalize schema
-    print("\n[3/8] Normalizing schema...")
+    # Step 5: Normalize schema
+    print("\n[5/10] Normalizing schema...")
     events = [normalize_event(e, chain) for e in events]
     print(f"  Normalized {len(events):,} events")
 
-    # Step 4: Enrich with token metadata
-    print("\n[4/8] Enriching with token metadata...")
+    # Step 6: Enrich with token metadata
+    print("\n[6/10] Enriching with token metadata...")
     events, registry = enrich_with_token_metadata(events, chain, skip_rpc=quick_mode)
 
-    # Step 5: Derive missing timestamps
-    print("\n[5/8] Deriving block timestamps...")
+    # Step 7: Derive missing timestamps
+    print("\n[7/10] Deriving block timestamps...")
     if quick_mode:
         print("  Skipping RPC timestamp derivation (quick mode)")
     else:
         events = derive_block_timestamps(events, chain)
     events = add_dates(events)
 
-    # Step 6: Calculate amounts and USD values
-    print("\n[6/8] Calculating amounts and USD values...")
+    # Step 8: Calculate amounts and USD values
+    print("\n[8/10] Calculating amounts and USD values...")
     events = calculate_amounts(events)
     events = calculate_usd_values(events, chain, skip_prices=args.skip_prices or quick_mode)
 
-    # Step 7: Validate
-    print("\n[7/8] Running validation checks...")
+    # Step 9: Validate
+    print("\n[9/10] Running validation checks...")
     warnings = validate_events(events)
     if warnings:
         print(f"  Found {len(warnings)} warnings:")
@@ -874,8 +1036,8 @@ def main():
     else:
         print("  All checks passed")
 
-    # Step 8: Export
-    print("\n[8/8] Exporting to parquet...")
+    # Step 10: Export
+    print("\n[10/10] Exporting to parquet...")
     export_to_parquet(events, chain)
 
     # Summary
