@@ -1,0 +1,99 @@
+csu,csu_denom,n_events,example_debt_symbols
+aave_v2_ethereum,aave_v2_ethereum_stable,17127,"USDC, USDT, DAI, BUSD, GUSD"
+aave_v2_ethereum,aave_v2_ethereum_volatile,2743,"WETH, WBTC, LINK, ENJ, UNI"
+aave_v2_polygon,aave_v2_polygon_stable,29470,"USDT0, USDC, DAI"
+aave_v2_polygon,aave_v2_polygon_volatile,4703,"WETH, WBTC, WPOL, LINK, CRV"
+aave_v3_arbitrum,aave_v3_arbitrum_stable,38944,"USDC, USD₮0, DAI, LUSD, GHO"
+aave_v3_arbitrum,aave_v3_arbitrum_volatile,6280,"WETH, WBTC, wstETH, ARB, LINK"
+aave_v3_avalanche,aave_v3_avalanche_stable,12029,"USDC, DAI.e, USDt, USDC.e, USDT.e"
+aave_v3_avalanche,aave_v3_avalanche_volatile,6374,"BTC.b, WAVAX, WETH.e, WBTC.e, LINK.e"
+aave_v3_base,aave_v3_base_stable,33154,"USDC, USDbC, GHO, EURC, DAI"
+aave_v3_base,aave_v3_base_volatile,7328,"cbETH, WETH, weETH, wstETH, cbBTC"
+aave_v3_binance,aave_v3_binance_stable,1383,"USDT, USDC, TUSD, BUSD, DAI"
+aave_v3_binance,aave_v3_binance_volatile,803,"WBNB, ETH, BTCB, FDUSD, Cake"
+aave_v3_celo,aave_v3_celo_stable,316,"USD₮, USDC, CELO, USDm"
+aave_v3_celo,aave_v3_celo_volatile,6,"WETH, EURm"
+aave_v3_ethereum,aave_v3_ethereum_stable,22258,"USDC, USDT, GHO, DAI, PYUSD"
+aave_v3_ethereum,aave_v3_ethereum_volatile,2671,"WBTC, WETH, RPL, LINK, wstETH"
+aave_v3_ink,aave_v3_ink_stable,45,"USDC.e, USD₮0, USDC"
+aave_v3_ink,aave_v3_ink_volatile,3,"WETH, kBTC"
+aave_v3_linea,aave_v3_linea_stable,12843,"USDC, USDT, DAI, asUSD, USDe"
+aave_v3_linea,aave_v3_linea_volatile,2157,"WETH, WBTC, wstETH, ezETH, weETH"
+aave_v3_optimism,aave_v3_optimism_stable,10104,"USDC, USDT, DAI, sUSD, LUSD"
+aave_v3_optimism,aave_v3_optimism_volatile,4111,"rETH, WETH, WBTC, OP, wstETH"
+aave_v3_polygon,aave_v3_polygon_stable,32168,"USDC, USDT0, DAI, EURS, jEUR"
+aave_v3_polygon,aave_v3_polygon_volatile,10022,"WBTC, WETH, GHST, WPOL, LINK"
+aave_v3_scroll,aave_v3_scroll_stable,11642,"USDC, USDT"
+aave_v3_scroll,aave_v3_scroll_volatile,1369,"wstETH, WETH, weETH, SCR"
+aave_v3_sonic,aave_v3_sonic_stable,3502,USDC
+aave_v3_sonic,aave_v3_sonic_volatile,238,"WETH, wS"
+aave_v3_xdai,aave_v3_xdai_stable,5585,"EURe, WXDAI, USDC, USDC.e, GHO"
+aave_v3_xdai,aave_v3_xdai_volatile,245,"wstETH, GNO, WETH"
+agave_lending_xdai,agave_lending_xdai_volatile,59,"ppCOMP, ppUSDC, hUSDC, ppYFI"
+benqi_lending_avalanche,benqi_lending_avalanche_stable,11670,"USDC, USDT.e, USDt, USDC.e, DAI.e"
+benqi_lending_avalanche,benqi_lending_avalanche_volatile,4722,"qiAVAX, WETH.e, BTC.b, sAVAX, WBTC.e"
+compound_v2_ethereum,compound_v2_ethereum_stable,5893,"cUSDC, cDAI, cUSDT, cUSDP, fDAI-18"
+compound_v2_ethereum,compound_v2_ethereum_volatile,4567,"cETH, cWBTC, bdUSD, Cozy-ETH-4, f6-USDC"
+compound_v3_arb_usdc,compound_v3_arb_usdc,1544,USDC
+compound_v3_arb_usdc_e,compound_v3_arb_usdc_e,227,USDC
+compound_v3_arb_usdt,compound_v3_arb_usdt,480,USD₮0
+compound_v3_arb_weth,compound_v3_arb_weth,121,WETH
+compound_v3_base_aero,compound_v3_base_aero,66,AERO
+compound_v3_base_usdbc,compound_v3_base_usdbc,751,USDbC
+compound_v3_base_usdc,compound_v3_base_usdc,2446,USDC
+compound_v3_base_weth,compound_v3_base_weth,24,WETH
+compound_v3_eth_usdc,compound_v3_eth_usdc,1811,USDC
+compound_v3_eth_usds,compound_v3_eth_usds,26,USDS
+compound_v3_eth_usdt,compound_v3_eth_usdt,322,USDT
+compound_v3_eth_weth,compound_v3_eth_weth,21,WETH
+compound_v3_op_usdc,compound_v3_op_usdc,2710,USDC
+compound_v3_op_usdt,compound_v3_op_usdt,200,USDT
+compound_v3_op_weth,compound_v3_op_weth,12,WETH
+compound_v3_poly_usdc,compound_v3_poly_usdc,446,USDC
+cream_binance,cream_binance_stable,1013,"crUSDT, crBUSD, crUSDC, crDAI"
+cream_binance,cream_binance_volatile,593,"crBNB, crBTCB, crETH, crXRP, crAUTO"
+euler_v2_arbitrum,euler_v2_arbitrum_stable,108,"eUSDC-1, eUSDC-5, eUSDC-2"
+euler_v2_arbitrum,euler_v2_arbitrum_volatile,237,"eWETH-1, eARB-1, eWBTC-1, esUSDC-1, eweETH-1"
+euler_v2_base,euler_v2_base_stable,547,"eUSDC-1, eEURC-1, eUSDS-1, eUSDC-29, eUSDC-3"
+euler_v2_base,euler_v2_base_volatile,467,"eWETH-1, ecbBTC-1, eAERO-1, eLBTC-1, eWETH-30"
+euler_v2_ethereum,euler_v2_ethereum_stable,213,"eUSDC-22, eUSDC-2, eUSDT-2, eUSDT-9, eUSDS-3"
+euler_v2_ethereum,euler_v2_ethereum_volatile,1282,"ecbBTC-3, eUSDe-6, eeUSDe-1, eWETH-2, eRLUSD-1"
+euler_v2_sonic,euler_v2_sonic_stable,258,"scUSD, USDC"
+euler_v2_sonic,euler_v2_sonic_volatile,140,"wS, scETH, wstkscETH, wstkscUSD, WETH"
+fraxlend_ethereum,fraxlend_ethereum_volatile,15,"fFRAX(gOHM)-11, fFRAX(sfrxETH)-9, fFRAX(FPI)-12"
+ironbank_fantom,ironbank_fantom_stable,92,"iFRAX, iUSDC, iDAI, iMIM"
+ironbank_fantom,ironbank_fantom_volatile,572,"iWFTM, iBTC, iETH, iSUSHI, iAAVE"
+keom_lending_polygon,keom_lending_polygon_stable,1617,"crUSDC, iUSDC, iUSDT, pUSDC, iDAI"
+keom_lending_polygon,keom_lending_polygon_volatile,1248,"crWETH, iUSX, kUSDC, pWETH, pLINK"
+layerbank_lending_scroll,layerbank_lending_scroll_stable,9208,"USDC, USDT, USDe"
+layerbank_lending_scroll,layerbank_lending_scroll_volatile,2978,"lETH, wrsETH, wstETH, STONE, weETH"
+lodestar_lending_arbitrum,lodestar_lending_arbitrum_stable,1120,"lUSDC, pUSDC, lUSDT, lDAI, iUSDC"
+lodestar_lending_arbitrum,lodestar_lending_arbitrum_volatile,2905,"Cozy-ETH-1, lUSDC.e, lETH, tUSDC, tUSDT"
+mendi_lending_linea,mendi_lending_linea_stable,9686,"USDC, USDT, DAI"
+mendi_lending_linea,mendi_lending_linea_volatile,17421,"wstETH, lETH, WETH, WBTC, weETH"
+moonwell_lending_base,moonwell_lending_base_stable,20033,"mUSDC, mDAI, mEURC, sobUSDC, mUSDS"
+moonwell_lending_base,moonwell_lending_base_volatile,4824,"mWETH, mAERO, mcbBTC, mwstETH, mcbETH"
+pac_blast,pac_blast_stable,951,USDB
+pac_blast,pac_blast_volatile,1506,"WETH, fwWETH, fwUSDB, DUSD, WBTC"
+seamless_base,seamless_base_stable,4565,"USDC, USDbC, EURC, DAI"
+seamless_base,seamless_base_volatile,4059,"wstETH, AERO, cbETH, WETH, cbBTC"
+sonne_lending_optimism,sonne_lending_optimism_stable,904,"mUSDC, mUSDT, mDAI, soUSDC, pUSDC"
+sonne_lending_optimism,sonne_lending_optimism_volatile,873,"mWETH, pETH, ionUSDC, soWETH, mOP"
+sparklend_ethereum,sparklend_ethereum_stable,2041,"DAI, USDS, USDC, USDT, PYUSD"
+sparklend_ethereum,sparklend_ethereum_volatile,53,"WETH, WBTC, wstETH, cbBTC, rETH"
+sparklend_gnosis,sparklend_gnosis_stable,1620,"EURe, WXDAI, USDT, USDC, USDC.e"
+sparklend_gnosis,sparklend_gnosis_volatile,221,"wstETH, WETH"
+tydro_ink,tydro_ink_stable,824,"USD₮0, USDG, GHO, USDC"
+tydro_ink,tydro_ink_volatile,49,"WETH, kBTC"
+venus_core_pool_binance,venus_core_pool_binance_stable,4776,"vUSDT, vUSDC, crUSDT, vDAI, crBUSD"
+venus_core_pool_binance,venus_core_pool_binance_volatile,3560,"blBNB, vBNB, vCAKE, vBTC, vETH"
+zerolend_base,zerolend_base_stable,399,USDC
+zerolend_base,zerolend_base_volatile,283,"cbETH, WETH, AERO, cbBTC, LBTC"
+zerolend_blast,zerolend_blast_stable,3481,USDB
+zerolend_blast,zerolend_blast_volatile,676,"WETH, ezETH, weETH"
+zerolend_ethereum,zerolend_ethereum_stable,215,"USDC, USDT, DAI"
+zerolend_ethereum,zerolend_ethereum_volatile,27,"WETH, ezETH"
+zerolend_linea,zerolend_linea_stable,12737,"USDC, USDT, DAI, USDe"
+zerolend_linea,zerolend_linea_volatile,1860,"WETH, WBTC, wstETH, ezETH, weETH"
+zerolend_zksync,zerolend_zksync_stable,10110,"USDC.e, USDT, DAI, USDC, LUSD"
+zerolend_zksync,zerolend_zksync_volatile,2676,"WETH, WBTC, ONEZ, ZK, M-BTC"
