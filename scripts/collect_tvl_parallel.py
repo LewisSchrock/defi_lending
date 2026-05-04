@@ -16,6 +16,7 @@ Usage:
     python scripts/collect_tvl_parallel.py --start-date 2024-01-01 --end-date 2024-12-31 --workers 3
 """
 from __future__ import annotations
+import os
 import sys
 from pathlib import Path
 
@@ -424,7 +425,7 @@ def collect_tvl_snapshot(
         protocol = csu_config.get('protocol', '')
 
         # Get a fresh Web3 instance - prefer direct RPC if specified in config
-        direct_rpc = csu_config.get('rpc', '')
+        direct_rpc = os.path.expandvars(csu_config.get('rpc', ''))
         if direct_rpc:
             w3 = Web3(Web3.HTTPProvider(direct_rpc))
             if chain in POA_CHAINS and geth_poa_middleware:

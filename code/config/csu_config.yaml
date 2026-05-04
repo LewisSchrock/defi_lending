@@ -300,7 +300,7 @@ csus:
     protocol: fluid
     version: v1
     chain: base
-    rpc: "https://lb.drpc.org/ogrpc?network=base&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=base&dkey=${DRPC_KEY}"
     registry: "0x264786EF916af64a1DB19F513F24a3681734ce92"
     liq_reg: "0xD0F95a6ed0112fbc6A200e5291bcDa9b55e84c9C"
     outputs_dir: "./out/fluid_lending_base"
@@ -599,7 +599,7 @@ csus:
     protocol: keom
     version: v1
     chain: polygon
-    rpc: "https://lb.drpc.org/ogrpc?network=polygon&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=polygon&dkey=${DRPC_KEY}"
     registry: "0x20CA53E2395FA571798623F1cFBD11Fe2C114c24"
     outputs_dir: "./out/keom_lending_polygon"
 
@@ -646,7 +646,7 @@ csus:
     protocol: aave
     version: v3
     chain: celo
-    rpc: "https://lb.drpc.org/ogrpc?network=celo&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=celo&dkey=${DRPC_KEY}"
     registry: "0x9F7Cf9417D5251C59fE94fB9147feEe1aAd9Cea5"
     outputs_dir: "./out/aave_v3_celo"
 
@@ -716,7 +716,7 @@ csus:
     protocol: zerolend
     version: v3
     chain: ethereum
-    rpc: "https://lb.drpc.org/ogrpc?network=ethereum&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=ethereum&dkey=${DRPC_KEY}"
     registry: "0xFD856E1a33225B86f70D686f9280435E3fF75FCF"  # PoolAddressesProvider (was Pool Proxy 0x3BC3D34C32cc98bf098D832364Df8A222bBaB4c0)
     outputs_dir: "./out/zerolend_ethereum"
 
@@ -724,7 +724,7 @@ csus:
     protocol: zerolend
     version: v3
     chain: base
-    rpc: "https://lb.drpc.org/ogrpc?network=base&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=base&dkey=${DRPC_KEY}"
     registry: "0x5213ab3997a596c75Ac6ebF81f8aEb9cf9A31007"  # PoolAddressesProvider (was Pool Proxy 0x766f21277087E18967c1b10bF602d8Fe56d0c671)
     outputs_dir: "./out/zerolend_base"
 
@@ -782,7 +782,7 @@ csus:
     protocol: ironbank
     version: v2
     chain: ethereum
-    rpc: "https://lb.drpc.org/ogrpc?network=ethereum&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=ethereum&dkey=${DRPC_KEY}"
     registry: "0xAB1c342C7bf5Ec5F02ADEA1c2270670bCa144CbB"
     outputs_dir: "./out/ironbank_ethereum"
 
@@ -790,7 +790,7 @@ csus:
     protocol: ironbank
     version: v2
     chain: fantom
-    rpc: "https://lb.drpc.org/ogrpc?network=fantom&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=fantom&dkey=${DRPC_KEY}"
     registry: "0x4250A6D3BD57455d7C6821eECb6206F507576cD2"
     outputs_dir: "./out/ironbank_fantom"
 
@@ -844,7 +844,7 @@ csus:
     protocol: euler
     version: v2
     chain: arbitrum
-    rpc: "https://lb.drpc.org/ogrpc?network=arbitrum&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=arbitrum&dkey=${DRPC_KEY}"
     factory: "0x78Df1CF5bf06a7f27f2ACc580B934238C1b80D50"
     outputs_dir: "./out/euler_v2_arbitrum"
 
@@ -852,7 +852,7 @@ csus:
     protocol: euler
     version: v2
     chain: sonic
-    rpc: "https://lb.drpc.org/ogrpc?network=sonic&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=sonic&dkey=${DRPC_KEY}"
     factory: "0xF075cC8660B51D0b8a4474e3f47eDAC5fA034cFB"
     outputs_dir: "./out/euler_v2_sonic"
 
@@ -899,7 +899,7 @@ csus:
     protocol: aave
     version: v2
     chain: polygon
-    rpc: "https://lb.drpc.org/ogrpc?network=polygon&dkey=Ao0Mxc6i6Uz9pLFmxy8G1v4NxhdPAQUR8bKVehXRfUMv"
+    rpc: "https://lb.drpc.org/ogrpc?network=polygon&dkey=${DRPC_KEY}"
     registry: "0xd05e3E715d945B59290df0ae8eF85c1BdB684744"  # LendingPoolAddressesProvider -> LendingPool 0x8dff5e27...
     outputs_dir: "./out/aave_v2_polygon"
 
