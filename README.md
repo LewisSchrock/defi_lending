@@ -241,4 +241,4 @@ converges. 28/31 qualified CSUs estimate successfully in the bivariate BQ run.
 
 ## Contact
 
-Lewis Schrock — `lps3@williams.edu`
+Lewis Schrock — `lewschrock@gmail.com`
