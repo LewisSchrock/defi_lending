@@ -7,7 +7,7 @@ Constructs panel data with economically meaningful variables:
 2. Liquidation = log(1 + total_collateral_usd) - log-transformed USD value of collateral seized per day
 3. Volatility = Collateral-weighted rolling std dev of basket returns
 
-Utilization and volatility are sourced from the vol_util_panel (computed
+Utilization and volatility are sourced from the collateral_basket panel (computed
 from bronze TVL data in build_volatility_panel.py). Liquidation comes from
 the gold liquidation panel. CSU names are normalized across data sources.
 
@@ -180,8 +180,9 @@ def _load_bronze_cv3_supplement(existing_csus: set) -> pd.DataFrame:
 
 
 def load_vol_util_panel() -> pd.DataFrame:
-    """Load utilization + volatility panel (from build_volatility_panel.py)."""
-    path = Path('data/analysis/vol_util_panel.parquet')
+    """Load collateral-basket panel (basket return, volatility, utilization, TVL)
+    produced by build_volatility_panel.py."""
+    path = Path('data/analysis/collateral_basket.parquet')
     df = pd.read_parquet(path)
     df['csu'] = df['csu'].map(normalize_csu)
     return df

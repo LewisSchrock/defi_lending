@@ -357,6 +357,8 @@ def build_composition_and_volatility(all_snapshots: dict, cache: dict,
         daily_data = {}  # date -> {symbol: weight}
         daily_addrs = {}  # date -> {symbol: token_address}
         daily_util = {}   # date -> utilization ratio
+        daily_borrow = {} # date -> total_borrow_usd
+        daily_supply = {} # date -> total_supply_usd
 
         for snap in snapshots:
             date = snap['date']
@@ -416,6 +418,8 @@ def build_composition_and_volatility(all_snapshots: dict, cache: dict,
             if total_supply_usd > 0:
                 util = total_borrow_usd / total_supply_usd
                 daily_util[date] = min(max(util, 0.0), 1.0)  # Clip to [0, 1]
+                daily_borrow[date] = total_borrow_usd
+                daily_supply[date] = total_supply_usd
 
         dates = sorted(daily_data.keys())
         if len(dates) < window + 1:
@@ -431,28 +435,27 @@ def build_composition_and_volatility(all_snapshots: dict, cache: dict,
             if not prev_weights:
                 continue
 
-            basket_ret = 0.0
+            # Exact log basket return: R_t = log( Σ_i w_i,t-1 · (P_i,t / P_i,t-1) ),
+            # renormalized over the surviving tokens (those that pass the
+            # outlier filter and have valid prices on both dates).
+            basket_gross = 0.0   # Σ_i w_i · (P_i,t / P_i,t-1) over surviving tokens
             total_w = 0.0
 
             for sym, w in prev_weights.items():
-                # Get token address for oracle lookup
                 addr = daily_addrs.get(prev_date, {}).get(sym, '')
-
-                p_today = _lookup_price_bvp(
-                    chain, addr, sym, date, cache, oracle_cache)
-                p_prev = _lookup_price_bvp(
-                    chain, addr, sym, prev_date, cache, oracle_cache)
+                p_today = _lookup_price_bvp(chain, addr, sym, date,      cache, oracle_cache)
+                p_prev  = _lookup_price_bvp(chain, addr, sym, prev_date, cache, oracle_cache)
 
                 if p_today and p_prev and p_today > 0 and p_prev > 0:
-                    log_ret = np.log(p_today) - np.log(p_prev)
-                    # Skip token if return implies bad oracle price
-                    # (|log_ret| > 2.0 ≈ >7x move, catches exchange-rate oracle errors)
-                    if abs(log_ret) > 2.0:
+                    gross = p_today / p_prev
+                    # outlier filter: |log_ret| > 2.0  ⇔  gross outside [e^-2, e^2]
+                    if abs(np.log(gross)) > 2.0:
                         continue
-                    basket_ret += w * log_ret
+                    basket_gross += w * gross
                     total_w += w
 
-            if total_w > 0.3:  # At least 30% weight coverage
+            if total_w > 0:
+                basket_ret = np.log(basket_gross / total_w)   # renormalize, then log
                 basket_returns.append({'date': date, 'basket_return': basket_ret})
 
         if len(basket_returns) < window:
@@ -466,10 +469,12 @@ def build_composition_and_volatility(all_snapshots: dict, cache: dict,
         ).std()
         br_df['csu'] = csu
 
-        # Step 4: Merge utilization onto volatility dates
+        # Step 4: Merge utilization + borrow/supply onto volatility dates
         br_df['utilization'] = br_df['date'].map(daily_util)
+        br_df['tvl_borrow_usd'] = br_df['date'].map(daily_borrow)
+        br_df['tvl_supply_usd'] = br_df['date'].map(daily_supply)
 
-        all_results.append(br_df[['date', 'csu', 'basket_return', 'volatility', 'utilization']])
+        all_results.append(br_df[['date', 'csu', 'basket_return', 'volatility', 'utilization', 'tvl_borrow_usd', 'tvl_supply_usd']])
 
         vol_coverage = br_df['volatility'].notna().mean() * 100
         util_coverage = br_df['utilization'].notna().mean() * 100
@@ -488,6 +493,11 @@ def build_panel(vol_df: pd.DataFrame, window: int) -> pd.DataFrame:
     # Utilization is already computed alongside volatility from bronze data
     panel = vol_df[['date', 'csu', 'basket_return', 'volatility', 'utilization']].copy()
     panel = panel.sort_values(['csu', 'date']).reset_index(drop=True)
+
+    # log_price = cumulative sum of basket_return per CSU (re-integrated from
+    # daily log returns starting at zero on the CSU's first observation).
+    # Some downstream consumers expect this column.
+    panel['log_price'] = panel.groupby('csu')['basket_return'].cumsum()
 
     # Drop CSUs with poor coverage
     good_csus = []
@@ -564,11 +574,11 @@ def main():
     # Save
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    excel_path = OUTPUT_DIR / 'vol_util_panel.xlsx'
+    excel_path = OUTPUT_DIR / 'collateral_basket.xlsx'
     panel.to_excel(excel_path, sheet_name='panel_data', index=False)
     print(f"\nSaved: {excel_path}")
 
-    parquet_path = OUTPUT_DIR / 'vol_util_panel.parquet'
+    parquet_path = OUTPUT_DIR / 'collateral_basket.parquet'
     panel.to_parquet(parquet_path, index=False)
     print(f"Saved: {parquet_path}")
 
@@ -583,7 +593,7 @@ def main():
     print("Panel VAR Configuration")
     print("=" * 70)
     print(f"""
-excel_path = "vol_util_panel.xlsx"
+excel_path = "collateral_basket.xlsx"
 excel_sheet_name = "panel_data"
 td_col = ["date"]
 member_col = "csu"
