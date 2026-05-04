@@ -16,9 +16,13 @@ archive/
 presentation/
 context/
 output/
-notebooks/
 poster_*
 ~$*
+
+# Notebooks: only ship canonical analysis notebooks
+notebooks/*
+!notebooks/bivariate_return_liq.ipynb
+!notebooks/svar_nb.py
 
 # LaTeX intermediates
 *.aux

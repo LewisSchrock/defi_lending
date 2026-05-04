@@ -51,7 +51,11 @@ defi_lending/
 │       ├── panelSVAR.py          Pedroni Lambda decomposition
 │       ├── identification.py     Cholesky / Blanchard-Quah utilities
 │       ├── plotting.py           IRF + FEVD plotting helpers
-│       └── run_bivariate_bq.py   Section 4 driver — bivariate BQ panel SVAR
+│       └── run_bivariate_bq.py   Standalone alternate bivariate BQ run (not used for paper figures)
+│
+├── notebooks/
+│   ├── svar_nb.py                Shared Panel SVAR utilities (panelSVAR wrapper, plotting)
+│   └── bivariate_return_liq.ipynb  Section 4 — canonical bivariate BQ panel SVAR notebook
 │
 ├── scripts/                      Pipeline (see "Run order" below)
 │   ├── collect_liquidations_unified.py
@@ -137,8 +141,8 @@ in the paper from the parquets in `data/gold/` and `data/analysis/`.
 
 ```bash
 # Section 4 — bivariate Blanchard-Quah panel SVAR
-python code/pedroni_svar/run_bivariate_bq.py
-# → writes results/pedroni/bivariate_return_liq/{irfs,fevd,lambda}.{png,csv}
+jupyter notebook notebooks/bivariate_return_liq.ipynb
+# Run all cells. Writes results/pedroni/bivariate_return_liq/{irfs,fevd,lambda}.{png,csv}
 
 # Section 5 — second-stage cross-sectional regressions
 python scripts/second_stage_inference.py
@@ -189,9 +193,9 @@ python scripts/clean_tvl_outliers.py
 
 ## Mapping paper output to source
 
-| Paper element | Source script | Output |
+| Paper element | Source | Output |
 |---|---|---|
-| §4 IRFs (common) | `code/pedroni_svar/run_bivariate_bq.py` | `results/pedroni/bivariate_return_liq/irfs_common.png` |
+| §4 IRFs (common) | `notebooks/bivariate_return_liq.ipynb` | `results/pedroni/bivariate_return_liq/irfs_common.png` |
 | §4 IRFs (idiosyncratic) | same | `irfs_idiosyncratic.png` |
 | §4 FEVD | same | `fevd_common.png`, `fevd_idiosyncratic.png` |
 | §4 Median λ table | same | `lambda.csv` |
