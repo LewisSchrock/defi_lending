@@ -2,7 +2,7 @@
 
 Replication package for Lewis Schrock's senior thesis, Williams College, May 2026.
 
-The compiled paper is at [paper/main.pdf](paper/main.pdf).
+The compiled paper is at [paper/main.pdf](paper/Schrock_Thesis.pdf).
 
 ## Research question
 
