@@ -225,11 +225,9 @@ converges. 28/31 qualified CSUs estimate successfully in the bivariate BQ run.
 ```
 @thesis{schrock2026defi,
   author = {Schrock, Lewis},
-  title  = {Cascading Liquidations and Collateral Volatility in DeFi Lending:
-            A Heterogeneous Panel SVAR Approach},
+  title  = {Denomination, Not Depth: Cross-Sectional Cascade Exposure in DeFi Lending},
   school = {Williams College},
   year   = {2026},
-  type   = {Senior thesis}
 }
 ```
 
