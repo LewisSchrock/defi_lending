@@ -2,21 +2,20 @@
 
 Replication package for Lewis Schrock's senior thesis, Williams College, May 2026.
 
-The compiled paper is at [paper/main.pdf](paper/Schrock_Thesis.pdf).
+The compiled paper is at [paper/Schrock_Thesis.pdf](paper/Schrock_Thesis.pdf).
 
 ## Research question
 
-Does leveraged borrowing in DeFi lending protocols create a feedback loop in
-which cascading liquidations amplify the volatility of the collateral assets
-that triggered them?
+Across protocol–chain pairs, which features of a market predict a stronger or weaker liquidation
+response?
 
 ## Methodology
 
 Pedroni (2013) heterogeneous panel SVAR. The first stage estimates a separate
 bivariate VAR for each cross-sectional unit (CSU = protocol × chain × asset)
-in collateral basket return and liquidation volume. Long-run (Blanchard–Quah)
-restrictions decompose shocks into a "cascade" shock (permanent price effect)
-and a "mechanical" shock (transitory). The Pedroni Lambda matrix then splits
+in collateral basket return and liquidation volume. 
+We orthogonalize the residuals by restricting liquidation's impact on the collateral basket contemporaneously.
+The Pedroni Lambda matrix then splits
 each member's response into common, composite, and idiosyncratic components.
 A second stage cross-sectional regression of member responses on protocol
 characteristics (TVL depth, stablecoin debt share, systematic share) tests
